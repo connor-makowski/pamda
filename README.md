@@ -1,4 +1,4 @@
-c3covid19
+Pamda
 ==========
 Python wrapper for object oriented processes similar to [Ramda](https://ramdajs.com/docs/).
 
