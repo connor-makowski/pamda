@@ -5,7 +5,7 @@ Python wrapper for object oriented processes similar to [Ramda](https://ramdajs.
 
 Full Documentation
 --------
-https://connor-makowski.github.io/pamda/
+https://connor-makowski.github.io/pamda/pamda.html
 
 Features
 --------
