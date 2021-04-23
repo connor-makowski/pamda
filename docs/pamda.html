@@ -1,0 +1,2179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>pamda.pamda API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>pamda.pamda</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import json, csv, math
+
+class error_handling:
+    def warn(self, message, depth=0):
+        &#34;&#34;&#34;
+        Usage:
+
+        - Creates a class based warning message
+
+        Requires:
+        - `message`:
+            - Type: str
+            - What: The message to warn users with
+            - Note: Messages with `{class_name}` and `{method_name}` in them are formatted appropriately
+        - `depth`:
+            - Type: int
+            - What: The depth of the nth call below the top of the method stack
+            - Note: Depth starts at 0 (indicating the current method in the stack)
+            - Default: 0
+
+        Notes:
+
+        - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
+        - If `self.show_warnings=False`, supresses all warnings
+        &#34;&#34;&#34;
+        if self.__dict__.get(&#39;show_warnings&#39;,True):
+            kwargs={
+                &#39;class_name&#39;:self.__class__.__name__,
+                &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+            }
+            pre_message=&#34;(Warning for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+            # Attempt to format in kwargs where possible
+            try:
+                message=pre_message+message.format(**kwargs)
+            except:
+                message=pre_message+message
+            if self.__dict__.get(&#39;show_warning_stack&#39;,False):
+                traceback.print_stack(limit=10)
+            print(message)
+
+    def vprint(self, message, depth=0, force=False):
+        &#34;&#34;&#34;
+        Usage:
+
+        - Print a given statement if `self.verbose` is true
+
+        Requires:
+
+        - `message`:
+            - Type: str
+            - What: A message to print if `self.verbose` is true
+            - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+
+        Optional:
+
+        - `depth`:
+            - Type: int
+            - What: The depth of the nth call below the top of the method stack
+            - Note: Depth starts at 0 (indicating the current method in the stack)
+            - Default: 0
+        - `force`:
+            - Type: bool
+            - What: Force a print statement even if not in verbose
+            - Note: For formatting purposes
+            - Default: False
+        &#34;&#34;&#34;
+        if self.verbose or force:
+            kwargs={
+                &#39;class_name&#39;:self.__class__.__name__,
+                &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+            }
+            pre_message=&#34;(`{class_name}.{method_name}`): &#34;.format(**kwargs)
+            # Attempt to format in kwargs where possible
+            try:
+                message=pre_message+message.format(**kwargs)
+            except:
+                message=pre_message+message
+            print(message)
+
+    def exception(self, message, depth=0):
+        &#34;&#34;&#34;
+        Usage:
+
+        - Creates a class based exception message
+
+        Requires:
+
+        - `message`:
+            - Type: str
+            - What: The message to warn users with
+            - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+        - `depth`:
+            - Type: int
+            - What: The depth of the nth call below the top of the method stack
+            - Note: Depth starts at 0 (indicating the current method in the stack)
+            - Default: 0
+
+        Notes:
+
+        - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
+        - If `self.show_warnings=False`, supresses all warnings
+        &#34;&#34;&#34;
+        kwargs={
+            &#39;class_name&#39;:self.__class__.__name__,
+            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+        }
+        pre_message=&#34;(Exception for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+        # Attempt to format in kwargs where possible
+        try:
+            message=pre_message+message.format(**kwargs)
+        except:
+            message=pre_message+message
+        raise Exception(message)
+
+class pamda_class(error_handling):
+    def flatten(self, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Flattens a list of lists to a single list
+
+        Requires:
+
+        - `data`:
+            - Type: list of lists
+            - What: The list of lists to reduce to a single list
+        Example:
+
+        ```
+        data=[[&#39;a&#39;,&#39;b&#39;],[1,2]]
+        p.flatten(data=data) #=&gt; [&#39;a&#39;,&#39;b&#39;,1,2]
+        ```
+        &#34;&#34;&#34;
+        return [i for sub_list in data for i in sub_list]
+
+    def path(self, data, path, Or=None):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the value of a path within a nested dictionary
+
+        Requires:
+
+        - `data`:
+            - Type: dict
+            - What: A dictionary to get the path from
+        - `path`:
+            - Type: list of strs
+            - What: The path to pull given the data
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.path(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; 1
+        ```
+        &#34;&#34;&#34;
+        #TODO: Add Or func
+        #TODO: Accept string for path if prop
+        if len(path) &gt; 0:
+            return self.path(data=data[path[0]], path=path[1:])
+        return data
+
+    def hasPath(self, data, path):
+        &#34;&#34;&#34;
+        Function:
+
+        - Checks if a path exists within a nested dictionary
+
+        Requires:
+
+        - `data`:
+            - Type: dict
+            - What: A dictionary to check if the path exists
+        - `path`:
+            - Type: list of strs or single str
+            - What: The path to check
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.hasPath(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; True
+        p.hasPath(data=data, path=[&#39;a&#39;,&#39;d&#39;]) #=&gt; False
+        ```
+        &#34;&#34;&#34;
+        if isinstance(path, str):
+            path=[path]
+        if len(path) &gt; 0:
+            if path[0] in data:
+                return self.hasPath(data=data[path[0]], path=path[1:])
+            else:
+                return False
+        return True
+
+    def assocPath(self, data, path, value):
+        &#34;&#34;&#34;
+        Function:
+
+        - Ensures a path exists within a nested dictionary
+
+        Requires:
+
+        - `data`:
+            - Type: dict
+            - What: A dictionary to check if the path exists
+        - `path`:
+            - Type: list of strs
+            - What: The path to check
+        - `value`:
+            - Type: any
+            - What: The value to appropriate to the end of the path
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.assocPath(data=data, path=[&#39;a&#39;,&#39;c&#39;], value=3) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:3}}
+        ```
+        &#34;&#34;&#34;
+        if len(path) &gt; 1:
+            if path[0] not in data:
+                data[path[0]] = {}
+            data[path[0]] = self.assocPath(data=data[path[0]], path=path[1:],value=value)
+            return data
+        else:
+            data[path[0]] = value
+            return data
+
+    def assocPathComplex(self, data, path, default=None, default_func=lambda x: x):
+        &#34;&#34;&#34;
+        Function:
+
+        - Ensures a path exists within a nested dictionary
+
+        Requires:
+
+        - `data`:
+            - Type: dict
+            - What: A dictionary to check if the path exists
+        - `path`:
+            - Type: list of strs
+            - What: The path to check
+
+        Optional:
+
+        - `default`:
+            - Type: any
+            - What: The default item to add to a path that does not yet exist
+            - Default: None
+        - `default_func`:
+            - Type: lambda function
+            - What: A single input lambda function that takes in the current path item (or default) and adjusts it
+            - Default: `lambda x: x` # Returns the value in the dict or the default value if none was present
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;b&#39;], default=[]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1}}
+        p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;c&#39;], default=[]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:[]}}
+        p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;d&#39;], default=[2], default_func=lambda x:x+[1]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[],&#39;d&#39;:[2,1]}}
+        ```
+        &#34;&#34;&#34;
+        if len(path) &gt; 1:
+            if path[0] not in data:
+                data[path[0]] = {}
+            data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_func=default_func)
+            return data
+        else:
+            if path[0] not in data:
+                data[path[0]] = default
+            data[path[0]] = default_func(data[path[0]])
+            return data
+
+    def dissocPath(self, data, path):
+        &#34;&#34;&#34;
+        Function:
+
+        - Removes the value at the end of a path within a nested dictionary
+
+        Requires:
+
+        - `data`:
+            - Type: dict
+            - What: A dictionary with a path to be removed
+        - `path`:
+            - Type: list of strs
+            - What: The path to remove from the dictionary
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:0,&#39;d&#39;:1}}}
+        p.dissocPath(data=data, path=[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;d&#39;:1}}}
+        ```
+        &#34;&#34;&#34;
+        if not self.hasPath(data, path):
+            self.warn(message=&#34;Path does not exist&#34;)
+            return data
+        if len(path)==0:
+            return {}
+        return self.assocPath(data=data, path=path[:-1], value={key:value for key, value in self.path(data, path=path[:-1]).items() if key!=path[-1]})
+
+    def pluck(self, data, path, if_path=None, if_vals=[]):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the values of a path within a list of nested dictionaries
+
+        Requires:
+
+        - `data`:
+            - Type: list of dicts
+            - What: A list of dictionary to get the path from
+        - `path`:
+            - Type: list of strs
+            - What: The path to pull given the data
+
+        Optional:
+        - `if_path`:
+            - Type: list of strs
+            - What: Path to check if the `if_val` matches
+            - Default: None
+            - Note: If None, no filtering is applied
+        - `if_vals`:
+            - Type: list of any types
+            - What: If the `if_path`s value is in this list, this item is returned
+            - Note: Items should be the same type as objects at end of `if_path`
+            - Note: If None, no filtering is applied
+
+        Example:
+
+        ```
+        data=[{&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:&#39;d&#39;}},{&#39;a&#39;:{&#39;b&#39;:2, &#39;c&#39;:&#39;e&#39;}}]
+        p.pluck(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; [1,2]
+        p.pluck(data=data, path=[&#39;a&#39;,&#39;b&#39;], if_path=[&#39;a&#39;,&#39;c&#39;], if_vals=[&#39;d&#39;]) #=&gt; [1]
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(data, list):
+            self.exception(&#34;Attempting to pluck from an object that is not a list&#34;)
+        if len(data) == 0:
+            self.exception(&#34;Attempting to pluck from an empty list&#34;)
+        if if_path is not None and isinstance(if_vals, list):
+            return [self.path(data=i, path=path) for i in data if self.path(data=i, path=if_path) in if_vals]
+        return [self.path(data=i, path=path) for i in data]
+
+    def nest(self, data, nest_by_variables, nest_output_variable):
+        &#34;&#34;&#34;
+        Function:
+
+        - Nests a list of dictionaries into a nested dictionary
+        - Similar items are appended to a list in the end of the nested dictionary
+
+        Requires:
+
+        - `data`:
+            - Type: list of dicts
+            - What: A list of dictionaries to use for nesting purposes
+        - `nest_by_variables`:
+            - Type: list of strs
+            - What: The variables to pull from each item in data
+            - Note: Used to build out the nested dicitonary
+            - Note: Order matters as the nesting occurs in order of variable
+        - `nest_output_variable`:
+            - Type: str
+            - What: The variable to add to the list at the end of the nested dictionary path
+
+        Example:
+
+        ```
+        data=[
+            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;c&#39;},
+            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;d&#39;},
+            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;e&#39;, &#39;output&#39;:&#39;f&#39;}
+        ]
+        p.nest(
+            data=data,
+            nest_by_variables=[&#39;x_1&#39;,&#39;x_2&#39;],
+            nest_output_variable=&#39;output&#39;
+        ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:[&#39;c&#39;,&#39;d&#39;], &#39;e&#39;:[&#39;f&#39;]}}
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(data, list):
+            self.exception(&#34;Attempting to `nest` an object that is not a list&#34;)
+        if len(data) == 0:
+            self.exception(&#34;Attempting to `nest` from an empty list&#34;)
+        nested_output = {}
+        for item in data:
+            nested_output = self.assocPathComplex(
+                data=nested_output,
+                path=[item[key] for key in nest_by_variables],
+                default=[],
+                default_func=lambda x: x + [item[nest_output_variable]]
+            )
+        return nested_output
+
+    # def intersection(self):
+    #     #TODO Code this
+    #     pass
+    #
+    # def difference(self, type=&#39;symmetric&#39;):
+    #     #TODO Code this
+    #     pass
+    #
+    # def zipObj(self):
+    #     #TODO Code this
+    #     pass
+
+class pamdata(error_handling):
+    def read_csv(self, filename, has_header=True, return_dict=True):
+        &#34;&#34;&#34;
+        Function:
+
+        - Reads the contents of a csv and converts it to list of dicts or list of lists
+
+        Requires:
+
+        - `filename`:
+            - Type: str
+            - What: The filepath of the csv to read
+
+        Optional:
+
+        - `has_header`:
+            - Type: bool
+            - What: Flag to indicate if the csv has an initial row that identifies columns
+            - Default: True
+            - Note: Returns a list of lists
+        - `return_dict`:
+            - Type: bool
+            - What: Flag to indicate if the csv should be converted to:
+                - True: list of dicts
+                - False: list of lists
+            - Note: If True, requires `has_header` to be True as the header determines the keys of the dicts
+        &#34;&#34;&#34;
+        with open(filename) as f:
+            file_data = csv.reader(f, delimiter=&#34;,&#34;, quotechar=&#39;&#34;&#39;)
+            if has_header:
+                headers = next(file_data)
+            if has_header and return_dict:
+                return [dict(zip(headers, i)) for i in file_data]
+            elif not has_header and return_dict:
+                self.exception(message=&#34;If `return_dict` is True, `has_header` must also be True.&#34;)
+            else:
+                return [i for i in file_data]
+
+    def write_csv(self, filename, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Writes the contents of a list of list or list of dicts to a csv
+
+        Requires:
+
+        - `filename`:
+            - Type: str
+            - What: The filepath of the csv to read
+        - `data`:
+            - Type: list of lists | list of dicts
+            - What: The data to write
+        &#34;&#34;&#34;
+        with open(filename, &#39;w&#39;) as f:
+            if isinstance(data[0], dict):
+                writer=csv.DictWriter(f, fieldnames=data[0].keys())
+                writer.writeheader()
+                for row in data:
+                    writer.writerow(row)
+            elif isinstance(data[0], list):
+                writer=csv.writer(f)
+                for row in data:
+                    writer.writerow(row)
+            else:
+                self.exception(&#34;write_csv takes in list of lists or list of dicts only.&#34;)
+
+    def read_json(self, filename):
+        &#34;&#34;&#34;
+        Function:
+
+        - Reads the contents of a json
+
+        Requires:
+        - `filename`:
+            - Type: str
+            - What: The filepath of the json to read
+        &#34;&#34;&#34;
+        const_map = {
+            &#39;-Infinity&#39;: float(&#39;-Infinity&#39;),
+            &#39;Infinity&#39;: float(&#39;Infinity&#39;),
+            &#39;NaN&#39;: None,
+        }
+        with open(filename) as f:
+            return json.load(f, parse_constant=lambda x:const_map[x])
+
+    def write_json(self, filename, data, pretty=False):
+        &#34;&#34;&#34;
+        Function:
+
+        - Writes the contents of a list of list or list of dicts to a json
+
+        Requires:
+
+        - `filename`:
+            - Type: str
+            - What: The filepath of the json to write
+        - `data`:
+            - Type: A json serializable python object
+            - What: The data to write
+        &#34;&#34;&#34;
+        with open(filename, &#39;w&#39;) as f:
+            if pretty:
+                json.dump(data, f, indent=4)
+            else:
+                json.dump(data, f)
+
+pamda=pamda_class()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="pamda.pamda.error_handling"><code class="flex name class">
+<span>class <span class="ident">error_handling</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class error_handling:
+    def warn(self, message, depth=0):
+        &#34;&#34;&#34;
+        Usage:
+
+        - Creates a class based warning message
+
+        Requires:
+        - `message`:
+            - Type: str
+            - What: The message to warn users with
+            - Note: Messages with `{class_name}` and `{method_name}` in them are formatted appropriately
+        - `depth`:
+            - Type: int
+            - What: The depth of the nth call below the top of the method stack
+            - Note: Depth starts at 0 (indicating the current method in the stack)
+            - Default: 0
+
+        Notes:
+
+        - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
+        - If `self.show_warnings=False`, supresses all warnings
+        &#34;&#34;&#34;
+        if self.__dict__.get(&#39;show_warnings&#39;,True):
+            kwargs={
+                &#39;class_name&#39;:self.__class__.__name__,
+                &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+            }
+            pre_message=&#34;(Warning for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+            # Attempt to format in kwargs where possible
+            try:
+                message=pre_message+message.format(**kwargs)
+            except:
+                message=pre_message+message
+            if self.__dict__.get(&#39;show_warning_stack&#39;,False):
+                traceback.print_stack(limit=10)
+            print(message)
+
+    def vprint(self, message, depth=0, force=False):
+        &#34;&#34;&#34;
+        Usage:
+
+        - Print a given statement if `self.verbose` is true
+
+        Requires:
+
+        - `message`:
+            - Type: str
+            - What: A message to print if `self.verbose` is true
+            - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+
+        Optional:
+
+        - `depth`:
+            - Type: int
+            - What: The depth of the nth call below the top of the method stack
+            - Note: Depth starts at 0 (indicating the current method in the stack)
+            - Default: 0
+        - `force`:
+            - Type: bool
+            - What: Force a print statement even if not in verbose
+            - Note: For formatting purposes
+            - Default: False
+        &#34;&#34;&#34;
+        if self.verbose or force:
+            kwargs={
+                &#39;class_name&#39;:self.__class__.__name__,
+                &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+            }
+            pre_message=&#34;(`{class_name}.{method_name}`): &#34;.format(**kwargs)
+            # Attempt to format in kwargs where possible
+            try:
+                message=pre_message+message.format(**kwargs)
+            except:
+                message=pre_message+message
+            print(message)
+
+    def exception(self, message, depth=0):
+        &#34;&#34;&#34;
+        Usage:
+
+        - Creates a class based exception message
+
+        Requires:
+
+        - `message`:
+            - Type: str
+            - What: The message to warn users with
+            - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+        - `depth`:
+            - Type: int
+            - What: The depth of the nth call below the top of the method stack
+            - Note: Depth starts at 0 (indicating the current method in the stack)
+            - Default: 0
+
+        Notes:
+
+        - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
+        - If `self.show_warnings=False`, supresses all warnings
+        &#34;&#34;&#34;
+        kwargs={
+            &#39;class_name&#39;:self.__class__.__name__,
+            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+        }
+        pre_message=&#34;(Exception for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+        # Attempt to format in kwargs where possible
+        try:
+            message=pre_message+message.format(**kwargs)
+        except:
+            message=pre_message+message
+        raise Exception(message)</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="pamda.pamda.pamda_class" href="#pamda.pamda.pamda_class">pamda_class</a></li>
+<li><a title="pamda.pamda.pamdata" href="#pamda.pamda.pamdata">pamdata</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="pamda.pamda.error_handling.exception"><code class="name flex">
+<span>def <span class="ident">exception</span></span>(<span>self, message, depth=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Usage:</p>
+<ul>
+<li>Creates a class based exception message</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>message</code>:<ul>
+<li>Type: str</li>
+<li>What: The message to warn users with</li>
+<li>Note: Messages with <code>{{class_name}}</code> and <code>{{method_name}}</code> in them are formatted appropriately</li>
+</ul>
+</li>
+<li><code>depth</code>:<ul>
+<li>Type: int</li>
+<li>What: The depth of the nth call below the top of the method stack</li>
+<li>Note: Depth starts at 0 (indicating the current method in the stack)</li>
+<li>Default: 0</li>
+</ul>
+</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>If <code>self.show_warning_stack=True</code>, also prints the stack trace up to 10 layers deep</li>
+<li>If <code>self.show_warnings=False</code>, supresses all warnings</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exception(self, message, depth=0):
+    &#34;&#34;&#34;
+    Usage:
+
+    - Creates a class based exception message
+
+    Requires:
+
+    - `message`:
+        - Type: str
+        - What: The message to warn users with
+        - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+    - `depth`:
+        - Type: int
+        - What: The depth of the nth call below the top of the method stack
+        - Note: Depth starts at 0 (indicating the current method in the stack)
+        - Default: 0
+
+    Notes:
+
+    - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
+    - If `self.show_warnings=False`, supresses all warnings
+    &#34;&#34;&#34;
+    kwargs={
+        &#39;class_name&#39;:self.__class__.__name__,
+        &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+    }
+    pre_message=&#34;(Exception for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+    # Attempt to format in kwargs where possible
+    try:
+        message=pre_message+message.format(**kwargs)
+    except:
+        message=pre_message+message
+    raise Exception(message)</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.error_handling.vprint"><code class="name flex">
+<span>def <span class="ident">vprint</span></span>(<span>self, message, depth=0, force=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Usage:</p>
+<ul>
+<li>Print a given statement if <code>self.verbose</code> is true</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>message</code>:<ul>
+<li>Type: str</li>
+<li>What: A message to print if <code>self.verbose</code> is true</li>
+<li>Note: Messages with <code>{{class_name}}</code> and <code>{{method_name}}</code> in them are formatted appropriately</li>
+</ul>
+</li>
+</ul>
+<p>Optional:</p>
+<ul>
+<li><code>depth</code>:<ul>
+<li>Type: int</li>
+<li>What: The depth of the nth call below the top of the method stack</li>
+<li>Note: Depth starts at 0 (indicating the current method in the stack)</li>
+<li>Default: 0</li>
+</ul>
+</li>
+<li><code>force</code>:<ul>
+<li>Type: bool</li>
+<li>What: Force a print statement even if not in verbose</li>
+<li>Note: For formatting purposes</li>
+<li>Default: False</li>
+</ul>
+</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def vprint(self, message, depth=0, force=False):
+    &#34;&#34;&#34;
+    Usage:
+
+    - Print a given statement if `self.verbose` is true
+
+    Requires:
+
+    - `message`:
+        - Type: str
+        - What: A message to print if `self.verbose` is true
+        - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+
+    Optional:
+
+    - `depth`:
+        - Type: int
+        - What: The depth of the nth call below the top of the method stack
+        - Note: Depth starts at 0 (indicating the current method in the stack)
+        - Default: 0
+    - `force`:
+        - Type: bool
+        - What: Force a print statement even if not in verbose
+        - Note: For formatting purposes
+        - Default: False
+    &#34;&#34;&#34;
+    if self.verbose or force:
+        kwargs={
+            &#39;class_name&#39;:self.__class__.__name__,
+            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+        }
+        pre_message=&#34;(`{class_name}.{method_name}`): &#34;.format(**kwargs)
+        # Attempt to format in kwargs where possible
+        try:
+            message=pre_message+message.format(**kwargs)
+        except:
+            message=pre_message+message
+        print(message)</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.error_handling.warn"><code class="name flex">
+<span>def <span class="ident">warn</span></span>(<span>self, message, depth=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Usage:</p>
+<ul>
+<li>Creates a class based warning message</li>
+</ul>
+<p>Requires:
+- <code>message</code>:
+- Type: str
+- What: The message to warn users with
+- Note: Messages with <code>{class_name}</code> and <code>{method_name}</code> in them are formatted appropriately
+- <code>depth</code>:
+- Type: int
+- What: The depth of the nth call below the top of the method stack
+- Note: Depth starts at 0 (indicating the current method in the stack)
+- Default: 0</p>
+<p>Notes:</p>
+<ul>
+<li>If <code>self.show_warning_stack=True</code>, also prints the stack trace up to 10 layers deep</li>
+<li>If <code>self.show_warnings=False</code>, supresses all warnings</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def warn(self, message, depth=0):
+    &#34;&#34;&#34;
+    Usage:
+
+    - Creates a class based warning message
+
+    Requires:
+    - `message`:
+        - Type: str
+        - What: The message to warn users with
+        - Note: Messages with `{class_name}` and `{method_name}` in them are formatted appropriately
+    - `depth`:
+        - Type: int
+        - What: The depth of the nth call below the top of the method stack
+        - Note: Depth starts at 0 (indicating the current method in the stack)
+        - Default: 0
+
+    Notes:
+
+    - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
+    - If `self.show_warnings=False`, supresses all warnings
+    &#34;&#34;&#34;
+    if self.__dict__.get(&#39;show_warnings&#39;,True):
+        kwargs={
+            &#39;class_name&#39;:self.__class__.__name__,
+            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+        }
+        pre_message=&#34;(Warning for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+        # Attempt to format in kwargs where possible
+        try:
+            message=pre_message+message.format(**kwargs)
+        except:
+            message=pre_message+message
+        if self.__dict__.get(&#39;show_warning_stack&#39;,False):
+            traceback.print_stack(limit=10)
+        print(message)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pamda.pamda.pamda_class"><code class="flex name class">
+<span>class <span class="ident">pamda_class</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class pamda_class(error_handling):
+    def flatten(self, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Flattens a list of lists to a single list
+
+        Requires:
+
+        - `data`:
+            - Type: list of lists
+            - What: The list of lists to reduce to a single list
+        Example:
+
+        ```
+        data=[[&#39;a&#39;,&#39;b&#39;],[1,2]]
+        p.flatten(data=data) #=&gt; [&#39;a&#39;,&#39;b&#39;,1,2]
+        ```
+        &#34;&#34;&#34;
+        return [i for sub_list in data for i in sub_list]
+
+    def path(self, data, path, Or=None):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the value of a path within a nested dictionary
+
+        Requires:
+
+        - `data`:
+            - Type: dict
+            - What: A dictionary to get the path from
+        - `path`:
+            - Type: list of strs
+            - What: The path to pull given the data
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.path(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; 1
+        ```
+        &#34;&#34;&#34;
+        #TODO: Add Or func
+        #TODO: Accept string for path if prop
+        if len(path) &gt; 0:
+            return self.path(data=data[path[0]], path=path[1:])
+        return data
+
+    def hasPath(self, data, path):
+        &#34;&#34;&#34;
+        Function:
+
+        - Checks if a path exists within a nested dictionary
+
+        Requires:
+
+        - `data`:
+            - Type: dict
+            - What: A dictionary to check if the path exists
+        - `path`:
+            - Type: list of strs or single str
+            - What: The path to check
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.hasPath(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; True
+        p.hasPath(data=data, path=[&#39;a&#39;,&#39;d&#39;]) #=&gt; False
+        ```
+        &#34;&#34;&#34;
+        if isinstance(path, str):
+            path=[path]
+        if len(path) &gt; 0:
+            if path[0] in data:
+                return self.hasPath(data=data[path[0]], path=path[1:])
+            else:
+                return False
+        return True
+
+    def assocPath(self, data, path, value):
+        &#34;&#34;&#34;
+        Function:
+
+        - Ensures a path exists within a nested dictionary
+
+        Requires:
+
+        - `data`:
+            - Type: dict
+            - What: A dictionary to check if the path exists
+        - `path`:
+            - Type: list of strs
+            - What: The path to check
+        - `value`:
+            - Type: any
+            - What: The value to appropriate to the end of the path
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.assocPath(data=data, path=[&#39;a&#39;,&#39;c&#39;], value=3) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:3}}
+        ```
+        &#34;&#34;&#34;
+        if len(path) &gt; 1:
+            if path[0] not in data:
+                data[path[0]] = {}
+            data[path[0]] = self.assocPath(data=data[path[0]], path=path[1:],value=value)
+            return data
+        else:
+            data[path[0]] = value
+            return data
+
+    def assocPathComplex(self, data, path, default=None, default_func=lambda x: x):
+        &#34;&#34;&#34;
+        Function:
+
+        - Ensures a path exists within a nested dictionary
+
+        Requires:
+
+        - `data`:
+            - Type: dict
+            - What: A dictionary to check if the path exists
+        - `path`:
+            - Type: list of strs
+            - What: The path to check
+
+        Optional:
+
+        - `default`:
+            - Type: any
+            - What: The default item to add to a path that does not yet exist
+            - Default: None
+        - `default_func`:
+            - Type: lambda function
+            - What: A single input lambda function that takes in the current path item (or default) and adjusts it
+            - Default: `lambda x: x` # Returns the value in the dict or the default value if none was present
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;b&#39;], default=[]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1}}
+        p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;c&#39;], default=[]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:[]}}
+        p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;d&#39;], default=[2], default_func=lambda x:x+[1]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[],&#39;d&#39;:[2,1]}}
+        ```
+        &#34;&#34;&#34;
+        if len(path) &gt; 1:
+            if path[0] not in data:
+                data[path[0]] = {}
+            data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_func=default_func)
+            return data
+        else:
+            if path[0] not in data:
+                data[path[0]] = default
+            data[path[0]] = default_func(data[path[0]])
+            return data
+
+    def dissocPath(self, data, path):
+        &#34;&#34;&#34;
+        Function:
+
+        - Removes the value at the end of a path within a nested dictionary
+
+        Requires:
+
+        - `data`:
+            - Type: dict
+            - What: A dictionary with a path to be removed
+        - `path`:
+            - Type: list of strs
+            - What: The path to remove from the dictionary
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:0,&#39;d&#39;:1}}}
+        p.dissocPath(data=data, path=[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;d&#39;:1}}}
+        ```
+        &#34;&#34;&#34;
+        if not self.hasPath(data, path):
+            self.warn(message=&#34;Path does not exist&#34;)
+            return data
+        if len(path)==0:
+            return {}
+        return self.assocPath(data=data, path=path[:-1], value={key:value for key, value in self.path(data, path=path[:-1]).items() if key!=path[-1]})
+
+    def pluck(self, data, path, if_path=None, if_vals=[]):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the values of a path within a list of nested dictionaries
+
+        Requires:
+
+        - `data`:
+            - Type: list of dicts
+            - What: A list of dictionary to get the path from
+        - `path`:
+            - Type: list of strs
+            - What: The path to pull given the data
+
+        Optional:
+        - `if_path`:
+            - Type: list of strs
+            - What: Path to check if the `if_val` matches
+            - Default: None
+            - Note: If None, no filtering is applied
+        - `if_vals`:
+            - Type: list of any types
+            - What: If the `if_path`s value is in this list, this item is returned
+            - Note: Items should be the same type as objects at end of `if_path`
+            - Note: If None, no filtering is applied
+
+        Example:
+
+        ```
+        data=[{&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:&#39;d&#39;}},{&#39;a&#39;:{&#39;b&#39;:2, &#39;c&#39;:&#39;e&#39;}}]
+        p.pluck(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; [1,2]
+        p.pluck(data=data, path=[&#39;a&#39;,&#39;b&#39;], if_path=[&#39;a&#39;,&#39;c&#39;], if_vals=[&#39;d&#39;]) #=&gt; [1]
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(data, list):
+            self.exception(&#34;Attempting to pluck from an object that is not a list&#34;)
+        if len(data) == 0:
+            self.exception(&#34;Attempting to pluck from an empty list&#34;)
+        if if_path is not None and isinstance(if_vals, list):
+            return [self.path(data=i, path=path) for i in data if self.path(data=i, path=if_path) in if_vals]
+        return [self.path(data=i, path=path) for i in data]
+
+    def nest(self, data, nest_by_variables, nest_output_variable):
+        &#34;&#34;&#34;
+        Function:
+
+        - Nests a list of dictionaries into a nested dictionary
+        - Similar items are appended to a list in the end of the nested dictionary
+
+        Requires:
+
+        - `data`:
+            - Type: list of dicts
+            - What: A list of dictionaries to use for nesting purposes
+        - `nest_by_variables`:
+            - Type: list of strs
+            - What: The variables to pull from each item in data
+            - Note: Used to build out the nested dicitonary
+            - Note: Order matters as the nesting occurs in order of variable
+        - `nest_output_variable`:
+            - Type: str
+            - What: The variable to add to the list at the end of the nested dictionary path
+
+        Example:
+
+        ```
+        data=[
+            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;c&#39;},
+            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;d&#39;},
+            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;e&#39;, &#39;output&#39;:&#39;f&#39;}
+        ]
+        p.nest(
+            data=data,
+            nest_by_variables=[&#39;x_1&#39;,&#39;x_2&#39;],
+            nest_output_variable=&#39;output&#39;
+        ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:[&#39;c&#39;,&#39;d&#39;], &#39;e&#39;:[&#39;f&#39;]}}
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(data, list):
+            self.exception(&#34;Attempting to `nest` an object that is not a list&#34;)
+        if len(data) == 0:
+            self.exception(&#34;Attempting to `nest` from an empty list&#34;)
+        nested_output = {}
+        for item in data:
+            nested_output = self.assocPathComplex(
+                data=nested_output,
+                path=[item[key] for key in nest_by_variables],
+                default=[],
+                default_func=lambda x: x + [item[nest_output_variable]]
+            )
+        return nested_output</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pamda.pamda.error_handling" href="#pamda.pamda.error_handling">error_handling</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="pamda.pamda.pamda_class.assocPath"><code class="name flex">
+<span>def <span class="ident">assocPath</span></span>(<span>self, data, path, value)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Ensures a path exists within a nested dictionary</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>data</code>:<ul>
+<li>Type: dict</li>
+<li>What: A dictionary to check if the path exists</li>
+</ul>
+</li>
+<li><code>path</code>:<ul>
+<li>Type: list of strs</li>
+<li>What: The path to check</li>
+</ul>
+</li>
+<li><code>value</code>:<ul>
+<li>Type: any</li>
+<li>What: The value to appropriate to the end of the path</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>data={'a':{'b':1}}
+p.assocPath(data=data, path=['a','c'], value=3) #=&gt; {'a':{'b':1, 'c':3}}
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def assocPath(self, data, path, value):
+    &#34;&#34;&#34;
+    Function:
+
+    - Ensures a path exists within a nested dictionary
+
+    Requires:
+
+    - `data`:
+        - Type: dict
+        - What: A dictionary to check if the path exists
+    - `path`:
+        - Type: list of strs
+        - What: The path to check
+    - `value`:
+        - Type: any
+        - What: The value to appropriate to the end of the path
+
+    Example:
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:1}}
+    p.assocPath(data=data, path=[&#39;a&#39;,&#39;c&#39;], value=3) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:3}}
+    ```
+    &#34;&#34;&#34;
+    if len(path) &gt; 1:
+        if path[0] not in data:
+            data[path[0]] = {}
+        data[path[0]] = self.assocPath(data=data[path[0]], path=path[1:],value=value)
+        return data
+    else:
+        data[path[0]] = value
+        return data</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.pamda_class.assocPathComplex"><code class="name flex">
+<span>def <span class="ident">assocPathComplex</span></span>(<span>self, data, path, default=None, default_func=&lt;function pamda_class.&lt;lambda&gt;&gt;)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Ensures a path exists within a nested dictionary</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>data</code>:<ul>
+<li>Type: dict</li>
+<li>What: A dictionary to check if the path exists</li>
+</ul>
+</li>
+<li><code>path</code>:<ul>
+<li>Type: list of strs</li>
+<li>What: The path to check</li>
+</ul>
+</li>
+</ul>
+<p>Optional:</p>
+<ul>
+<li><code>default</code>:<ul>
+<li>Type: any</li>
+<li>What: The default item to add to a path that does not yet exist</li>
+<li>Default: None</li>
+</ul>
+</li>
+<li><code>default_func</code>:<ul>
+<li>Type: lambda function</li>
+<li>What: A single input lambda function that takes in the current path item (or default) and adjusts it</li>
+<li>Default: <code>lambda x: x</code> # Returns the value in the dict or the default value if none was present</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>data={'a':{'b':1}}
+p.assocPathComplex(data=data, path=['a','b'], default=[]) #=&gt; {'a':{'b':1}}
+p.assocPathComplex(data=data, path=['a','c'], default=[]) #=&gt; {'a':{'b':1, 'c':[]}}
+p.assocPathComplex(data=data, path=['a','d'], default=[2], default_func=lambda x:x+[1]) #=&gt; {'a':{'b':1,'c':[],'d':[2,1]}}
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def assocPathComplex(self, data, path, default=None, default_func=lambda x: x):
+    &#34;&#34;&#34;
+    Function:
+
+    - Ensures a path exists within a nested dictionary
+
+    Requires:
+
+    - `data`:
+        - Type: dict
+        - What: A dictionary to check if the path exists
+    - `path`:
+        - Type: list of strs
+        - What: The path to check
+
+    Optional:
+
+    - `default`:
+        - Type: any
+        - What: The default item to add to a path that does not yet exist
+        - Default: None
+    - `default_func`:
+        - Type: lambda function
+        - What: A single input lambda function that takes in the current path item (or default) and adjusts it
+        - Default: `lambda x: x` # Returns the value in the dict or the default value if none was present
+
+    Example:
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:1}}
+    p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;b&#39;], default=[]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1}}
+    p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;c&#39;], default=[]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:[]}}
+    p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;d&#39;], default=[2], default_func=lambda x:x+[1]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[],&#39;d&#39;:[2,1]}}
+    ```
+    &#34;&#34;&#34;
+    if len(path) &gt; 1:
+        if path[0] not in data:
+            data[path[0]] = {}
+        data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_func=default_func)
+        return data
+    else:
+        if path[0] not in data:
+            data[path[0]] = default
+        data[path[0]] = default_func(data[path[0]])
+        return data</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.pamda_class.dissocPath"><code class="name flex">
+<span>def <span class="ident">dissocPath</span></span>(<span>self, data, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Removes the value at the end of a path within a nested dictionary</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>data</code>:<ul>
+<li>Type: dict</li>
+<li>What: A dictionary with a path to be removed</li>
+</ul>
+</li>
+<li><code>path</code>:<ul>
+<li>Type: list of strs</li>
+<li>What: The path to remove from the dictionary</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>data={'a':{'b':{'c':0,'d':1}}}
+p.dissocPath(data=data, path=['a','b','c']) #=&gt; {'a':{'b':{'d':1}}}
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dissocPath(self, data, path):
+    &#34;&#34;&#34;
+    Function:
+
+    - Removes the value at the end of a path within a nested dictionary
+
+    Requires:
+
+    - `data`:
+        - Type: dict
+        - What: A dictionary with a path to be removed
+    - `path`:
+        - Type: list of strs
+        - What: The path to remove from the dictionary
+
+    Example:
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:0,&#39;d&#39;:1}}}
+    p.dissocPath(data=data, path=[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;d&#39;:1}}}
+    ```
+    &#34;&#34;&#34;
+    if not self.hasPath(data, path):
+        self.warn(message=&#34;Path does not exist&#34;)
+        return data
+    if len(path)==0:
+        return {}
+    return self.assocPath(data=data, path=path[:-1], value={key:value for key, value in self.path(data, path=path[:-1]).items() if key!=path[-1]})</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.pamda_class.flatten"><code class="name flex">
+<span>def <span class="ident">flatten</span></span>(<span>self, data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Flattens a list of lists to a single list</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>data</code>:<ul>
+<li>Type: list of lists</li>
+<li>What: The list of lists to reduce to a single list
+Example:</li>
+</ul>
+</li>
+</ul>
+<pre><code>data=[['a','b'],[1,2]]
+p.flatten(data=data) #=&gt; ['a','b',1,2]
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def flatten(self, data):
+    &#34;&#34;&#34;
+    Function:
+
+    - Flattens a list of lists to a single list
+
+    Requires:
+
+    - `data`:
+        - Type: list of lists
+        - What: The list of lists to reduce to a single list
+    Example:
+
+    ```
+    data=[[&#39;a&#39;,&#39;b&#39;],[1,2]]
+    p.flatten(data=data) #=&gt; [&#39;a&#39;,&#39;b&#39;,1,2]
+    ```
+    &#34;&#34;&#34;
+    return [i for sub_list in data for i in sub_list]</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.pamda_class.hasPath"><code class="name flex">
+<span>def <span class="ident">hasPath</span></span>(<span>self, data, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Checks if a path exists within a nested dictionary</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>data</code>:<ul>
+<li>Type: dict</li>
+<li>What: A dictionary to check if the path exists</li>
+</ul>
+</li>
+<li><code>path</code>:<ul>
+<li>Type: list of strs or single str</li>
+<li>What: The path to check</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>data={'a':{'b':1}}
+p.hasPath(data=data, path=['a','b']) #=&gt; True
+p.hasPath(data=data, path=['a','d']) #=&gt; False
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hasPath(self, data, path):
+    &#34;&#34;&#34;
+    Function:
+
+    - Checks if a path exists within a nested dictionary
+
+    Requires:
+
+    - `data`:
+        - Type: dict
+        - What: A dictionary to check if the path exists
+    - `path`:
+        - Type: list of strs or single str
+        - What: The path to check
+
+    Example:
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:1}}
+    p.hasPath(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; True
+    p.hasPath(data=data, path=[&#39;a&#39;,&#39;d&#39;]) #=&gt; False
+    ```
+    &#34;&#34;&#34;
+    if isinstance(path, str):
+        path=[path]
+    if len(path) &gt; 0:
+        if path[0] in data:
+            return self.hasPath(data=data[path[0]], path=path[1:])
+        else:
+            return False
+    return True</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.pamda_class.nest"><code class="name flex">
+<span>def <span class="ident">nest</span></span>(<span>self, data, nest_by_variables, nest_output_variable)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Nests a list of dictionaries into a nested dictionary</li>
+<li>Similar items are appended to a list in the end of the nested dictionary</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>data</code>:<ul>
+<li>Type: list of dicts</li>
+<li>What: A list of dictionaries to use for nesting purposes</li>
+</ul>
+</li>
+<li><code>nest_by_variables</code>:<ul>
+<li>Type: list of strs</li>
+<li>What: The variables to pull from each item in data</li>
+<li>Note: Used to build out the nested dicitonary</li>
+<li>Note: Order matters as the nesting occurs in order of variable</li>
+</ul>
+</li>
+<li><code>nest_output_variable</code>:<ul>
+<li>Type: str</li>
+<li>What: The variable to add to the list at the end of the nested dictionary path</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>data=[
+    {'x_1':'a','x_2':'b', 'output':'c'},
+    {'x_1':'a','x_2':'b', 'output':'d'},
+    {'x_1':'a','x_2':'e', 'output':'f'}
+]
+p.nest(
+    data=data,
+    nest_by_variables=['x_1','x_2'],
+    nest_output_variable='output'
+) #=&gt; {'a':{'b':['c','d'], 'e':['f']}}
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def nest(self, data, nest_by_variables, nest_output_variable):
+    &#34;&#34;&#34;
+    Function:
+
+    - Nests a list of dictionaries into a nested dictionary
+    - Similar items are appended to a list in the end of the nested dictionary
+
+    Requires:
+
+    - `data`:
+        - Type: list of dicts
+        - What: A list of dictionaries to use for nesting purposes
+    - `nest_by_variables`:
+        - Type: list of strs
+        - What: The variables to pull from each item in data
+        - Note: Used to build out the nested dicitonary
+        - Note: Order matters as the nesting occurs in order of variable
+    - `nest_output_variable`:
+        - Type: str
+        - What: The variable to add to the list at the end of the nested dictionary path
+
+    Example:
+
+    ```
+    data=[
+        {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;c&#39;},
+        {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;d&#39;},
+        {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;e&#39;, &#39;output&#39;:&#39;f&#39;}
+    ]
+    p.nest(
+        data=data,
+        nest_by_variables=[&#39;x_1&#39;,&#39;x_2&#39;],
+        nest_output_variable=&#39;output&#39;
+    ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:[&#39;c&#39;,&#39;d&#39;], &#39;e&#39;:[&#39;f&#39;]}}
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(data, list):
+        self.exception(&#34;Attempting to `nest` an object that is not a list&#34;)
+    if len(data) == 0:
+        self.exception(&#34;Attempting to `nest` from an empty list&#34;)
+    nested_output = {}
+    for item in data:
+        nested_output = self.assocPathComplex(
+            data=nested_output,
+            path=[item[key] for key in nest_by_variables],
+            default=[],
+            default_func=lambda x: x + [item[nest_output_variable]]
+        )
+    return nested_output</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.pamda_class.path"><code class="name flex">
+<span>def <span class="ident">path</span></span>(<span>self, data, path, Or=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Returns the value of a path within a nested dictionary</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>data</code>:<ul>
+<li>Type: dict</li>
+<li>What: A dictionary to get the path from</li>
+</ul>
+</li>
+<li><code>path</code>:<ul>
+<li>Type: list of strs</li>
+<li>What: The path to pull given the data</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>data={'a':{'b':1}}
+p.path(data=data, path=['a','b']) #=&gt; 1
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def path(self, data, path, Or=None):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns the value of a path within a nested dictionary
+
+    Requires:
+
+    - `data`:
+        - Type: dict
+        - What: A dictionary to get the path from
+    - `path`:
+        - Type: list of strs
+        - What: The path to pull given the data
+
+    Example:
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:1}}
+    p.path(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; 1
+    ```
+    &#34;&#34;&#34;
+    #TODO: Add Or func
+    #TODO: Accept string for path if prop
+    if len(path) &gt; 0:
+        return self.path(data=data[path[0]], path=path[1:])
+    return data</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.pamda_class.pluck"><code class="name flex">
+<span>def <span class="ident">pluck</span></span>(<span>self, data, path, if_path=None, if_vals=[])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Returns the values of a path within a list of nested dictionaries</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>data</code>:<ul>
+<li>Type: list of dicts</li>
+<li>What: A list of dictionary to get the path from</li>
+</ul>
+</li>
+<li><code>path</code>:<ul>
+<li>Type: list of strs</li>
+<li>What: The path to pull given the data</li>
+</ul>
+</li>
+</ul>
+<p>Optional:
+- <code>if_path</code>:
+- Type: list of strs
+- What: Path to check if the <code>if_val</code> matches
+- Default: None
+- Note: If None, no filtering is applied
+- <code>if_vals</code>:
+- Type: list of any types
+- What: If the <code>if_path</code>s value is in this list, this item is returned
+- Note: Items should be the same type as objects at end of <code>if_path</code>
+- Note: If None, no filtering is applied</p>
+<p>Example:</p>
+<pre><code>data=[{'a':{'b':1, 'c':'d'}},{'a':{'b':2, 'c':'e'}}]
+p.pluck(data=data, path=['a','b']) #=&gt; [1,2]
+p.pluck(data=data, path=['a','b'], if_path=['a','c'], if_vals=['d']) #=&gt; [1]
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pluck(self, data, path, if_path=None, if_vals=[]):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns the values of a path within a list of nested dictionaries
+
+    Requires:
+
+    - `data`:
+        - Type: list of dicts
+        - What: A list of dictionary to get the path from
+    - `path`:
+        - Type: list of strs
+        - What: The path to pull given the data
+
+    Optional:
+    - `if_path`:
+        - Type: list of strs
+        - What: Path to check if the `if_val` matches
+        - Default: None
+        - Note: If None, no filtering is applied
+    - `if_vals`:
+        - Type: list of any types
+        - What: If the `if_path`s value is in this list, this item is returned
+        - Note: Items should be the same type as objects at end of `if_path`
+        - Note: If None, no filtering is applied
+
+    Example:
+
+    ```
+    data=[{&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:&#39;d&#39;}},{&#39;a&#39;:{&#39;b&#39;:2, &#39;c&#39;:&#39;e&#39;}}]
+    p.pluck(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; [1,2]
+    p.pluck(data=data, path=[&#39;a&#39;,&#39;b&#39;], if_path=[&#39;a&#39;,&#39;c&#39;], if_vals=[&#39;d&#39;]) #=&gt; [1]
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(data, list):
+        self.exception(&#34;Attempting to pluck from an object that is not a list&#34;)
+    if len(data) == 0:
+        self.exception(&#34;Attempting to pluck from an empty list&#34;)
+    if if_path is not None and isinstance(if_vals, list):
+        return [self.path(data=i, path=path) for i in data if self.path(data=i, path=if_path) in if_vals]
+    return [self.path(data=i, path=path) for i in data]</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pamda.pamda.error_handling" href="#pamda.pamda.error_handling">error_handling</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pamda.pamda.error_handling.exception" href="#pamda.pamda.error_handling.exception">exception</a></code></li>
+<li><code><a title="pamda.pamda.error_handling.vprint" href="#pamda.pamda.error_handling.vprint">vprint</a></code></li>
+<li><code><a title="pamda.pamda.error_handling.warn" href="#pamda.pamda.error_handling.warn">warn</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="pamda.pamda.pamdata"><code class="flex name class">
+<span>class <span class="ident">pamdata</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class pamdata(error_handling):
+    def read_csv(self, filename, has_header=True, return_dict=True):
+        &#34;&#34;&#34;
+        Function:
+
+        - Reads the contents of a csv and converts it to list of dicts or list of lists
+
+        Requires:
+
+        - `filename`:
+            - Type: str
+            - What: The filepath of the csv to read
+
+        Optional:
+
+        - `has_header`:
+            - Type: bool
+            - What: Flag to indicate if the csv has an initial row that identifies columns
+            - Default: True
+            - Note: Returns a list of lists
+        - `return_dict`:
+            - Type: bool
+            - What: Flag to indicate if the csv should be converted to:
+                - True: list of dicts
+                - False: list of lists
+            - Note: If True, requires `has_header` to be True as the header determines the keys of the dicts
+        &#34;&#34;&#34;
+        with open(filename) as f:
+            file_data = csv.reader(f, delimiter=&#34;,&#34;, quotechar=&#39;&#34;&#39;)
+            if has_header:
+                headers = next(file_data)
+            if has_header and return_dict:
+                return [dict(zip(headers, i)) for i in file_data]
+            elif not has_header and return_dict:
+                self.exception(message=&#34;If `return_dict` is True, `has_header` must also be True.&#34;)
+            else:
+                return [i for i in file_data]
+
+    def write_csv(self, filename, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Writes the contents of a list of list or list of dicts to a csv
+
+        Requires:
+
+        - `filename`:
+            - Type: str
+            - What: The filepath of the csv to read
+        - `data`:
+            - Type: list of lists | list of dicts
+            - What: The data to write
+        &#34;&#34;&#34;
+        with open(filename, &#39;w&#39;) as f:
+            if isinstance(data[0], dict):
+                writer=csv.DictWriter(f, fieldnames=data[0].keys())
+                writer.writeheader()
+                for row in data:
+                    writer.writerow(row)
+            elif isinstance(data[0], list):
+                writer=csv.writer(f)
+                for row in data:
+                    writer.writerow(row)
+            else:
+                self.exception(&#34;write_csv takes in list of lists or list of dicts only.&#34;)
+
+    def read_json(self, filename):
+        &#34;&#34;&#34;
+        Function:
+
+        - Reads the contents of a json
+
+        Requires:
+        - `filename`:
+            - Type: str
+            - What: The filepath of the json to read
+        &#34;&#34;&#34;
+        const_map = {
+            &#39;-Infinity&#39;: float(&#39;-Infinity&#39;),
+            &#39;Infinity&#39;: float(&#39;Infinity&#39;),
+            &#39;NaN&#39;: None,
+        }
+        with open(filename) as f:
+            return json.load(f, parse_constant=lambda x:const_map[x])
+
+    def write_json(self, filename, data, pretty=False):
+        &#34;&#34;&#34;
+        Function:
+
+        - Writes the contents of a list of list or list of dicts to a json
+
+        Requires:
+
+        - `filename`:
+            - Type: str
+            - What: The filepath of the json to write
+        - `data`:
+            - Type: A json serializable python object
+            - What: The data to write
+        &#34;&#34;&#34;
+        with open(filename, &#39;w&#39;) as f:
+            if pretty:
+                json.dump(data, f, indent=4)
+            else:
+                json.dump(data, f)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pamda.pamda.error_handling" href="#pamda.pamda.error_handling">error_handling</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="pamda.pamda.pamdata.read_csv"><code class="name flex">
+<span>def <span class="ident">read_csv</span></span>(<span>self, filename, has_header=True, return_dict=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Reads the contents of a csv and converts it to list of dicts or list of lists</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>filename</code>:<ul>
+<li>Type: str</li>
+<li>What: The filepath of the csv to read</li>
+</ul>
+</li>
+</ul>
+<p>Optional:</p>
+<ul>
+<li><code>has_header</code>:<ul>
+<li>Type: bool</li>
+<li>What: Flag to indicate if the csv has an initial row that identifies columns</li>
+<li>Default: True</li>
+<li>Note: Returns a list of lists</li>
+</ul>
+</li>
+<li><code>return_dict</code>:<ul>
+<li>Type: bool</li>
+<li>What: Flag to indicate if the csv should be converted to:<ul>
+<li>True: list of dicts</li>
+<li>False: list of lists</li>
+</ul>
+</li>
+<li>Note: If True, requires <code>has_header</code> to be True as the header determines the keys of the dicts</li>
+</ul>
+</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def read_csv(self, filename, has_header=True, return_dict=True):
+    &#34;&#34;&#34;
+    Function:
+
+    - Reads the contents of a csv and converts it to list of dicts or list of lists
+
+    Requires:
+
+    - `filename`:
+        - Type: str
+        - What: The filepath of the csv to read
+
+    Optional:
+
+    - `has_header`:
+        - Type: bool
+        - What: Flag to indicate if the csv has an initial row that identifies columns
+        - Default: True
+        - Note: Returns a list of lists
+    - `return_dict`:
+        - Type: bool
+        - What: Flag to indicate if the csv should be converted to:
+            - True: list of dicts
+            - False: list of lists
+        - Note: If True, requires `has_header` to be True as the header determines the keys of the dicts
+    &#34;&#34;&#34;
+    with open(filename) as f:
+        file_data = csv.reader(f, delimiter=&#34;,&#34;, quotechar=&#39;&#34;&#39;)
+        if has_header:
+            headers = next(file_data)
+        if has_header and return_dict:
+            return [dict(zip(headers, i)) for i in file_data]
+        elif not has_header and return_dict:
+            self.exception(message=&#34;If `return_dict` is True, `has_header` must also be True.&#34;)
+        else:
+            return [i for i in file_data]</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.pamdata.read_json"><code class="name flex">
+<span>def <span class="ident">read_json</span></span>(<span>self, filename)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Reads the contents of a json</li>
+</ul>
+<p>Requires:
+- <code>filename</code>:
+- Type: str
+- What: The filepath of the json to read</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def read_json(self, filename):
+    &#34;&#34;&#34;
+    Function:
+
+    - Reads the contents of a json
+
+    Requires:
+    - `filename`:
+        - Type: str
+        - What: The filepath of the json to read
+    &#34;&#34;&#34;
+    const_map = {
+        &#39;-Infinity&#39;: float(&#39;-Infinity&#39;),
+        &#39;Infinity&#39;: float(&#39;Infinity&#39;),
+        &#39;NaN&#39;: None,
+    }
+    with open(filename) as f:
+        return json.load(f, parse_constant=lambda x:const_map[x])</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.pamdata.write_csv"><code class="name flex">
+<span>def <span class="ident">write_csv</span></span>(<span>self, filename, data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Writes the contents of a list of list or list of dicts to a csv</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>filename</code>:<ul>
+<li>Type: str</li>
+<li>What: The filepath of the csv to read</li>
+</ul>
+</li>
+<li><code>data</code>:<ul>
+<li>Type: list of lists | list of dicts</li>
+<li>What: The data to write</li>
+</ul>
+</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write_csv(self, filename, data):
+    &#34;&#34;&#34;
+    Function:
+
+    - Writes the contents of a list of list or list of dicts to a csv
+
+    Requires:
+
+    - `filename`:
+        - Type: str
+        - What: The filepath of the csv to read
+    - `data`:
+        - Type: list of lists | list of dicts
+        - What: The data to write
+    &#34;&#34;&#34;
+    with open(filename, &#39;w&#39;) as f:
+        if isinstance(data[0], dict):
+            writer=csv.DictWriter(f, fieldnames=data[0].keys())
+            writer.writeheader()
+            for row in data:
+                writer.writerow(row)
+        elif isinstance(data[0], list):
+            writer=csv.writer(f)
+            for row in data:
+                writer.writerow(row)
+        else:
+            self.exception(&#34;write_csv takes in list of lists or list of dicts only.&#34;)</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.pamdata.write_json"><code class="name flex">
+<span>def <span class="ident">write_json</span></span>(<span>self, filename, data, pretty=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Writes the contents of a list of list or list of dicts to a json</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>filename</code>:<ul>
+<li>Type: str</li>
+<li>What: The filepath of the json to write</li>
+</ul>
+</li>
+<li><code>data</code>:<ul>
+<li>Type: A json serializable python object</li>
+<li>What: The data to write</li>
+</ul>
+</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write_json(self, filename, data, pretty=False):
+    &#34;&#34;&#34;
+    Function:
+
+    - Writes the contents of a list of list or list of dicts to a json
+
+    Requires:
+
+    - `filename`:
+        - Type: str
+        - What: The filepath of the json to write
+    - `data`:
+        - Type: A json serializable python object
+        - What: The data to write
+    &#34;&#34;&#34;
+    with open(filename, &#39;w&#39;) as f:
+        if pretty:
+            json.dump(data, f, indent=4)
+        else:
+            json.dump(data, f)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pamda.pamda.error_handling" href="#pamda.pamda.error_handling">error_handling</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pamda.pamda.error_handling.exception" href="#pamda.pamda.error_handling.exception">exception</a></code></li>
+<li><code><a title="pamda.pamda.error_handling.vprint" href="#pamda.pamda.error_handling.vprint">vprint</a></code></li>
+<li><code><a title="pamda.pamda.error_handling.warn" href="#pamda.pamda.error_handling.warn">warn</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="pamda" href="index.html">pamda</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="pamda.pamda.error_handling" href="#pamda.pamda.error_handling">error_handling</a></code></h4>
+<ul class="">
+<li><code><a title="pamda.pamda.error_handling.exception" href="#pamda.pamda.error_handling.exception">exception</a></code></li>
+<li><code><a title="pamda.pamda.error_handling.vprint" href="#pamda.pamda.error_handling.vprint">vprint</a></code></li>
+<li><code><a title="pamda.pamda.error_handling.warn" href="#pamda.pamda.error_handling.warn">warn</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pamda.pamda.pamda_class" href="#pamda.pamda.pamda_class">pamda_class</a></code></h4>
+<ul class="two-column">
+<li><code><a title="pamda.pamda.pamda_class.assocPath" href="#pamda.pamda.pamda_class.assocPath">assocPath</a></code></li>
+<li><code><a title="pamda.pamda.pamda_class.assocPathComplex" href="#pamda.pamda.pamda_class.assocPathComplex">assocPathComplex</a></code></li>
+<li><code><a title="pamda.pamda.pamda_class.dissocPath" href="#pamda.pamda.pamda_class.dissocPath">dissocPath</a></code></li>
+<li><code><a title="pamda.pamda.pamda_class.flatten" href="#pamda.pamda.pamda_class.flatten">flatten</a></code></li>
+<li><code><a title="pamda.pamda.pamda_class.hasPath" href="#pamda.pamda.pamda_class.hasPath">hasPath</a></code></li>
+<li><code><a title="pamda.pamda.pamda_class.nest" href="#pamda.pamda.pamda_class.nest">nest</a></code></li>
+<li><code><a title="pamda.pamda.pamda_class.path" href="#pamda.pamda.pamda_class.path">path</a></code></li>
+<li><code><a title="pamda.pamda.pamda_class.pluck" href="#pamda.pamda.pamda_class.pluck">pluck</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pamda.pamda.pamdata" href="#pamda.pamda.pamdata">pamdata</a></code></h4>
+<ul class="">
+<li><code><a title="pamda.pamda.pamdata.read_csv" href="#pamda.pamda.pamdata.read_csv">read_csv</a></code></li>
+<li><code><a title="pamda.pamda.pamdata.read_json" href="#pamda.pamda.pamdata.read_json">read_json</a></code></li>
+<li><code><a title="pamda.pamda.pamdata.write_csv" href="#pamda.pamda.pamdata.write_csv">write_csv</a></code></li>
+<li><code><a title="pamda.pamda.pamdata.write_json" href="#pamda.pamda.pamdata.write_json">write_json</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
