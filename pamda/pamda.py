@@ -1,6 +1,6 @@
 import json, csv, math
 
-class error_handling:
+class pamda_error:
     def warn(self, message, depth=0):
         """
         Usage:
@@ -112,7 +112,7 @@ class error_handling:
             message=pre_message+message
         raise Exception(message)
 
-class pamda_class(error_handling):
+class pamda_class(pamda_error):
     def flatten(self, data):
         """
         Function:
@@ -407,7 +407,7 @@ class pamda_class(error_handling):
     #     #TODO Code this
     #     pass
 
-class pamdata(error_handling):
+class pamdata(pamda_error):
     def read_csv(self, filename, has_header=True, return_dict=True):
         """
         Function:

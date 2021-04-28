@@ -28,7 +28,7 @@
 </summary>
 <pre><code class="python">import json, csv, math
 
-class error_handling:
+class pamda_error:
     def warn(self, message, depth=0):
         &#34;&#34;&#34;
         Usage:
@@ -140,7 +140,7 @@ class error_handling:
             message=pre_message+message
         raise Exception(message)
 
-class pamda_class(error_handling):
+class pamda_class(pamda_error):
     def flatten(self, data):
         &#34;&#34;&#34;
         Function:
@@ -435,7 +435,7 @@ class pamda_class(error_handling):
     #     #TODO Code this
     #     pass
 
-class pamdata(error_handling):
+class pamdata(pamda_error):
     def read_csv(self, filename, has_header=True, return_dict=True):
         &#34;&#34;&#34;
         Function:
@@ -553,348 +553,6 @@ pamda=pamda_class()</code></pre>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="pamda.pamda.error_handling"><code class="flex name class">
-<span>class <span class="ident">error_handling</span></span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class error_handling:
-    def warn(self, message, depth=0):
-        &#34;&#34;&#34;
-        Usage:
-
-        - Creates a class based warning message
-
-        Requires:
-        - `message`:
-            - Type: str
-            - What: The message to warn users with
-            - Note: Messages with `{class_name}` and `{method_name}` in them are formatted appropriately
-        - `depth`:
-            - Type: int
-            - What: The depth of the nth call below the top of the method stack
-            - Note: Depth starts at 0 (indicating the current method in the stack)
-            - Default: 0
-
-        Notes:
-
-        - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
-        - If `self.show_warnings=False`, supresses all warnings
-        &#34;&#34;&#34;
-        if self.__dict__.get(&#39;show_warnings&#39;,True):
-            kwargs={
-                &#39;class_name&#39;:self.__class__.__name__,
-                &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
-            }
-            pre_message=&#34;(Warning for `{class_name}.{method_name}`): &#34;.format(**kwargs)
-            # Attempt to format in kwargs where possible
-            try:
-                message=pre_message+message.format(**kwargs)
-            except:
-                message=pre_message+message
-            if self.__dict__.get(&#39;show_warning_stack&#39;,False):
-                traceback.print_stack(limit=10)
-            print(message)
-
-    def vprint(self, message, depth=0, force=False):
-        &#34;&#34;&#34;
-        Usage:
-
-        - Print a given statement if `self.verbose` is true
-
-        Requires:
-
-        - `message`:
-            - Type: str
-            - What: A message to print if `self.verbose` is true
-            - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
-
-        Optional:
-
-        - `depth`:
-            - Type: int
-            - What: The depth of the nth call below the top of the method stack
-            - Note: Depth starts at 0 (indicating the current method in the stack)
-            - Default: 0
-        - `force`:
-            - Type: bool
-            - What: Force a print statement even if not in verbose
-            - Note: For formatting purposes
-            - Default: False
-        &#34;&#34;&#34;
-        if self.verbose or force:
-            kwargs={
-                &#39;class_name&#39;:self.__class__.__name__,
-                &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
-            }
-            pre_message=&#34;(`{class_name}.{method_name}`): &#34;.format(**kwargs)
-            # Attempt to format in kwargs where possible
-            try:
-                message=pre_message+message.format(**kwargs)
-            except:
-                message=pre_message+message
-            print(message)
-
-    def exception(self, message, depth=0):
-        &#34;&#34;&#34;
-        Usage:
-
-        - Creates a class based exception message
-
-        Requires:
-
-        - `message`:
-            - Type: str
-            - What: The message to warn users with
-            - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
-        - `depth`:
-            - Type: int
-            - What: The depth of the nth call below the top of the method stack
-            - Note: Depth starts at 0 (indicating the current method in the stack)
-            - Default: 0
-
-        Notes:
-
-        - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
-        - If `self.show_warnings=False`, supresses all warnings
-        &#34;&#34;&#34;
-        kwargs={
-            &#39;class_name&#39;:self.__class__.__name__,
-            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
-        }
-        pre_message=&#34;(Exception for `{class_name}.{method_name}`): &#34;.format(**kwargs)
-        # Attempt to format in kwargs where possible
-        try:
-            message=pre_message+message.format(**kwargs)
-        except:
-            message=pre_message+message
-        raise Exception(message)</code></pre>
-</details>
-<h3>Subclasses</h3>
-<ul class="hlist">
-<li><a title="pamda.pamda.pamda_class" href="#pamda.pamda.pamda_class">pamda_class</a></li>
-<li><a title="pamda.pamda.pamdata" href="#pamda.pamda.pamdata">pamdata</a></li>
-</ul>
-<h3>Methods</h3>
-<dl>
-<dt id="pamda.pamda.error_handling.exception"><code class="name flex">
-<span>def <span class="ident">exception</span></span>(<span>self, message, depth=0)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Usage:</p>
-<ul>
-<li>Creates a class based exception message</li>
-</ul>
-<p>Requires:</p>
-<ul>
-<li><code>message</code>:<ul>
-<li>Type: str</li>
-<li>What: The message to warn users with</li>
-<li>Note: Messages with <code>{{class_name}}</code> and <code>{{method_name}}</code> in them are formatted appropriately</li>
-</ul>
-</li>
-<li><code>depth</code>:<ul>
-<li>Type: int</li>
-<li>What: The depth of the nth call below the top of the method stack</li>
-<li>Note: Depth starts at 0 (indicating the current method in the stack)</li>
-<li>Default: 0</li>
-</ul>
-</li>
-</ul>
-<p>Notes:</p>
-<ul>
-<li>If <code>self.show_warning_stack=True</code>, also prints the stack trace up to 10 layers deep</li>
-<li>If <code>self.show_warnings=False</code>, supresses all warnings</li>
-</ul></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def exception(self, message, depth=0):
-    &#34;&#34;&#34;
-    Usage:
-
-    - Creates a class based exception message
-
-    Requires:
-
-    - `message`:
-        - Type: str
-        - What: The message to warn users with
-        - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
-    - `depth`:
-        - Type: int
-        - What: The depth of the nth call below the top of the method stack
-        - Note: Depth starts at 0 (indicating the current method in the stack)
-        - Default: 0
-
-    Notes:
-
-    - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
-    - If `self.show_warnings=False`, supresses all warnings
-    &#34;&#34;&#34;
-    kwargs={
-        &#39;class_name&#39;:self.__class__.__name__,
-        &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
-    }
-    pre_message=&#34;(Exception for `{class_name}.{method_name}`): &#34;.format(**kwargs)
-    # Attempt to format in kwargs where possible
-    try:
-        message=pre_message+message.format(**kwargs)
-    except:
-        message=pre_message+message
-    raise Exception(message)</code></pre>
-</details>
-</dd>
-<dt id="pamda.pamda.error_handling.vprint"><code class="name flex">
-<span>def <span class="ident">vprint</span></span>(<span>self, message, depth=0, force=False)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Usage:</p>
-<ul>
-<li>Print a given statement if <code>self.verbose</code> is true</li>
-</ul>
-<p>Requires:</p>
-<ul>
-<li><code>message</code>:<ul>
-<li>Type: str</li>
-<li>What: A message to print if <code>self.verbose</code> is true</li>
-<li>Note: Messages with <code>{{class_name}}</code> and <code>{{method_name}}</code> in them are formatted appropriately</li>
-</ul>
-</li>
-</ul>
-<p>Optional:</p>
-<ul>
-<li><code>depth</code>:<ul>
-<li>Type: int</li>
-<li>What: The depth of the nth call below the top of the method stack</li>
-<li>Note: Depth starts at 0 (indicating the current method in the stack)</li>
-<li>Default: 0</li>
-</ul>
-</li>
-<li><code>force</code>:<ul>
-<li>Type: bool</li>
-<li>What: Force a print statement even if not in verbose</li>
-<li>Note: For formatting purposes</li>
-<li>Default: False</li>
-</ul>
-</li>
-</ul></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def vprint(self, message, depth=0, force=False):
-    &#34;&#34;&#34;
-    Usage:
-
-    - Print a given statement if `self.verbose` is true
-
-    Requires:
-
-    - `message`:
-        - Type: str
-        - What: A message to print if `self.verbose` is true
-        - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
-
-    Optional:
-
-    - `depth`:
-        - Type: int
-        - What: The depth of the nth call below the top of the method stack
-        - Note: Depth starts at 0 (indicating the current method in the stack)
-        - Default: 0
-    - `force`:
-        - Type: bool
-        - What: Force a print statement even if not in verbose
-        - Note: For formatting purposes
-        - Default: False
-    &#34;&#34;&#34;
-    if self.verbose or force:
-        kwargs={
-            &#39;class_name&#39;:self.__class__.__name__,
-            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
-        }
-        pre_message=&#34;(`{class_name}.{method_name}`): &#34;.format(**kwargs)
-        # Attempt to format in kwargs where possible
-        try:
-            message=pre_message+message.format(**kwargs)
-        except:
-            message=pre_message+message
-        print(message)</code></pre>
-</details>
-</dd>
-<dt id="pamda.pamda.error_handling.warn"><code class="name flex">
-<span>def <span class="ident">warn</span></span>(<span>self, message, depth=0)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Usage:</p>
-<ul>
-<li>Creates a class based warning message</li>
-</ul>
-<p>Requires:
-- <code>message</code>:
-- Type: str
-- What: The message to warn users with
-- Note: Messages with <code>{class_name}</code> and <code>{method_name}</code> in them are formatted appropriately
-- <code>depth</code>:
-- Type: int
-- What: The depth of the nth call below the top of the method stack
-- Note: Depth starts at 0 (indicating the current method in the stack)
-- Default: 0</p>
-<p>Notes:</p>
-<ul>
-<li>If <code>self.show_warning_stack=True</code>, also prints the stack trace up to 10 layers deep</li>
-<li>If <code>self.show_warnings=False</code>, supresses all warnings</li>
-</ul></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def warn(self, message, depth=0):
-    &#34;&#34;&#34;
-    Usage:
-
-    - Creates a class based warning message
-
-    Requires:
-    - `message`:
-        - Type: str
-        - What: The message to warn users with
-        - Note: Messages with `{class_name}` and `{method_name}` in them are formatted appropriately
-    - `depth`:
-        - Type: int
-        - What: The depth of the nth call below the top of the method stack
-        - Note: Depth starts at 0 (indicating the current method in the stack)
-        - Default: 0
-
-    Notes:
-
-    - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
-    - If `self.show_warnings=False`, supresses all warnings
-    &#34;&#34;&#34;
-    if self.__dict__.get(&#39;show_warnings&#39;,True):
-        kwargs={
-            &#39;class_name&#39;:self.__class__.__name__,
-            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
-        }
-        pre_message=&#34;(Warning for `{class_name}.{method_name}`): &#34;.format(**kwargs)
-        # Attempt to format in kwargs where possible
-        try:
-            message=pre_message+message.format(**kwargs)
-        except:
-            message=pre_message+message
-        if self.__dict__.get(&#39;show_warning_stack&#39;,False):
-            traceback.print_stack(limit=10)
-        print(message)</code></pre>
-</details>
-</dd>
-</dl>
-</dd>
 <dt id="pamda.pamda.pamda_class"><code class="flex name class">
 <span>class <span class="ident">pamda_class</span></span>
 </code></dt>
@@ -904,7 +562,7 @@ pamda=pamda_class()</code></pre>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class pamda_class(error_handling):
+<pre><code class="python">class pamda_class(pamda_error):
     def flatten(self, data):
         &#34;&#34;&#34;
         Function:
@@ -1189,7 +847,7 @@ pamda=pamda_class()</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="pamda.pamda.error_handling" href="#pamda.pamda.error_handling">error_handling</a></li>
+<li><a title="pamda.pamda.pamda_error" href="#pamda.pamda.pamda_error">pamda_error</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -1764,14 +1422,356 @@ p.pluck(data=data, path=['a','b'], if_path=['a','c'], if_vals=['d']) #=&gt; [1]
 </dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
-<li><code><b><a title="pamda.pamda.error_handling" href="#pamda.pamda.error_handling">error_handling</a></b></code>:
+<li><code><b><a title="pamda.pamda.pamda_error" href="#pamda.pamda.pamda_error">pamda_error</a></b></code>:
 <ul class="hlist">
-<li><code><a title="pamda.pamda.error_handling.exception" href="#pamda.pamda.error_handling.exception">exception</a></code></li>
-<li><code><a title="pamda.pamda.error_handling.vprint" href="#pamda.pamda.error_handling.vprint">vprint</a></code></li>
-<li><code><a title="pamda.pamda.error_handling.warn" href="#pamda.pamda.error_handling.warn">warn</a></code></li>
+<li><code><a title="pamda.pamda.pamda_error.exception" href="#pamda.pamda.pamda_error.exception">exception</a></code></li>
+<li><code><a title="pamda.pamda.pamda_error.vprint" href="#pamda.pamda.pamda_error.vprint">vprint</a></code></li>
+<li><code><a title="pamda.pamda.pamda_error.warn" href="#pamda.pamda.pamda_error.warn">warn</a></code></li>
 </ul>
 </li>
 </ul>
+</dd>
+<dt id="pamda.pamda.pamda_error"><code class="flex name class">
+<span>class <span class="ident">pamda_error</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class pamda_error:
+    def warn(self, message, depth=0):
+        &#34;&#34;&#34;
+        Usage:
+
+        - Creates a class based warning message
+
+        Requires:
+        - `message`:
+            - Type: str
+            - What: The message to warn users with
+            - Note: Messages with `{class_name}` and `{method_name}` in them are formatted appropriately
+        - `depth`:
+            - Type: int
+            - What: The depth of the nth call below the top of the method stack
+            - Note: Depth starts at 0 (indicating the current method in the stack)
+            - Default: 0
+
+        Notes:
+
+        - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
+        - If `self.show_warnings=False`, supresses all warnings
+        &#34;&#34;&#34;
+        if self.__dict__.get(&#39;show_warnings&#39;,True):
+            kwargs={
+                &#39;class_name&#39;:self.__class__.__name__,
+                &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+            }
+            pre_message=&#34;(Warning for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+            # Attempt to format in kwargs where possible
+            try:
+                message=pre_message+message.format(**kwargs)
+            except:
+                message=pre_message+message
+            if self.__dict__.get(&#39;show_warning_stack&#39;,False):
+                traceback.print_stack(limit=10)
+            print(message)
+
+    def vprint(self, message, depth=0, force=False):
+        &#34;&#34;&#34;
+        Usage:
+
+        - Print a given statement if `self.verbose` is true
+
+        Requires:
+
+        - `message`:
+            - Type: str
+            - What: A message to print if `self.verbose` is true
+            - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+
+        Optional:
+
+        - `depth`:
+            - Type: int
+            - What: The depth of the nth call below the top of the method stack
+            - Note: Depth starts at 0 (indicating the current method in the stack)
+            - Default: 0
+        - `force`:
+            - Type: bool
+            - What: Force a print statement even if not in verbose
+            - Note: For formatting purposes
+            - Default: False
+        &#34;&#34;&#34;
+        if self.verbose or force:
+            kwargs={
+                &#39;class_name&#39;:self.__class__.__name__,
+                &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+            }
+            pre_message=&#34;(`{class_name}.{method_name}`): &#34;.format(**kwargs)
+            # Attempt to format in kwargs where possible
+            try:
+                message=pre_message+message.format(**kwargs)
+            except:
+                message=pre_message+message
+            print(message)
+
+    def exception(self, message, depth=0):
+        &#34;&#34;&#34;
+        Usage:
+
+        - Creates a class based exception message
+
+        Requires:
+
+        - `message`:
+            - Type: str
+            - What: The message to warn users with
+            - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+        - `depth`:
+            - Type: int
+            - What: The depth of the nth call below the top of the method stack
+            - Note: Depth starts at 0 (indicating the current method in the stack)
+            - Default: 0
+
+        Notes:
+
+        - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
+        - If `self.show_warnings=False`, supresses all warnings
+        &#34;&#34;&#34;
+        kwargs={
+            &#39;class_name&#39;:self.__class__.__name__,
+            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+        }
+        pre_message=&#34;(Exception for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+        # Attempt to format in kwargs where possible
+        try:
+            message=pre_message+message.format(**kwargs)
+        except:
+            message=pre_message+message
+        raise Exception(message)</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="pamda.pamda.pamda_class" href="#pamda.pamda.pamda_class">pamda_class</a></li>
+<li><a title="pamda.pamda.pamdata" href="#pamda.pamda.pamdata">pamdata</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="pamda.pamda.pamda_error.exception"><code class="name flex">
+<span>def <span class="ident">exception</span></span>(<span>self, message, depth=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Usage:</p>
+<ul>
+<li>Creates a class based exception message</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>message</code>:<ul>
+<li>Type: str</li>
+<li>What: The message to warn users with</li>
+<li>Note: Messages with <code>{{class_name}}</code> and <code>{{method_name}}</code> in them are formatted appropriately</li>
+</ul>
+</li>
+<li><code>depth</code>:<ul>
+<li>Type: int</li>
+<li>What: The depth of the nth call below the top of the method stack</li>
+<li>Note: Depth starts at 0 (indicating the current method in the stack)</li>
+<li>Default: 0</li>
+</ul>
+</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>If <code>self.show_warning_stack=True</code>, also prints the stack trace up to 10 layers deep</li>
+<li>If <code>self.show_warnings=False</code>, supresses all warnings</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exception(self, message, depth=0):
+    &#34;&#34;&#34;
+    Usage:
+
+    - Creates a class based exception message
+
+    Requires:
+
+    - `message`:
+        - Type: str
+        - What: The message to warn users with
+        - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+    - `depth`:
+        - Type: int
+        - What: The depth of the nth call below the top of the method stack
+        - Note: Depth starts at 0 (indicating the current method in the stack)
+        - Default: 0
+
+    Notes:
+
+    - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
+    - If `self.show_warnings=False`, supresses all warnings
+    &#34;&#34;&#34;
+    kwargs={
+        &#39;class_name&#39;:self.__class__.__name__,
+        &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+    }
+    pre_message=&#34;(Exception for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+    # Attempt to format in kwargs where possible
+    try:
+        message=pre_message+message.format(**kwargs)
+    except:
+        message=pre_message+message
+    raise Exception(message)</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.pamda_error.vprint"><code class="name flex">
+<span>def <span class="ident">vprint</span></span>(<span>self, message, depth=0, force=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Usage:</p>
+<ul>
+<li>Print a given statement if <code>self.verbose</code> is true</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>message</code>:<ul>
+<li>Type: str</li>
+<li>What: A message to print if <code>self.verbose</code> is true</li>
+<li>Note: Messages with <code>{{class_name}}</code> and <code>{{method_name}}</code> in them are formatted appropriately</li>
+</ul>
+</li>
+</ul>
+<p>Optional:</p>
+<ul>
+<li><code>depth</code>:<ul>
+<li>Type: int</li>
+<li>What: The depth of the nth call below the top of the method stack</li>
+<li>Note: Depth starts at 0 (indicating the current method in the stack)</li>
+<li>Default: 0</li>
+</ul>
+</li>
+<li><code>force</code>:<ul>
+<li>Type: bool</li>
+<li>What: Force a print statement even if not in verbose</li>
+<li>Note: For formatting purposes</li>
+<li>Default: False</li>
+</ul>
+</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def vprint(self, message, depth=0, force=False):
+    &#34;&#34;&#34;
+    Usage:
+
+    - Print a given statement if `self.verbose` is true
+
+    Requires:
+
+    - `message`:
+        - Type: str
+        - What: A message to print if `self.verbose` is true
+        - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+
+    Optional:
+
+    - `depth`:
+        - Type: int
+        - What: The depth of the nth call below the top of the method stack
+        - Note: Depth starts at 0 (indicating the current method in the stack)
+        - Default: 0
+    - `force`:
+        - Type: bool
+        - What: Force a print statement even if not in verbose
+        - Note: For formatting purposes
+        - Default: False
+    &#34;&#34;&#34;
+    if self.verbose or force:
+        kwargs={
+            &#39;class_name&#39;:self.__class__.__name__,
+            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+        }
+        pre_message=&#34;(`{class_name}.{method_name}`): &#34;.format(**kwargs)
+        # Attempt to format in kwargs where possible
+        try:
+            message=pre_message+message.format(**kwargs)
+        except:
+            message=pre_message+message
+        print(message)</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda.pamda_error.warn"><code class="name flex">
+<span>def <span class="ident">warn</span></span>(<span>self, message, depth=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Usage:</p>
+<ul>
+<li>Creates a class based warning message</li>
+</ul>
+<p>Requires:
+- <code>message</code>:
+- Type: str
+- What: The message to warn users with
+- Note: Messages with <code>{class_name}</code> and <code>{method_name}</code> in them are formatted appropriately
+- <code>depth</code>:
+- Type: int
+- What: The depth of the nth call below the top of the method stack
+- Note: Depth starts at 0 (indicating the current method in the stack)
+- Default: 0</p>
+<p>Notes:</p>
+<ul>
+<li>If <code>self.show_warning_stack=True</code>, also prints the stack trace up to 10 layers deep</li>
+<li>If <code>self.show_warnings=False</code>, supresses all warnings</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def warn(self, message, depth=0):
+    &#34;&#34;&#34;
+    Usage:
+
+    - Creates a class based warning message
+
+    Requires:
+    - `message`:
+        - Type: str
+        - What: The message to warn users with
+        - Note: Messages with `{class_name}` and `{method_name}` in them are formatted appropriately
+    - `depth`:
+        - Type: int
+        - What: The depth of the nth call below the top of the method stack
+        - Note: Depth starts at 0 (indicating the current method in the stack)
+        - Default: 0
+
+    Notes:
+
+    - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
+    - If `self.show_warnings=False`, supresses all warnings
+    &#34;&#34;&#34;
+    if self.__dict__.get(&#39;show_warnings&#39;,True):
+        kwargs={
+            &#39;class_name&#39;:self.__class__.__name__,
+            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+        }
+        pre_message=&#34;(Warning for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+        # Attempt to format in kwargs where possible
+        try:
+            message=pre_message+message.format(**kwargs)
+        except:
+            message=pre_message+message
+        if self.__dict__.get(&#39;show_warning_stack&#39;,False):
+            traceback.print_stack(limit=10)
+        print(message)</code></pre>
+</details>
+</dd>
+</dl>
 </dd>
 <dt id="pamda.pamda.pamdata"><code class="flex name class">
 <span>class <span class="ident">pamdata</span></span>
@@ -1782,7 +1782,7 @@ p.pluck(data=data, path=['a','b'], if_path=['a','c'], if_vals=['d']) #=&gt; [1]
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class pamdata(error_handling):
+<pre><code class="python">class pamdata(pamda_error):
     def read_csv(self, filename, has_header=True, return_dict=True):
         &#34;&#34;&#34;
         Function:
@@ -1890,7 +1890,7 @@ p.pluck(data=data, path=['a','b'], if_path=['a','c'], if_vals=['d']) #=&gt; [1]
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="pamda.pamda.error_handling" href="#pamda.pamda.error_handling">error_handling</a></li>
+<li><a title="pamda.pamda.pamda_error" href="#pamda.pamda.pamda_error">pamda_error</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2112,11 +2112,11 @@ p.pluck(data=data, path=['a','b'], if_path=['a','c'], if_vals=['d']) #=&gt; [1]
 </dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
-<li><code><b><a title="pamda.pamda.error_handling" href="#pamda.pamda.error_handling">error_handling</a></b></code>:
+<li><code><b><a title="pamda.pamda.pamda_error" href="#pamda.pamda.pamda_error">pamda_error</a></b></code>:
 <ul class="hlist">
-<li><code><a title="pamda.pamda.error_handling.exception" href="#pamda.pamda.error_handling.exception">exception</a></code></li>
-<li><code><a title="pamda.pamda.error_handling.vprint" href="#pamda.pamda.error_handling.vprint">vprint</a></code></li>
-<li><code><a title="pamda.pamda.error_handling.warn" href="#pamda.pamda.error_handling.warn">warn</a></code></li>
+<li><code><a title="pamda.pamda.pamda_error.exception" href="#pamda.pamda.pamda_error.exception">exception</a></code></li>
+<li><code><a title="pamda.pamda.pamda_error.vprint" href="#pamda.pamda.pamda_error.vprint">vprint</a></code></li>
+<li><code><a title="pamda.pamda.pamda_error.warn" href="#pamda.pamda.pamda_error.warn">warn</a></code></li>
 </ul>
 </li>
 </ul>
@@ -2138,14 +2138,6 @@ p.pluck(data=data, path=['a','b'], if_path=['a','c'], if_vals=['d']) #=&gt; [1]
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="pamda.pamda.error_handling" href="#pamda.pamda.error_handling">error_handling</a></code></h4>
-<ul class="">
-<li><code><a title="pamda.pamda.error_handling.exception" href="#pamda.pamda.error_handling.exception">exception</a></code></li>
-<li><code><a title="pamda.pamda.error_handling.vprint" href="#pamda.pamda.error_handling.vprint">vprint</a></code></li>
-<li><code><a title="pamda.pamda.error_handling.warn" href="#pamda.pamda.error_handling.warn">warn</a></code></li>
-</ul>
-</li>
-<li>
 <h4><code><a title="pamda.pamda.pamda_class" href="#pamda.pamda.pamda_class">pamda_class</a></code></h4>
 <ul class="two-column">
 <li><code><a title="pamda.pamda.pamda_class.assocPath" href="#pamda.pamda.pamda_class.assocPath">assocPath</a></code></li>
@@ -2156,6 +2148,14 @@ p.pluck(data=data, path=['a','b'], if_path=['a','c'], if_vals=['d']) #=&gt; [1]
 <li><code><a title="pamda.pamda.pamda_class.nest" href="#pamda.pamda.pamda_class.nest">nest</a></code></li>
 <li><code><a title="pamda.pamda.pamda_class.path" href="#pamda.pamda.pamda_class.path">path</a></code></li>
 <li><code><a title="pamda.pamda.pamda_class.pluck" href="#pamda.pamda.pamda_class.pluck">pluck</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pamda.pamda.pamda_error" href="#pamda.pamda.pamda_error">pamda_error</a></code></h4>
+<ul class="">
+<li><code><a title="pamda.pamda.pamda_error.exception" href="#pamda.pamda.pamda_error.exception">exception</a></code></li>
+<li><code><a title="pamda.pamda.pamda_error.vprint" href="#pamda.pamda.pamda_error.vprint">vprint</a></code></li>
+<li><code><a title="pamda.pamda.pamda_error.warn" href="#pamda.pamda.pamda_error.warn">warn</a></code></li>
 </ul>
 </li>
 <li>
