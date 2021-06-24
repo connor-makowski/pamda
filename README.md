@@ -3,14 +3,18 @@ Pamda
 Python wrapper for object oriented processes similar to [Ramda](https://ramdajs.com/docs/).
 
 
-Full Documentation
+Documentation for Pamda
 --------
-https://connor-makowski.github.io/pamda/pamda.html
+https://connor-makowski.github.io/pamda/pamda_class.html
+
+Documentation for Pamdata (simplified data access)
+--------
+https://connor-makowski.github.io/pamda/pamdata_class.html
 
 Features
 --------
 
-- Simplified python access for certain Ramda functions.
+- Simplified python access for certain Ramda and python data functions.
 
 Setup
 ----------
