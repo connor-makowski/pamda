@@ -206,6 +206,7 @@ class pamda_class(pamda_utils):
             - What: The path to pull given the data
 
         Optional:
+
         - `if_path`:
             - Type: list of strs
             - What: Path to check if the `if_val` matches

@@ -234,6 +234,7 @@ class pamda_class(pamda_utils):
             - What: The path to pull given the data
 
         Optional:
+        
         - `if_path`:
             - Type: list of strs
             - What: Path to check if the `if_val` matches
@@ -757,6 +758,7 @@ class pamda_class(pamda_utils):
             - What: The path to pull given the data
 
         Optional:
+        
         - `if_path`:
             - Type: list of strs
             - What: Path to check if the `if_val` matches
@@ -1812,17 +1814,23 @@ p.path(data=data, path=['a','b']) #=&gt; 1
 </ul>
 </li>
 </ul>
-<p>Optional:
-- <code>if_path</code>:
-- Type: list of strs
-- What: Path to check if the <code>if_val</code> matches
-- Default: None
-- Note: If None, no filtering is applied
-- <code>if_vals</code>:
-- Type: list of any types
-- What: If the <code>if_path</code>s value is in this list, this item is returned
-- Note: Items should be the same type as objects at end of <code>if_path</code>
-- Note: If None, no filtering is applied</p>
+<p>Optional:</p>
+<ul>
+<li><code>if_path</code>:<ul>
+<li>Type: list of strs</li>
+<li>What: Path to check if the <code>if_val</code> matches</li>
+<li>Default: None</li>
+<li>Note: If None, no filtering is applied</li>
+</ul>
+</li>
+<li><code>if_vals</code>:<ul>
+<li>Type: list of any types</li>
+<li>What: If the <code>if_path</code>s value is in this list, this item is returned</li>
+<li>Note: Items should be the same type as objects at end of <code>if_path</code></li>
+<li>Note: If None, no filtering is applied</li>
+</ul>
+</li>
+</ul>
 <p>Example:</p>
 <pre><code>data=[{'a':{'b':1, 'c':'d'}},{'a':{'b':2, 'c':'e'}}]
 p.pluck(data=data, path=['a','b']) #=&gt; [1,2]
@@ -1848,6 +1856,7 @@ p.pluck(data=data, path=['a','b'], if_path=['a','c'], if_vals=['d']) #=&gt; [1]
         - What: The path to pull given the data
 
     Optional:
+    
     - `if_path`:
         - Type: list of strs
         - What: Path to check if the `if_val` matches
