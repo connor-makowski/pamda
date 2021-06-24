@@ -1,4 +1,5 @@
 from pamda.pamda_utils import pamda_utils
+import types
 
 class pamda_class(pamda_utils):
     def flatten(self, data):
@@ -160,6 +161,54 @@ class pamda_class(pamda_utils):
                 data[path[0]] = default
             data[path[0]] = default_func(data[path[0]])
             return data
+
+    def curry(self, fn):
+        """
+        Function:
+
+        - Curries a function such that inputs can be added interatively
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to curry
+            - Note: Class methods auto apply self during curry
+
+        Examples:
+
+        ```
+        curZip=p.curry(p.zip)
+        print(curZip(['a','b'],[1,2])) #=> [['a',1],['b',2]]
+        ```
+
+        ```
+        def myFunction(a,b,c):
+            return [a,b,c]
+
+        curFn=p.curry(myFunction)
+
+        print(curFn(1,2,3)) #=> [1,2,3]
+        print(curFn(1)(2,3)) #=> [1,2,3]
+
+        x=curFn(1)
+        y=x(2)
+        z=y(3)
+        print(z) #=> [1,2,3]
+        ```
+        """
+        def __init__(*args, **kwargs):
+            def __call__(*call_args, **call_kwargs):
+                all_args = args + call_args
+                all_kwargs = dict(**kwargs, **call_kwargs)
+                # Handle class methods different than functions accounting for one extra input (self)
+                extra_method_input_count=1 if isinstance(fn, types.MethodType) else 0
+                if len(all_args) + len(all_kwargs) >= fn.__code__.co_argcount-extra_method_input_count:
+                    return fn(*all_args, **all_kwargs)
+                else:
+                    return __init__(*all_args, **all_kwargs)
+            return __call__
+        return __init__()
 
     def dissocPath(self, data, path):
         """
