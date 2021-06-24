@@ -27,10 +27,16 @@ Make sure you have Python 3.6.x (or higher) installed on your system. You can do
 pip install pamda
 ```
 
-### Example
+### Examples
 ```py
 from pamda import pamda as p
 
 data=[['a','b'],[1,2]]
 p.flatten(data=data) #=> ['a','b',1,2]
+```
+
+```py
+from pamda import pamdata as pdt
+
+pdt.read_csv(filename='myfile.csv')
 ```
