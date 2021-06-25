@@ -27,16 +27,43 @@ Make sure you have Python 3.6.x (or higher) installed on your system. You can do
 pip install pamda
 ```
 
-### Examples
+### Choice Examples Highlight key Pamda features
 ```py
 from pamda import pamda as p
 
-data=[['a','b'],[1,2]]
-p.flatten(data=data) #=> ['a','b',1,2]
+# Path
+data={'a':{'b':1, 'c':2}}
+p.path(path=['a','b'], data=data) #=> 1
+
+# Curry
+def myFunction(a,b,c):
+    return [a,b,c]
+
+curriedMyFn=p.curry(myFunction)
+x=curriedMyFn(1,2)
+x(3) #=> [1,2,3]
+x(4) #=> [1,2,4]
+
+data={'a':{'b':1, 'c':2}}
+curriedPath=p.curry(p.path)
+abPath=curriedPath(['a','b'])
+abPath(data=data) #=> 1
+
+# Pipe
+def square(x):
+  return x**2
+
+def half(x):
+  return x/2
+
+def negate(x):
+  return -x
+
+p.pipe(fns=[square, half, negate], data=6) #=> -18
 ```
 
 ```py
-from pamda import pamdata as pdt
+from pamda import pamdata as pdata
 
-pdt.read_csv(filename='myfile.csv')
+pdata.read_csv(filename='myfile.csv')
 ```
