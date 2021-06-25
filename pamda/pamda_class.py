@@ -469,6 +469,10 @@ class pamda_class(pamda_utils):
         - `fns`:
             - Type: list of (functions | methods)
             - What: The list of functions and methods to pipe the data through
+            - Notes: The first function in the list can be any arity (accepting any number of inputs)
+            - Notes: Any further function in the list can only be unary (accepting only one input)
+            - Notes: A function can be curried, but is not required to be
+            - Notes: You may opt to curry functions and add inputs to make them unary 
         - `data`:
             - Type: any
             - What: The data to be piped through the specified `fns`
