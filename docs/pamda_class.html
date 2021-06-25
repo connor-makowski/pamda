@@ -26,9 +26,181 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from pamda.pamda_utils import pamda_utils
+<pre><code class="python">from pamda.pamda_utils import pamda_utils, curry_class
 
 class pamda_class(pamda_utils):
+    def assocPath(self, path, value, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Ensures a path exists within a nested dictionary
+
+        Requires:
+
+        - `path`:
+            - Type: list of strs | str
+            - What: The path to check
+            - Note: If a string is passed, assumes a single item path list with that string
+        - `value`:
+            - Type: any
+            - What: The value to appropriate to the end of the path
+        - `data`:
+            - Type: dict
+            - What: A dictionary to check if the path exists
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.assocPath(path=[&#39;a&#39;,&#39;c&#39;], value=3, data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:3}}
+        ```
+        &#34;&#34;&#34;
+        if isinstance(path, str):
+            path=[path]
+        if len(path) &gt; 1:
+            if path[0] not in data:
+                data[path[0]] = {}
+            data[path[0]] = self.assocPath(data=data[path[0]], path=path[1:],value=value)
+            return data
+        else:
+            data[path[0]] = value
+            return data
+
+    def assocPathComplex(self, default, default_fn, path, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Ensures a path exists within a nested dictionary
+
+        Requires:
+
+        - `default`:
+            - Type: any
+            - What: The default item to add to a path that does not yet exist
+        - `default_fn`:
+            - Type: lambda function
+            - What: A single input lambda function that takes in the current path item (or default) and adjusts it
+            - Example: `lambda x: x` # Returns the value in the dict or the default value if none was present
+        - `path`:
+            - Type: list of strs
+            - What: The path to check
+        - `data`:
+            - Type: dict
+            - What: A dictionary to check if the path exists
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=[&#39;a&#39;,&#39;d&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[],&#39;d&#39;:[2,1]}}
+        ```
+        &#34;&#34;&#34;
+        if len(path) &gt; 1:
+            if path[0] not in data:
+                data[path[0]] = {}
+            data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_fn=default_fn)
+            return data
+        else:
+            if path[0] not in data:
+                data[path[0]] = default
+            data[path[0]] = default_fn(data[path[0]])
+            return data
+
+    def curry(self, fn):
+        &#34;&#34;&#34;
+        Function:
+
+        - Curries a function such that inputs can be added interatively
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to curry
+            - Note: Class methods auto apply self during curry
+
+        Examples:
+
+        ```
+        curriedZip=p.curry(p.zip)
+        print(curiedZip([&#39;a&#39;,&#39;b&#39;])([1,2])) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+        ```
+
+        ```
+        def myFunction(a,b,c):
+            return [a,b,c]
+
+        curriedMyFn=p.curry(myFunction)
+
+        print(curriedMyFn(1,2,3)) #=&gt; [1,2,3]
+        print(curriedMyFn(1)(2,3)) #=&gt; [1,2,3]
+
+        x=curriedMyFn(1)
+        y=x(2)
+        print(y(3)) #=&gt; [1,2,3]
+        print(y(4)) #=&gt; [1,2,4]
+        ```
+        &#34;&#34;&#34;
+        return curry_class(fn)
+
+    def difference(self, a, b):
+        &#34;&#34;&#34;
+        Function:
+
+        - Combines two lists into a list of no duplicates items present in the first list but not the second
+
+        Requires:
+
+        - `a`:
+            - Type: list
+            - What: List of items in which to look for a difference
+        - `b`:
+            - Type: list
+            - What: List of items in which to compare when looking for the difference
+
+        Example:
+
+        ```
+        a=[&#39;a&#39;,&#39;b&#39;]
+        b=[&#39;b&#39;,&#39;c&#39;]
+        p.difference(a=a, b=b) #=&gt; [&#39;a&#39;]
+        p.difference(a=b, b=a) #=&gt; [&#39;c&#39;]
+        ```
+        &#34;&#34;&#34;
+        return list(set(a).difference(set(b)))
+
+    def dissocPath(self, path, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Removes the value at the end of a path within a nested dictionary
+
+        Requires:
+
+        - `path`:
+            - Type: list of strs | str
+            - What: The path to remove from the dictionary
+            - Note: If a string is passed, assumes a single item path list with that string
+        - `data`:
+            - Type: dict
+            - What: A dictionary with a path to be removed
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:0,&#39;d&#39;:1}}}
+        p.dissocPath(path=[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;d&#39;:1}}}
+        ```
+        &#34;&#34;&#34;
+        if isinstance(path, str):
+            path=[path]
+        if not self.hasPath(data, path):
+            self.warn(message=&#34;Path does not exist&#34;)
+            return data
+        if len(path)==0:
+            return {}
+        return self.assocPath(data=data, path=path[:-1], value={key:value for key, value in self.path(data, path=path[:-1]).items() if key!=path[-1]})
+
     def flatten(self, data):
         &#34;&#34;&#34;
         Function:
@@ -49,35 +221,33 @@ class pamda_class(pamda_utils):
         &#34;&#34;&#34;
         return [i for sub_list in data for i in sub_list]
 
-    def path(self, data, path, Or=None):
+    def getArity(self, fn):
         &#34;&#34;&#34;
         Function:
 
-        - Returns the value of a path within a nested dictionary
+        - Gets the arity (number of inputs left to be specified) of a function or method (curried or uncurried)
 
         Requires:
 
-        - `data`:
-            - Type: dict
-            - What: A dictionary to get the path from
-        - `path`:
-            - Type: list of strs
-            - What: The path to pull given the data
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to get the arity of
+            - Note: Class methods remove one arity to account for self
 
-        Example:
+        Examples:
 
         ```
-        data={&#39;a&#39;:{&#39;b&#39;:1}}
-        p.path(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; 1
+        p.getArity(p.zip) #=&gt; 2
+        curriedZip=p.curry(p.zip)
+        ABCuriedZip=curriedZip([&#39;a&#39;,&#39;b&#39;])
+        p.getArity(ABCuriedZip) #=&gt; 1
         ```
         &#34;&#34;&#34;
-        #TODO: Add Or func
-        #TODO: Accept string for path if prop
-        if len(path) &gt; 0:
-            return self.path(data=data[path[0]], path=path[1:])
-        return data
+        if isinstance(fn, curry_class):
+            return fn.arity
+        return curry_class(fn).arity
 
-    def hasPath(self, data, path):
+    def hasPath(self, path, data):
         &#34;&#34;&#34;
         Function:
 
@@ -85,19 +255,20 @@ class pamda_class(pamda_utils):
 
         Requires:
 
+        - `path`:
+            - Type: list of strs | str
+            - What: The path to check
+            - Note: If a string is passed, assumes a single item path list with that string
         - `data`:
             - Type: dict
             - What: A dictionary to check if the path exists
-        - `path`:
-            - Type: list of strs or single str
-            - What: The path to check
 
         Example:
 
         ```
         data={&#39;a&#39;:{&#39;b&#39;:1}}
-        p.hasPath(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; True
-        p.hasPath(data=data, path=[&#39;a&#39;,&#39;d&#39;]) #=&gt; False
+        p.hasPath(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; True
+        p.hasPath(path=[&#39;a&#39;,&#39;d&#39;], data=data) #=&gt; False
         ```
         &#34;&#34;&#34;
         if isinstance(path, str):
@@ -108,209 +279,6 @@ class pamda_class(pamda_utils):
             else:
                 return False
         return True
-
-    def assocPath(self, data, path, value):
-        &#34;&#34;&#34;
-        Function:
-
-        - Ensures a path exists within a nested dictionary
-
-        Requires:
-
-        - `data`:
-            - Type: dict
-            - What: A dictionary to check if the path exists
-        - `path`:
-            - Type: list of strs
-            - What: The path to check
-        - `value`:
-            - Type: any
-            - What: The value to appropriate to the end of the path
-
-        Example:
-
-        ```
-        data={&#39;a&#39;:{&#39;b&#39;:1}}
-        p.assocPath(data=data, path=[&#39;a&#39;,&#39;c&#39;], value=3) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:3}}
-        ```
-        &#34;&#34;&#34;
-        if len(path) &gt; 1:
-            if path[0] not in data:
-                data[path[0]] = {}
-            data[path[0]] = self.assocPath(data=data[path[0]], path=path[1:],value=value)
-            return data
-        else:
-            data[path[0]] = value
-            return data
-
-    def assocPathComplex(self, data, path, default=None, default_func=lambda x: x):
-        &#34;&#34;&#34;
-        Function:
-
-        - Ensures a path exists within a nested dictionary
-
-        Requires:
-
-        - `data`:
-            - Type: dict
-            - What: A dictionary to check if the path exists
-        - `path`:
-            - Type: list of strs
-            - What: The path to check
-
-        Optional:
-
-        - `default`:
-            - Type: any
-            - What: The default item to add to a path that does not yet exist
-            - Default: None
-        - `default_func`:
-            - Type: lambda function
-            - What: A single input lambda function that takes in the current path item (or default) and adjusts it
-            - Default: `lambda x: x` # Returns the value in the dict or the default value if none was present
-
-        Example:
-
-        ```
-        data={&#39;a&#39;:{&#39;b&#39;:1}}
-        p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;b&#39;], default=[]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1}}
-        p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;c&#39;], default=[]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:[]}}
-        p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;d&#39;], default=[2], default_func=lambda x:x+[1]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[],&#39;d&#39;:[2,1]}}
-        ```
-        &#34;&#34;&#34;
-        if len(path) &gt; 1:
-            if path[0] not in data:
-                data[path[0]] = {}
-            data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_func=default_func)
-            return data
-        else:
-            if path[0] not in data:
-                data[path[0]] = default
-            data[path[0]] = default_func(data[path[0]])
-            return data
-
-    def dissocPath(self, data, path):
-        &#34;&#34;&#34;
-        Function:
-
-        - Removes the value at the end of a path within a nested dictionary
-
-        Requires:
-
-        - `data`:
-            - Type: dict
-            - What: A dictionary with a path to be removed
-        - `path`:
-            - Type: list of strs
-            - What: The path to remove from the dictionary
-
-        Example:
-
-        ```
-        data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:0,&#39;d&#39;:1}}}
-        p.dissocPath(data=data, path=[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;d&#39;:1}}}
-        ```
-        &#34;&#34;&#34;
-        if not self.hasPath(data, path):
-            self.warn(message=&#34;Path does not exist&#34;)
-            return data
-        if len(path)==0:
-            return {}
-        return self.assocPath(data=data, path=path[:-1], value={key:value for key, value in self.path(data, path=path[:-1]).items() if key!=path[-1]})
-
-    def pluck(self, data, path, if_path=None, if_vals=[]):
-        &#34;&#34;&#34;
-        Function:
-
-        - Returns the values of a path within a list of nested dictionaries
-
-        Requires:
-
-        - `data`:
-            - Type: list of dicts
-            - What: A list of dictionary to get the path from
-        - `path`:
-            - Type: list of strs
-            - What: The path to pull given the data
-
-        Optional:
-        
-        - `if_path`:
-            - Type: list of strs
-            - What: Path to check if the `if_val` matches
-            - Default: None
-            - Note: If None, no filtering is applied
-        - `if_vals`:
-            - Type: list of any types
-            - What: If the `if_path`s value is in this list, this item is returned
-            - Note: Items should be the same type as objects at end of `if_path`
-            - Note: If None, no filtering is applied
-
-        Example:
-
-        ```
-        data=[{&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:&#39;d&#39;}},{&#39;a&#39;:{&#39;b&#39;:2, &#39;c&#39;:&#39;e&#39;}}]
-        p.pluck(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; [1,2]
-        p.pluck(data=data, path=[&#39;a&#39;,&#39;b&#39;], if_path=[&#39;a&#39;,&#39;c&#39;], if_vals=[&#39;d&#39;]) #=&gt; [1]
-        ```
-        &#34;&#34;&#34;
-        if not isinstance(data, list):
-            self.exception(&#34;Attempting to pluck from an object that is not a list&#34;)
-        if len(data) == 0:
-            self.exception(&#34;Attempting to pluck from an empty list&#34;)
-        if if_path is not None and isinstance(if_vals, list):
-            return [self.path(data=i, path=path) for i in data if self.path(data=i, path=if_path) in if_vals]
-        return [self.path(data=i, path=path) for i in data]
-
-    def nest(self, data, nest_by_variables, nest_output_variable):
-        &#34;&#34;&#34;
-        Function:
-
-        - Nests a list of dictionaries into a nested dictionary
-        - Similar items are appended to a list in the end of the nested dictionary
-
-        Requires:
-
-        - `data`:
-            - Type: list of dicts
-            - What: A list of dictionaries to use for nesting purposes
-        - `nest_by_variables`:
-            - Type: list of strs
-            - What: The variables to pull from each item in data
-            - Note: Used to build out the nested dicitonary
-            - Note: Order matters as the nesting occurs in order of variable
-        - `nest_output_variable`:
-            - Type: str
-            - What: The variable to add to the list at the end of the nested dictionary path
-
-        Example:
-
-        ```
-        data=[
-            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;c&#39;},
-            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;d&#39;},
-            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;e&#39;, &#39;output&#39;:&#39;f&#39;}
-        ]
-        p.nest(
-            data=data,
-            nest_by_variables=[&#39;x_1&#39;,&#39;x_2&#39;],
-            nest_output_variable=&#39;output&#39;
-        ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:[&#39;c&#39;,&#39;d&#39;], &#39;e&#39;:[&#39;f&#39;]}}
-        ```
-        &#34;&#34;&#34;
-        if not isinstance(data, list):
-            self.exception(&#34;Attempting to `nest` an object that is not a list&#34;)
-        if len(data) == 0:
-            self.exception(&#34;Attempting to `nest` from an empty list&#34;)
-        nested_output = {}
-        for item in data:
-            nested_output = self.assocPathComplex(
-                data=nested_output,
-                path=[item[key] for key in nest_by_variables],
-                default=[],
-                default_func=lambda x: x + [item[nest_output_variable]]
-            )
-        return nested_output
 
     def head(self, data):
         &#34;&#34;&#34;
@@ -339,6 +307,317 @@ class pamda_class(pamda_utils):
             self.exception(&#34;Attempting to call `head` on an empty list or str&#34;)
         return data[0]
 
+    def intersection(self, a, b):
+        &#34;&#34;&#34;
+        Function:
+
+        - Combines two lists into a list of no duplicates composed of those elements common to both lists
+
+        Requires:
+
+        - `a`:
+            - Type: list
+            - What: List of items in which to look for an intersection
+        - `b`:
+            - Type: list
+            - What: List of items in which to look for an intersection
+
+        Example:
+
+        ```
+        a=[&#39;a&#39;,&#39;b&#39;]
+        b=[&#39;b&#39;,&#39;c&#39;]
+        p.intersection(a=a, b=b) #=&gt; [&#39;b&#39;]
+        ```
+        &#34;&#34;&#34;
+        return list(set(a).intersection(set(b)))
+
+    def mergeDeep(self, update_data, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Recursively merges two nested dictionaries keeping all keys at each layer
+        - Values from `update_data` are used when keys are present in both dictionaries
+
+        Requires:
+
+        - `update_data`:
+            - Type: dict
+            - What: The new data that will take precedence during merging
+        - `data`:
+            - Type: dict
+            - What: The original data that will be merged into
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:&#39;d&#39;},&#39;e&#39;:&#39;f&#39;}}
+        update_data={&#39;a&#39;:{&#39;b&#39;:{&#39;h&#39;:&#39;i&#39;},&#39;e&#39;,&#39;g&#39;}}
+        p.mergeDeep(
+            update_data=update_data,
+            data=data
+        ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:&#39;d&#39;,&#39;h&#39;:&#39;i&#39;},&#39;e&#39;:&#39;g&#39;}}
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(data, dict) or not isinstance(update_data, dict):
+            return update_data
+        output=dict(data)
+        keys_original=set(data.keys())
+        keys_update=set(update_data.keys())
+        similar_keys=keys_original.intersection(keys_update)
+        similar_dict={key:self.mergeDeep(data[key], update_data[key]) for key in similar_keys}
+        new_keys=keys_update.difference(keys_original)
+        new_dict={key:update_data[key] for key in new_keys}
+        output.update(similar_dict)
+        output.update(new_dict)
+        return output
+
+    def nest(self, path_keys, value_key, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Nests a list of dictionaries into a nested dictionary
+        - Similar items are appended to a list in the end of the nested dictionary
+
+        Requires:
+
+        - `path_keys`:
+            - Type: list of strs
+            - What: The variables to pull from each item in data
+            - Note: Used to build out the nested dicitonary
+            - Note: Order matters as the nesting occurs in order of variable
+        - `value_key`:
+            - Type: str
+            - What: The variable to add to the list at the end of the nested dictionary path
+        - `data`:
+            - Type: list of dicts
+            - What: A list of dictionaries to use for nesting purposes
+
+        Example:
+
+        ```
+        data=[
+            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;c&#39;},
+            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;d&#39;},
+            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;e&#39;, &#39;output&#39;:&#39;f&#39;}
+        ]
+        p.nest(
+            path_keys=[&#39;x_1&#39;,&#39;x_2&#39;],
+            value_key=&#39;output&#39;,
+            data=data
+        ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:[&#39;c&#39;,&#39;d&#39;], &#39;e&#39;:[&#39;f&#39;]}}
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(data, list):
+            self.exception(&#34;Attempting to `nest` an object that is not a list&#34;)
+        if len(data) == 0:
+            self.exception(&#34;Attempting to `nest` from an empty list&#34;)
+        nested_output = {}
+        for item in data:
+            nested_output = self.assocPathComplex(
+                data=nested_output,
+                path=[item[key] for key in path_keys],
+                default=[],
+                default_fn=lambda x: x + [item[value_key]]
+            )
+        return nested_output
+
+    def path(self, path, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the value of a path within a nested dictionary
+
+        Requires:
+
+        - `path`:
+            - Type: list of strs | str
+            - What: The path to pull given the data
+            - Note: If a string is passed, assumes a single item path list with that string
+        - `data`:
+            - Type: dict
+            - What: A dictionary to get the path from
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.path(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; 1
+        ```
+        &#34;&#34;&#34;
+        if isinstance(path, str):
+            path=[path]
+        if len(path) &gt; 0:
+            return self.path(data=data[path[0]], path=path[1:])
+        return data
+
+    def pathOr(self, default, path, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the value of a path within a nested dictionary or a default value if that path does not exist
+
+        Requires:
+
+        - `default`:
+            - Type: any
+            - What: The object to return if the path does not exist
+        - `path`:
+            - Type: list of strs | str
+            - What: The path to pull given the data
+            - Note: If a string is passed, assumes a single item path list with that string
+        - `data`:
+            - Type: dict
+            - What: A dictionary to get the path from
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.path(default=2, path=[&#39;a&#39;,&#39;c&#39;], data=data) #=&gt; 2
+        ```
+        &#34;&#34;&#34;
+        if isinstance(path, str):
+            path=[path]
+        if len(path) &gt; 0:
+            if path[0] in data:
+                return self.path(data=data[path[0]], path=path[1:])
+            else:
+                return default
+        return data
+
+    def pipe(self, fns, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Pipes data through n functions in order (left to right composition) and returns the output
+
+        Requires:
+
+        - `fns`:
+            - Type: list of (functions | methods)
+            - What: The list of functions and methods to pipe the data through
+        - `data`:
+            - Type: any
+            - What: The data to be piped through the specified `fns`
+
+        Examples:
+
+        ```
+        data=[&#39;abc&#39;,&#39;def&#39;]
+        p.pipe(fns=[p.head, p.tail], data=data) #=&gt; &#39;c&#39;
+        ```
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:&#39;c&#39;}}
+        curriedPath=p.curry(p.path)
+        p.pipe(fns=[curriedPath(&#39;a&#39;), curriedPath(&#39;b&#39;)], data=data) #=&gt; &#39;c&#39;
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(fns, list):
+            self.exception(&#39;`fns` must be a list&#39;)
+        if len(fns)==0:
+            self.exception(&#39;`fns` must be a list with at least one function&#39;)
+        if self.getArity(fns[0])==0:
+            self.exception(&#39;The first function in `fns` can have n arity (accepting n args), but this must be greater than 0.&#39;)
+        if not all([(True if self.getArity(fn)==1 else False) for fn in fns[1:]]):
+            self.exception(&#39;Only the first function in `fns` can have n arity (accept n args). All other functions must have an arity of one (accepting one argument).&#39;)
+        for fn in fns:
+            data=fn(data)
+        return data
+
+    def pluck(self, path, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the values of a path within a list of nested dictionaries
+
+        Requires:
+
+        - `path`:
+            - Type: list of strs
+            - What: The path to pull given the data
+            - Note: If a string is passed, assumes a single item path list with that string
+        - `data`:
+            - Type: list of dicts
+            - What: A list of dictionaries to get the path from
+
+        Example:
+
+        ```
+        data=[{&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:&#39;d&#39;}},{&#39;a&#39;:{&#39;b&#39;:2, &#39;c&#39;:&#39;e&#39;}}]
+        p.pluck(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; [1,2]
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(data, list):
+            self.exception(&#34;Attempting to pluck from an object that is not a list&#34;)
+        if len(data) == 0:
+            self.exception(&#34;Attempting to pluck from an empty list&#34;)
+        return [self.path(data=i, path=path) for i in data]
+
+    def pluckIf(self, if_path, if_vals, path, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the values of a path within a list of nested dictionaries if a path in those same dictionaries matches a value
+
+        Requires:
+
+        - `if_path`:
+            - Type: list of strs
+            - What: Path to check if the `if_val` matches
+        - `if_vals`:
+            - Type: list of any types
+            - What: If the `if_path`s value is in this list, this item is returned
+            - Note: Items should be the same type as objects at end of `if_path`
+        - `path`:
+            - Type: list of strs
+            - What: The path to pull given the data
+            - Note: If a string is passed, assumes a single item path list with that string
+        - `data`:
+            - Type: list of dicts
+            - What: A list of dictionary to get the path from
+
+        Example:
+
+        ```
+        data=[{&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:&#39;d&#39;}},{&#39;a&#39;:{&#39;b&#39;:2, &#39;c&#39;:&#39;e&#39;}}]
+        p.pluck(if_path=[&#39;a&#39;,&#39;c&#39;], if_vals=[&#39;d&#39;], path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; [1]
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(if_vals, list):
+            self.exception(&#39;`if_vals` must be a list&#39;)
+        if not isinstance(data, list):
+            self.exception(&#34;Attempting to pluck from an object that is not a list&#34;)
+        if len(data) == 0:
+            self.exception(&#34;Attempting to pluck from an empty list&#34;)
+        return [self.path(data=i, path=path) for i in data if self.path(data=i, path=if_path) in if_vals]
+
+    def symmetricDifference(self, a, b):
+        &#34;&#34;&#34;
+        Function:
+
+        - Combines two lists into a list of no duplicates items present in one list but not the other
+
+        Requires:
+
+        - `a`:
+            - Type: list
+            - What: List of items in which to look for a difference
+        - `b`:
+            - Type: list
+            - What: List of items in which to look for a difference
+
+        Example:
+
+        ```
+        a=[&#39;a&#39;,&#39;b&#39;]
+        b=[&#39;b&#39;,&#39;c&#39;]
+        p.symmetricDifference(a=a, b=b) #=&gt; [&#39;a&#39;,&#39;c&#39;]
+        ```
+        &#34;&#34;&#34;
+        return list(set(a).difference(set(b)))+list(set(b).difference(set(a)))
+
     def tail(self, data):
         &#34;&#34;&#34;
         Function:
@@ -365,122 +644,6 @@ class pamda_class(pamda_utils):
         if not len(data)&gt;0:
             self.exception(&#34;Attempting to call `tail` on an empty list or str&#34;)
         return data[-1]
-
-    def mergeDeep(self, data, update_data):
-        &#34;&#34;&#34;
-        Function:
-
-        - Recursively merges two nested dictionaries keeping all keys at each layer
-        - Values from `update_data` are used when keys are present in both dictionaries
-
-        Requires:
-
-        - `data`:
-            - Type: dict
-            - What: The original data that will be merged into
-
-        - `update_data`:
-            - Type: dict
-            - What
-
-        Example:
-
-        ```
-        data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:&#39;d&#39;},&#39;e&#39;:&#39;f&#39;}}
-        update_data={&#39;a&#39;:{&#39;b&#39;:{&#39;h&#39;:&#39;i&#39;},&#39;e&#39;,&#39;g&#39;}}
-        p.mergeDeep(
-            data=data,
-            update_data=update_data
-        ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:&#39;d&#39;,&#39;h&#39;:&#39;i&#39;},&#39;e&#39;:&#39;g&#39;}}
-        ```
-        &#34;&#34;&#34;
-        if not isinstance(data, dict) or not isinstance(update_data, dict):
-            return update_data
-        output=dict(data)
-        keys_original=set(data.keys())
-        keys_update=set(update_data.keys())
-        similar_keys=keys_original.intersection(keys_update)
-        similar_dict={key:self.mergeDeep(data[key], update_data[key]) for key in similar_keys}
-        new_keys=keys_update.difference(keys_original)
-        new_dict={key:update_data[key] for key in new_keys}
-        output.update(similar_dict)
-        output.update(new_dict)
-        return output
-
-    def intersection(self, a, b):
-        &#34;&#34;&#34;
-        Function:
-
-        - Combines two lists into a list of no duplicates composed of those elements common to both lists
-
-        Requires:
-
-        - `a`:
-            - Type: list
-            - What: List of items in which to look for an intersection
-        - `b`:
-            - Type: list
-            - What: List of items in which to look for an intersection
-
-        Example:
-
-        ```
-        a=[&#39;a&#39;,&#39;b&#39;]
-        b=[&#39;b&#39;,&#39;c&#39;]
-        p.intersection(a=a, b=b) #=&gt; [&#39;b&#39;]
-        ```
-        &#34;&#34;&#34;
-        return list(set(a).intersection(set(b)))
-
-    def difference(self, a, b):
-        &#34;&#34;&#34;
-        Function:
-
-        - Combines two lists into a list of no duplicates items present in the first list but not the second
-
-        Requires:
-
-        - `a`:
-            - Type: list
-            - What: List of items in which to look for a difference
-        - `b`:
-            - Type: list
-            - What: List of items in which to compare when looking for the difference
-
-        Example:
-
-        ```
-        a=[&#39;a&#39;,&#39;b&#39;]
-        b=[&#39;b&#39;,&#39;c&#39;]
-        p.intersection(a=a, b=b) #=&gt; [&#39;a&#39;]
-        ```
-        &#34;&#34;&#34;
-        return list(set(a).difference(set(b)))
-
-    def symmetricDifference(self, a, b):
-        &#34;&#34;&#34;
-        Function:
-
-        - Combines two lists into a list of no duplicates items present in one list but not the other
-
-        Requires:
-
-        - `a`:
-            - Type: list
-            - What: List of items in which to look for a difference
-        - `b`:
-            - Type: list
-            - What: List of items in which to look for a difference
-
-        Example:
-
-        ```
-        a=[&#39;a&#39;,&#39;b&#39;]
-        b=[&#39;b&#39;,&#39;c&#39;]
-        p.intersection(a=a, b=b) #=&gt; [&#39;a&#39;,&#39;c&#39;]
-        ```
-        &#34;&#34;&#34;
-        return list(set(a).difference(set(b)))+list(set(b).difference(set(a)))
 
     def zip(self, a, b):
         &#34;&#34;&#34;
@@ -528,7 +691,7 @@ class pamda_class(pamda_utils):
         ```
         a=[&#39;a&#39;,&#39;b&#39;]
         b=[1,2]
-        p.zip(a=a, b=b) #=&gt; {&#39;a&#39;:1, &#39;b&#39;:2}
+        p.zipObj(a=a, b=b) #=&gt; {&#39;a&#39;:1, &#39;b&#39;:2}
         ```
         &#34;&#34;&#34;
         return dict(zip(a,b))</code></pre>
@@ -553,6 +716,178 @@ class pamda_class(pamda_utils):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class pamda_class(pamda_utils):
+    def assocPath(self, path, value, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Ensures a path exists within a nested dictionary
+
+        Requires:
+
+        - `path`:
+            - Type: list of strs | str
+            - What: The path to check
+            - Note: If a string is passed, assumes a single item path list with that string
+        - `value`:
+            - Type: any
+            - What: The value to appropriate to the end of the path
+        - `data`:
+            - Type: dict
+            - What: A dictionary to check if the path exists
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.assocPath(path=[&#39;a&#39;,&#39;c&#39;], value=3, data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:3}}
+        ```
+        &#34;&#34;&#34;
+        if isinstance(path, str):
+            path=[path]
+        if len(path) &gt; 1:
+            if path[0] not in data:
+                data[path[0]] = {}
+            data[path[0]] = self.assocPath(data=data[path[0]], path=path[1:],value=value)
+            return data
+        else:
+            data[path[0]] = value
+            return data
+
+    def assocPathComplex(self, default, default_fn, path, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Ensures a path exists within a nested dictionary
+
+        Requires:
+
+        - `default`:
+            - Type: any
+            - What: The default item to add to a path that does not yet exist
+        - `default_fn`:
+            - Type: lambda function
+            - What: A single input lambda function that takes in the current path item (or default) and adjusts it
+            - Example: `lambda x: x` # Returns the value in the dict or the default value if none was present
+        - `path`:
+            - Type: list of strs
+            - What: The path to check
+        - `data`:
+            - Type: dict
+            - What: A dictionary to check if the path exists
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=[&#39;a&#39;,&#39;d&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[],&#39;d&#39;:[2,1]}}
+        ```
+        &#34;&#34;&#34;
+        if len(path) &gt; 1:
+            if path[0] not in data:
+                data[path[0]] = {}
+            data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_fn=default_fn)
+            return data
+        else:
+            if path[0] not in data:
+                data[path[0]] = default
+            data[path[0]] = default_fn(data[path[0]])
+            return data
+
+    def curry(self, fn):
+        &#34;&#34;&#34;
+        Function:
+
+        - Curries a function such that inputs can be added interatively
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to curry
+            - Note: Class methods auto apply self during curry
+
+        Examples:
+
+        ```
+        curriedZip=p.curry(p.zip)
+        print(curiedZip([&#39;a&#39;,&#39;b&#39;])([1,2])) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+        ```
+
+        ```
+        def myFunction(a,b,c):
+            return [a,b,c]
+
+        curriedMyFn=p.curry(myFunction)
+
+        print(curriedMyFn(1,2,3)) #=&gt; [1,2,3]
+        print(curriedMyFn(1)(2,3)) #=&gt; [1,2,3]
+
+        x=curriedMyFn(1)
+        y=x(2)
+        print(y(3)) #=&gt; [1,2,3]
+        print(y(4)) #=&gt; [1,2,4]
+        ```
+        &#34;&#34;&#34;
+        return curry_class(fn)
+
+    def difference(self, a, b):
+        &#34;&#34;&#34;
+        Function:
+
+        - Combines two lists into a list of no duplicates items present in the first list but not the second
+
+        Requires:
+
+        - `a`:
+            - Type: list
+            - What: List of items in which to look for a difference
+        - `b`:
+            - Type: list
+            - What: List of items in which to compare when looking for the difference
+
+        Example:
+
+        ```
+        a=[&#39;a&#39;,&#39;b&#39;]
+        b=[&#39;b&#39;,&#39;c&#39;]
+        p.difference(a=a, b=b) #=&gt; [&#39;a&#39;]
+        p.difference(a=b, b=a) #=&gt; [&#39;c&#39;]
+        ```
+        &#34;&#34;&#34;
+        return list(set(a).difference(set(b)))
+
+    def dissocPath(self, path, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Removes the value at the end of a path within a nested dictionary
+
+        Requires:
+
+        - `path`:
+            - Type: list of strs | str
+            - What: The path to remove from the dictionary
+            - Note: If a string is passed, assumes a single item path list with that string
+        - `data`:
+            - Type: dict
+            - What: A dictionary with a path to be removed
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:0,&#39;d&#39;:1}}}
+        p.dissocPath(path=[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;d&#39;:1}}}
+        ```
+        &#34;&#34;&#34;
+        if isinstance(path, str):
+            path=[path]
+        if not self.hasPath(data, path):
+            self.warn(message=&#34;Path does not exist&#34;)
+            return data
+        if len(path)==0:
+            return {}
+        return self.assocPath(data=data, path=path[:-1], value={key:value for key, value in self.path(data, path=path[:-1]).items() if key!=path[-1]})
+
     def flatten(self, data):
         &#34;&#34;&#34;
         Function:
@@ -573,35 +908,33 @@ class pamda_class(pamda_utils):
         &#34;&#34;&#34;
         return [i for sub_list in data for i in sub_list]
 
-    def path(self, data, path, Or=None):
+    def getArity(self, fn):
         &#34;&#34;&#34;
         Function:
 
-        - Returns the value of a path within a nested dictionary
+        - Gets the arity (number of inputs left to be specified) of a function or method (curried or uncurried)
 
         Requires:
 
-        - `data`:
-            - Type: dict
-            - What: A dictionary to get the path from
-        - `path`:
-            - Type: list of strs
-            - What: The path to pull given the data
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to get the arity of
+            - Note: Class methods remove one arity to account for self
 
-        Example:
+        Examples:
 
         ```
-        data={&#39;a&#39;:{&#39;b&#39;:1}}
-        p.path(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; 1
+        p.getArity(p.zip) #=&gt; 2
+        curriedZip=p.curry(p.zip)
+        ABCuriedZip=curriedZip([&#39;a&#39;,&#39;b&#39;])
+        p.getArity(ABCuriedZip) #=&gt; 1
         ```
         &#34;&#34;&#34;
-        #TODO: Add Or func
-        #TODO: Accept string for path if prop
-        if len(path) &gt; 0:
-            return self.path(data=data[path[0]], path=path[1:])
-        return data
+        if isinstance(fn, curry_class):
+            return fn.arity
+        return curry_class(fn).arity
 
-    def hasPath(self, data, path):
+    def hasPath(self, path, data):
         &#34;&#34;&#34;
         Function:
 
@@ -609,19 +942,20 @@ class pamda_class(pamda_utils):
 
         Requires:
 
+        - `path`:
+            - Type: list of strs | str
+            - What: The path to check
+            - Note: If a string is passed, assumes a single item path list with that string
         - `data`:
             - Type: dict
             - What: A dictionary to check if the path exists
-        - `path`:
-            - Type: list of strs or single str
-            - What: The path to check
 
         Example:
 
         ```
         data={&#39;a&#39;:{&#39;b&#39;:1}}
-        p.hasPath(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; True
-        p.hasPath(data=data, path=[&#39;a&#39;,&#39;d&#39;]) #=&gt; False
+        p.hasPath(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; True
+        p.hasPath(path=[&#39;a&#39;,&#39;d&#39;], data=data) #=&gt; False
         ```
         &#34;&#34;&#34;
         if isinstance(path, str):
@@ -632,209 +966,6 @@ class pamda_class(pamda_utils):
             else:
                 return False
         return True
-
-    def assocPath(self, data, path, value):
-        &#34;&#34;&#34;
-        Function:
-
-        - Ensures a path exists within a nested dictionary
-
-        Requires:
-
-        - `data`:
-            - Type: dict
-            - What: A dictionary to check if the path exists
-        - `path`:
-            - Type: list of strs
-            - What: The path to check
-        - `value`:
-            - Type: any
-            - What: The value to appropriate to the end of the path
-
-        Example:
-
-        ```
-        data={&#39;a&#39;:{&#39;b&#39;:1}}
-        p.assocPath(data=data, path=[&#39;a&#39;,&#39;c&#39;], value=3) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:3}}
-        ```
-        &#34;&#34;&#34;
-        if len(path) &gt; 1:
-            if path[0] not in data:
-                data[path[0]] = {}
-            data[path[0]] = self.assocPath(data=data[path[0]], path=path[1:],value=value)
-            return data
-        else:
-            data[path[0]] = value
-            return data
-
-    def assocPathComplex(self, data, path, default=None, default_func=lambda x: x):
-        &#34;&#34;&#34;
-        Function:
-
-        - Ensures a path exists within a nested dictionary
-
-        Requires:
-
-        - `data`:
-            - Type: dict
-            - What: A dictionary to check if the path exists
-        - `path`:
-            - Type: list of strs
-            - What: The path to check
-
-        Optional:
-
-        - `default`:
-            - Type: any
-            - What: The default item to add to a path that does not yet exist
-            - Default: None
-        - `default_func`:
-            - Type: lambda function
-            - What: A single input lambda function that takes in the current path item (or default) and adjusts it
-            - Default: `lambda x: x` # Returns the value in the dict or the default value if none was present
-
-        Example:
-
-        ```
-        data={&#39;a&#39;:{&#39;b&#39;:1}}
-        p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;b&#39;], default=[]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1}}
-        p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;c&#39;], default=[]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:[]}}
-        p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;d&#39;], default=[2], default_func=lambda x:x+[1]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[],&#39;d&#39;:[2,1]}}
-        ```
-        &#34;&#34;&#34;
-        if len(path) &gt; 1:
-            if path[0] not in data:
-                data[path[0]] = {}
-            data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_func=default_func)
-            return data
-        else:
-            if path[0] not in data:
-                data[path[0]] = default
-            data[path[0]] = default_func(data[path[0]])
-            return data
-
-    def dissocPath(self, data, path):
-        &#34;&#34;&#34;
-        Function:
-
-        - Removes the value at the end of a path within a nested dictionary
-
-        Requires:
-
-        - `data`:
-            - Type: dict
-            - What: A dictionary with a path to be removed
-        - `path`:
-            - Type: list of strs
-            - What: The path to remove from the dictionary
-
-        Example:
-
-        ```
-        data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:0,&#39;d&#39;:1}}}
-        p.dissocPath(data=data, path=[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;d&#39;:1}}}
-        ```
-        &#34;&#34;&#34;
-        if not self.hasPath(data, path):
-            self.warn(message=&#34;Path does not exist&#34;)
-            return data
-        if len(path)==0:
-            return {}
-        return self.assocPath(data=data, path=path[:-1], value={key:value for key, value in self.path(data, path=path[:-1]).items() if key!=path[-1]})
-
-    def pluck(self, data, path, if_path=None, if_vals=[]):
-        &#34;&#34;&#34;
-        Function:
-
-        - Returns the values of a path within a list of nested dictionaries
-
-        Requires:
-
-        - `data`:
-            - Type: list of dicts
-            - What: A list of dictionary to get the path from
-        - `path`:
-            - Type: list of strs
-            - What: The path to pull given the data
-
-        Optional:
-        
-        - `if_path`:
-            - Type: list of strs
-            - What: Path to check if the `if_val` matches
-            - Default: None
-            - Note: If None, no filtering is applied
-        - `if_vals`:
-            - Type: list of any types
-            - What: If the `if_path`s value is in this list, this item is returned
-            - Note: Items should be the same type as objects at end of `if_path`
-            - Note: If None, no filtering is applied
-
-        Example:
-
-        ```
-        data=[{&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:&#39;d&#39;}},{&#39;a&#39;:{&#39;b&#39;:2, &#39;c&#39;:&#39;e&#39;}}]
-        p.pluck(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; [1,2]
-        p.pluck(data=data, path=[&#39;a&#39;,&#39;b&#39;], if_path=[&#39;a&#39;,&#39;c&#39;], if_vals=[&#39;d&#39;]) #=&gt; [1]
-        ```
-        &#34;&#34;&#34;
-        if not isinstance(data, list):
-            self.exception(&#34;Attempting to pluck from an object that is not a list&#34;)
-        if len(data) == 0:
-            self.exception(&#34;Attempting to pluck from an empty list&#34;)
-        if if_path is not None and isinstance(if_vals, list):
-            return [self.path(data=i, path=path) for i in data if self.path(data=i, path=if_path) in if_vals]
-        return [self.path(data=i, path=path) for i in data]
-
-    def nest(self, data, nest_by_variables, nest_output_variable):
-        &#34;&#34;&#34;
-        Function:
-
-        - Nests a list of dictionaries into a nested dictionary
-        - Similar items are appended to a list in the end of the nested dictionary
-
-        Requires:
-
-        - `data`:
-            - Type: list of dicts
-            - What: A list of dictionaries to use for nesting purposes
-        - `nest_by_variables`:
-            - Type: list of strs
-            - What: The variables to pull from each item in data
-            - Note: Used to build out the nested dicitonary
-            - Note: Order matters as the nesting occurs in order of variable
-        - `nest_output_variable`:
-            - Type: str
-            - What: The variable to add to the list at the end of the nested dictionary path
-
-        Example:
-
-        ```
-        data=[
-            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;c&#39;},
-            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;d&#39;},
-            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;e&#39;, &#39;output&#39;:&#39;f&#39;}
-        ]
-        p.nest(
-            data=data,
-            nest_by_variables=[&#39;x_1&#39;,&#39;x_2&#39;],
-            nest_output_variable=&#39;output&#39;
-        ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:[&#39;c&#39;,&#39;d&#39;], &#39;e&#39;:[&#39;f&#39;]}}
-        ```
-        &#34;&#34;&#34;
-        if not isinstance(data, list):
-            self.exception(&#34;Attempting to `nest` an object that is not a list&#34;)
-        if len(data) == 0:
-            self.exception(&#34;Attempting to `nest` from an empty list&#34;)
-        nested_output = {}
-        for item in data:
-            nested_output = self.assocPathComplex(
-                data=nested_output,
-                path=[item[key] for key in nest_by_variables],
-                default=[],
-                default_func=lambda x: x + [item[nest_output_variable]]
-            )
-        return nested_output
 
     def head(self, data):
         &#34;&#34;&#34;
@@ -863,6 +994,317 @@ class pamda_class(pamda_utils):
             self.exception(&#34;Attempting to call `head` on an empty list or str&#34;)
         return data[0]
 
+    def intersection(self, a, b):
+        &#34;&#34;&#34;
+        Function:
+
+        - Combines two lists into a list of no duplicates composed of those elements common to both lists
+
+        Requires:
+
+        - `a`:
+            - Type: list
+            - What: List of items in which to look for an intersection
+        - `b`:
+            - Type: list
+            - What: List of items in which to look for an intersection
+
+        Example:
+
+        ```
+        a=[&#39;a&#39;,&#39;b&#39;]
+        b=[&#39;b&#39;,&#39;c&#39;]
+        p.intersection(a=a, b=b) #=&gt; [&#39;b&#39;]
+        ```
+        &#34;&#34;&#34;
+        return list(set(a).intersection(set(b)))
+
+    def mergeDeep(self, update_data, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Recursively merges two nested dictionaries keeping all keys at each layer
+        - Values from `update_data` are used when keys are present in both dictionaries
+
+        Requires:
+
+        - `update_data`:
+            - Type: dict
+            - What: The new data that will take precedence during merging
+        - `data`:
+            - Type: dict
+            - What: The original data that will be merged into
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:&#39;d&#39;},&#39;e&#39;:&#39;f&#39;}}
+        update_data={&#39;a&#39;:{&#39;b&#39;:{&#39;h&#39;:&#39;i&#39;},&#39;e&#39;,&#39;g&#39;}}
+        p.mergeDeep(
+            update_data=update_data,
+            data=data
+        ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:&#39;d&#39;,&#39;h&#39;:&#39;i&#39;},&#39;e&#39;:&#39;g&#39;}}
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(data, dict) or not isinstance(update_data, dict):
+            return update_data
+        output=dict(data)
+        keys_original=set(data.keys())
+        keys_update=set(update_data.keys())
+        similar_keys=keys_original.intersection(keys_update)
+        similar_dict={key:self.mergeDeep(data[key], update_data[key]) for key in similar_keys}
+        new_keys=keys_update.difference(keys_original)
+        new_dict={key:update_data[key] for key in new_keys}
+        output.update(similar_dict)
+        output.update(new_dict)
+        return output
+
+    def nest(self, path_keys, value_key, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Nests a list of dictionaries into a nested dictionary
+        - Similar items are appended to a list in the end of the nested dictionary
+
+        Requires:
+
+        - `path_keys`:
+            - Type: list of strs
+            - What: The variables to pull from each item in data
+            - Note: Used to build out the nested dicitonary
+            - Note: Order matters as the nesting occurs in order of variable
+        - `value_key`:
+            - Type: str
+            - What: The variable to add to the list at the end of the nested dictionary path
+        - `data`:
+            - Type: list of dicts
+            - What: A list of dictionaries to use for nesting purposes
+
+        Example:
+
+        ```
+        data=[
+            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;c&#39;},
+            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;d&#39;},
+            {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;e&#39;, &#39;output&#39;:&#39;f&#39;}
+        ]
+        p.nest(
+            path_keys=[&#39;x_1&#39;,&#39;x_2&#39;],
+            value_key=&#39;output&#39;,
+            data=data
+        ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:[&#39;c&#39;,&#39;d&#39;], &#39;e&#39;:[&#39;f&#39;]}}
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(data, list):
+            self.exception(&#34;Attempting to `nest` an object that is not a list&#34;)
+        if len(data) == 0:
+            self.exception(&#34;Attempting to `nest` from an empty list&#34;)
+        nested_output = {}
+        for item in data:
+            nested_output = self.assocPathComplex(
+                data=nested_output,
+                path=[item[key] for key in path_keys],
+                default=[],
+                default_fn=lambda x: x + [item[value_key]]
+            )
+        return nested_output
+
+    def path(self, path, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the value of a path within a nested dictionary
+
+        Requires:
+
+        - `path`:
+            - Type: list of strs | str
+            - What: The path to pull given the data
+            - Note: If a string is passed, assumes a single item path list with that string
+        - `data`:
+            - Type: dict
+            - What: A dictionary to get the path from
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.path(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; 1
+        ```
+        &#34;&#34;&#34;
+        if isinstance(path, str):
+            path=[path]
+        if len(path) &gt; 0:
+            return self.path(data=data[path[0]], path=path[1:])
+        return data
+
+    def pathOr(self, default, path, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the value of a path within a nested dictionary or a default value if that path does not exist
+
+        Requires:
+
+        - `default`:
+            - Type: any
+            - What: The object to return if the path does not exist
+        - `path`:
+            - Type: list of strs | str
+            - What: The path to pull given the data
+            - Note: If a string is passed, assumes a single item path list with that string
+        - `data`:
+            - Type: dict
+            - What: A dictionary to get the path from
+
+        Example:
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:1}}
+        p.path(default=2, path=[&#39;a&#39;,&#39;c&#39;], data=data) #=&gt; 2
+        ```
+        &#34;&#34;&#34;
+        if isinstance(path, str):
+            path=[path]
+        if len(path) &gt; 0:
+            if path[0] in data:
+                return self.path(data=data[path[0]], path=path[1:])
+            else:
+                return default
+        return data
+
+    def pipe(self, fns, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Pipes data through n functions in order (left to right composition) and returns the output
+
+        Requires:
+
+        - `fns`:
+            - Type: list of (functions | methods)
+            - What: The list of functions and methods to pipe the data through
+        - `data`:
+            - Type: any
+            - What: The data to be piped through the specified `fns`
+
+        Examples:
+
+        ```
+        data=[&#39;abc&#39;,&#39;def&#39;]
+        p.pipe(fns=[p.head, p.tail], data=data) #=&gt; &#39;c&#39;
+        ```
+
+        ```
+        data={&#39;a&#39;:{&#39;b&#39;:&#39;c&#39;}}
+        curriedPath=p.curry(p.path)
+        p.pipe(fns=[curriedPath(&#39;a&#39;), curriedPath(&#39;b&#39;)], data=data) #=&gt; &#39;c&#39;
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(fns, list):
+            self.exception(&#39;`fns` must be a list&#39;)
+        if len(fns)==0:
+            self.exception(&#39;`fns` must be a list with at least one function&#39;)
+        if self.getArity(fns[0])==0:
+            self.exception(&#39;The first function in `fns` can have n arity (accepting n args), but this must be greater than 0.&#39;)
+        if not all([(True if self.getArity(fn)==1 else False) for fn in fns[1:]]):
+            self.exception(&#39;Only the first function in `fns` can have n arity (accept n args). All other functions must have an arity of one (accepting one argument).&#39;)
+        for fn in fns:
+            data=fn(data)
+        return data
+
+    def pluck(self, path, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the values of a path within a list of nested dictionaries
+
+        Requires:
+
+        - `path`:
+            - Type: list of strs
+            - What: The path to pull given the data
+            - Note: If a string is passed, assumes a single item path list with that string
+        - `data`:
+            - Type: list of dicts
+            - What: A list of dictionaries to get the path from
+
+        Example:
+
+        ```
+        data=[{&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:&#39;d&#39;}},{&#39;a&#39;:{&#39;b&#39;:2, &#39;c&#39;:&#39;e&#39;}}]
+        p.pluck(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; [1,2]
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(data, list):
+            self.exception(&#34;Attempting to pluck from an object that is not a list&#34;)
+        if len(data) == 0:
+            self.exception(&#34;Attempting to pluck from an empty list&#34;)
+        return [self.path(data=i, path=path) for i in data]
+
+    def pluckIf(self, if_path, if_vals, path, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the values of a path within a list of nested dictionaries if a path in those same dictionaries matches a value
+
+        Requires:
+
+        - `if_path`:
+            - Type: list of strs
+            - What: Path to check if the `if_val` matches
+        - `if_vals`:
+            - Type: list of any types
+            - What: If the `if_path`s value is in this list, this item is returned
+            - Note: Items should be the same type as objects at end of `if_path`
+        - `path`:
+            - Type: list of strs
+            - What: The path to pull given the data
+            - Note: If a string is passed, assumes a single item path list with that string
+        - `data`:
+            - Type: list of dicts
+            - What: A list of dictionary to get the path from
+
+        Example:
+
+        ```
+        data=[{&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:&#39;d&#39;}},{&#39;a&#39;:{&#39;b&#39;:2, &#39;c&#39;:&#39;e&#39;}}]
+        p.pluck(if_path=[&#39;a&#39;,&#39;c&#39;], if_vals=[&#39;d&#39;], path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; [1]
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(if_vals, list):
+            self.exception(&#39;`if_vals` must be a list&#39;)
+        if not isinstance(data, list):
+            self.exception(&#34;Attempting to pluck from an object that is not a list&#34;)
+        if len(data) == 0:
+            self.exception(&#34;Attempting to pluck from an empty list&#34;)
+        return [self.path(data=i, path=path) for i in data if self.path(data=i, path=if_path) in if_vals]
+
+    def symmetricDifference(self, a, b):
+        &#34;&#34;&#34;
+        Function:
+
+        - Combines two lists into a list of no duplicates items present in one list but not the other
+
+        Requires:
+
+        - `a`:
+            - Type: list
+            - What: List of items in which to look for a difference
+        - `b`:
+            - Type: list
+            - What: List of items in which to look for a difference
+
+        Example:
+
+        ```
+        a=[&#39;a&#39;,&#39;b&#39;]
+        b=[&#39;b&#39;,&#39;c&#39;]
+        p.symmetricDifference(a=a, b=b) #=&gt; [&#39;a&#39;,&#39;c&#39;]
+        ```
+        &#34;&#34;&#34;
+        return list(set(a).difference(set(b)))+list(set(b).difference(set(a)))
+
     def tail(self, data):
         &#34;&#34;&#34;
         Function:
@@ -889,122 +1331,6 @@ class pamda_class(pamda_utils):
         if not len(data)&gt;0:
             self.exception(&#34;Attempting to call `tail` on an empty list or str&#34;)
         return data[-1]
-
-    def mergeDeep(self, data, update_data):
-        &#34;&#34;&#34;
-        Function:
-
-        - Recursively merges two nested dictionaries keeping all keys at each layer
-        - Values from `update_data` are used when keys are present in both dictionaries
-
-        Requires:
-
-        - `data`:
-            - Type: dict
-            - What: The original data that will be merged into
-
-        - `update_data`:
-            - Type: dict
-            - What
-
-        Example:
-
-        ```
-        data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:&#39;d&#39;},&#39;e&#39;:&#39;f&#39;}}
-        update_data={&#39;a&#39;:{&#39;b&#39;:{&#39;h&#39;:&#39;i&#39;},&#39;e&#39;,&#39;g&#39;}}
-        p.mergeDeep(
-            data=data,
-            update_data=update_data
-        ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:&#39;d&#39;,&#39;h&#39;:&#39;i&#39;},&#39;e&#39;:&#39;g&#39;}}
-        ```
-        &#34;&#34;&#34;
-        if not isinstance(data, dict) or not isinstance(update_data, dict):
-            return update_data
-        output=dict(data)
-        keys_original=set(data.keys())
-        keys_update=set(update_data.keys())
-        similar_keys=keys_original.intersection(keys_update)
-        similar_dict={key:self.mergeDeep(data[key], update_data[key]) for key in similar_keys}
-        new_keys=keys_update.difference(keys_original)
-        new_dict={key:update_data[key] for key in new_keys}
-        output.update(similar_dict)
-        output.update(new_dict)
-        return output
-
-    def intersection(self, a, b):
-        &#34;&#34;&#34;
-        Function:
-
-        - Combines two lists into a list of no duplicates composed of those elements common to both lists
-
-        Requires:
-
-        - `a`:
-            - Type: list
-            - What: List of items in which to look for an intersection
-        - `b`:
-            - Type: list
-            - What: List of items in which to look for an intersection
-
-        Example:
-
-        ```
-        a=[&#39;a&#39;,&#39;b&#39;]
-        b=[&#39;b&#39;,&#39;c&#39;]
-        p.intersection(a=a, b=b) #=&gt; [&#39;b&#39;]
-        ```
-        &#34;&#34;&#34;
-        return list(set(a).intersection(set(b)))
-
-    def difference(self, a, b):
-        &#34;&#34;&#34;
-        Function:
-
-        - Combines two lists into a list of no duplicates items present in the first list but not the second
-
-        Requires:
-
-        - `a`:
-            - Type: list
-            - What: List of items in which to look for a difference
-        - `b`:
-            - Type: list
-            - What: List of items in which to compare when looking for the difference
-
-        Example:
-
-        ```
-        a=[&#39;a&#39;,&#39;b&#39;]
-        b=[&#39;b&#39;,&#39;c&#39;]
-        p.intersection(a=a, b=b) #=&gt; [&#39;a&#39;]
-        ```
-        &#34;&#34;&#34;
-        return list(set(a).difference(set(b)))
-
-    def symmetricDifference(self, a, b):
-        &#34;&#34;&#34;
-        Function:
-
-        - Combines two lists into a list of no duplicates items present in one list but not the other
-
-        Requires:
-
-        - `a`:
-            - Type: list
-            - What: List of items in which to look for a difference
-        - `b`:
-            - Type: list
-            - What: List of items in which to look for a difference
-
-        Example:
-
-        ```
-        a=[&#39;a&#39;,&#39;b&#39;]
-        b=[&#39;b&#39;,&#39;c&#39;]
-        p.intersection(a=a, b=b) #=&gt; [&#39;a&#39;,&#39;c&#39;]
-        ```
-        &#34;&#34;&#34;
-        return list(set(a).difference(set(b)))+list(set(b).difference(set(a)))
 
     def zip(self, a, b):
         &#34;&#34;&#34;
@@ -1052,7 +1378,7 @@ class pamda_class(pamda_utils):
         ```
         a=[&#39;a&#39;,&#39;b&#39;]
         b=[1,2]
-        p.zip(a=a, b=b) #=&gt; {&#39;a&#39;:1, &#39;b&#39;:2}
+        p.zipObj(a=a, b=b) #=&gt; {&#39;a&#39;:1, &#39;b&#39;:2}
         ```
         &#34;&#34;&#34;
         return dict(zip(a,b))</code></pre>
@@ -1065,7 +1391,7 @@ class pamda_class(pamda_utils):
 <h3>Methods</h3>
 <dl>
 <dt id="pamda.pamda_class.pamda_class.assocPath"><code class="name flex">
-<span>def <span class="ident">assocPath</span></span>(<span>self, data, path, value)</span>
+<span>def <span class="ident">assocPath</span></span>(<span>self, path, value, data)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -1074,14 +1400,10 @@ class pamda_class(pamda_utils):
 </ul>
 <p>Requires:</p>
 <ul>
-<li><code>data</code>:<ul>
-<li>Type: dict</li>
-<li>What: A dictionary to check if the path exists</li>
-</ul>
-</li>
 <li><code>path</code>:<ul>
-<li>Type: list of strs</li>
+<li>Type: list of strs | str</li>
 <li>What: The path to check</li>
+<li>Note: If a string is passed, assumes a single item path list with that string</li>
 </ul>
 </li>
 <li><code>value</code>:<ul>
@@ -1089,16 +1411,21 @@ class pamda_class(pamda_utils):
 <li>What: The value to appropriate to the end of the path</li>
 </ul>
 </li>
+<li><code>data</code>:<ul>
+<li>Type: dict</li>
+<li>What: A dictionary to check if the path exists</li>
+</ul>
+</li>
 </ul>
 <p>Example:</p>
 <pre><code>data={'a':{'b':1}}
-p.assocPath(data=data, path=['a','c'], value=3) #=&gt; {'a':{'b':1, 'c':3}}
+p.assocPath(path=['a','c'], value=3, data=data) #=&gt; {'a':{'b':1, 'c':3}}
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def assocPath(self, data, path, value):
+<pre><code class="python">def assocPath(self, path, value, data):
     &#34;&#34;&#34;
     Function:
 
@@ -1106,23 +1433,26 @@ p.assocPath(data=data, path=['a','c'], value=3) #=&gt; {'a':{'b':1, 'c':3}}
 
     Requires:
 
-    - `data`:
-        - Type: dict
-        - What: A dictionary to check if the path exists
     - `path`:
-        - Type: list of strs
+        - Type: list of strs | str
         - What: The path to check
+        - Note: If a string is passed, assumes a single item path list with that string
     - `value`:
         - Type: any
         - What: The value to appropriate to the end of the path
+    - `data`:
+        - Type: dict
+        - What: A dictionary to check if the path exists
 
     Example:
 
     ```
     data={&#39;a&#39;:{&#39;b&#39;:1}}
-    p.assocPath(data=data, path=[&#39;a&#39;,&#39;c&#39;], value=3) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:3}}
+    p.assocPath(path=[&#39;a&#39;,&#39;c&#39;], value=3, data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:3}}
     ```
     &#34;&#34;&#34;
+    if isinstance(path, str):
+        path=[path]
     if len(path) &gt; 1:
         if path[0] not in data:
             data[path[0]] = {}
@@ -1134,7 +1464,7 @@ p.assocPath(data=data, path=['a','c'], value=3) #=&gt; {'a':{'b':1, 'c':3}}
 </details>
 </dd>
 <dt id="pamda.pamda_class.pamda_class.assocPathComplex"><code class="name flex">
-<span>def <span class="ident">assocPathComplex</span></span>(<span>self, data, path, default=None, default_func=&lt;function pamda_class.&lt;lambda&gt;&gt;)</span>
+<span>def <span class="ident">assocPathComplex</span></span>(<span>self, default, default_fn, path, data)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -1143,9 +1473,15 @@ p.assocPath(data=data, path=['a','c'], value=3) #=&gt; {'a':{'b':1, 'c':3}}
 </ul>
 <p>Requires:</p>
 <ul>
-<li><code>data</code>:<ul>
-<li>Type: dict</li>
-<li>What: A dictionary to check if the path exists</li>
+<li><code>default</code>:<ul>
+<li>Type: any</li>
+<li>What: The default item to add to a path that does not yet exist</li>
+</ul>
+</li>
+<li><code>default_fn</code>:<ul>
+<li>Type: lambda function</li>
+<li>What: A single input lambda function that takes in the current path item (or default) and adjusts it</li>
+<li>Example: <code>lambda x: x</code> # Returns the value in the dict or the default value if none was present</li>
 </ul>
 </li>
 <li><code>path</code>:<ul>
@@ -1153,33 +1489,21 @@ p.assocPath(data=data, path=['a','c'], value=3) #=&gt; {'a':{'b':1, 'c':3}}
 <li>What: The path to check</li>
 </ul>
 </li>
-</ul>
-<p>Optional:</p>
-<ul>
-<li><code>default</code>:<ul>
-<li>Type: any</li>
-<li>What: The default item to add to a path that does not yet exist</li>
-<li>Default: None</li>
-</ul>
-</li>
-<li><code>default_func</code>:<ul>
-<li>Type: lambda function</li>
-<li>What: A single input lambda function that takes in the current path item (or default) and adjusts it</li>
-<li>Default: <code>lambda x: x</code> # Returns the value in the dict or the default value if none was present</li>
+<li><code>data</code>:<ul>
+<li>Type: dict</li>
+<li>What: A dictionary to check if the path exists</li>
 </ul>
 </li>
 </ul>
 <p>Example:</p>
 <pre><code>data={'a':{'b':1}}
-p.assocPathComplex(data=data, path=['a','b'], default=[]) #=&gt; {'a':{'b':1}}
-p.assocPathComplex(data=data, path=['a','c'], default=[]) #=&gt; {'a':{'b':1, 'c':[]}}
-p.assocPathComplex(data=data, path=['a','d'], default=[2], default_func=lambda x:x+[1]) #=&gt; {'a':{'b':1,'c':[],'d':[2,1]}}
+p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','d'], data=data) #=&gt; {'a':{'b':1,'c':[],'d':[2,1]}}
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def assocPathComplex(self, data, path, default=None, default_func=lambda x: x):
+<pre><code class="python">def assocPathComplex(self, default, default_fn, path, data):
     &#34;&#34;&#34;
     Function:
 
@@ -1187,43 +1511,113 @@ p.assocPathComplex(data=data, path=['a','d'], default=[2], default_func=lambda x
 
     Requires:
 
-    - `data`:
-        - Type: dict
-        - What: A dictionary to check if the path exists
-    - `path`:
-        - Type: list of strs
-        - What: The path to check
-
-    Optional:
-
     - `default`:
         - Type: any
         - What: The default item to add to a path that does not yet exist
-        - Default: None
-    - `default_func`:
+    - `default_fn`:
         - Type: lambda function
         - What: A single input lambda function that takes in the current path item (or default) and adjusts it
-        - Default: `lambda x: x` # Returns the value in the dict or the default value if none was present
+        - Example: `lambda x: x` # Returns the value in the dict or the default value if none was present
+    - `path`:
+        - Type: list of strs
+        - What: The path to check
+    - `data`:
+        - Type: dict
+        - What: A dictionary to check if the path exists
 
     Example:
 
     ```
     data={&#39;a&#39;:{&#39;b&#39;:1}}
-    p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;b&#39;], default=[]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1}}
-    p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;c&#39;], default=[]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:[]}}
-    p.assocPathComplex(data=data, path=[&#39;a&#39;,&#39;d&#39;], default=[2], default_func=lambda x:x+[1]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[],&#39;d&#39;:[2,1]}}
+    p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=[&#39;a&#39;,&#39;d&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[],&#39;d&#39;:[2,1]}}
     ```
     &#34;&#34;&#34;
     if len(path) &gt; 1:
         if path[0] not in data:
             data[path[0]] = {}
-        data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_func=default_func)
+        data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_fn=default_fn)
         return data
     else:
         if path[0] not in data:
             data[path[0]] = default
-        data[path[0]] = default_func(data[path[0]])
+        data[path[0]] = default_fn(data[path[0]])
         return data</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_class.pamda_class.curry"><code class="name flex">
+<span>def <span class="ident">curry</span></span>(<span>self, fn)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Curries a function such that inputs can be added interatively</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>fn</code>:<ul>
+<li>Type: function | method</li>
+<li>What: The function or method to curry</li>
+<li>Note: Class methods auto apply self during curry</li>
+</ul>
+</li>
+</ul>
+<p>Examples:</p>
+<pre><code>curriedZip=p.curry(p.zip)
+print(curiedZip(['a','b'])([1,2])) #=&gt; [['a',1],['b',2]]
+</code></pre>
+<pre><code>def myFunction(a,b,c):
+    return [a,b,c]
+
+curriedMyFn=p.curry(myFunction)
+
+print(curriedMyFn(1,2,3)) #=&gt; [1,2,3]
+print(curriedMyFn(1)(2,3)) #=&gt; [1,2,3]
+
+x=curriedMyFn(1)
+y=x(2)
+print(y(3)) #=&gt; [1,2,3]
+print(y(4)) #=&gt; [1,2,4]
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def curry(self, fn):
+    &#34;&#34;&#34;
+    Function:
+
+    - Curries a function such that inputs can be added interatively
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to curry
+        - Note: Class methods auto apply self during curry
+
+    Examples:
+
+    ```
+    curriedZip=p.curry(p.zip)
+    print(curiedZip([&#39;a&#39;,&#39;b&#39;])([1,2])) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+    ```
+
+    ```
+    def myFunction(a,b,c):
+        return [a,b,c]
+
+    curriedMyFn=p.curry(myFunction)
+
+    print(curriedMyFn(1,2,3)) #=&gt; [1,2,3]
+    print(curriedMyFn(1)(2,3)) #=&gt; [1,2,3]
+
+    x=curriedMyFn(1)
+    y=x(2)
+    print(y(3)) #=&gt; [1,2,3]
+    print(y(4)) #=&gt; [1,2,4]
+    ```
+    &#34;&#34;&#34;
+    return curry_class(fn)</code></pre>
 </details>
 </dd>
 <dt id="pamda.pamda_class.pamda_class.difference"><code class="name flex">
@@ -1250,7 +1644,8 @@ p.assocPathComplex(data=data, path=['a','d'], default=[2], default_func=lambda x
 <p>Example:</p>
 <pre><code>a=['a','b']
 b=['b','c']
-p.intersection(a=a, b=b) #=&gt; ['a']
+p.difference(a=a, b=b) #=&gt; ['a']
+p.difference(a=b, b=a) #=&gt; ['c']
 </code></pre></div>
 <details class="source">
 <summary>
@@ -1276,14 +1671,15 @@ p.intersection(a=a, b=b) #=&gt; ['a']
     ```
     a=[&#39;a&#39;,&#39;b&#39;]
     b=[&#39;b&#39;,&#39;c&#39;]
-    p.intersection(a=a, b=b) #=&gt; [&#39;a&#39;]
+    p.difference(a=a, b=b) #=&gt; [&#39;a&#39;]
+    p.difference(a=b, b=a) #=&gt; [&#39;c&#39;]
     ```
     &#34;&#34;&#34;
     return list(set(a).difference(set(b)))</code></pre>
 </details>
 </dd>
 <dt id="pamda.pamda_class.pamda_class.dissocPath"><code class="name flex">
-<span>def <span class="ident">dissocPath</span></span>(<span>self, data, path)</span>
+<span>def <span class="ident">dissocPath</span></span>(<span>self, path, data)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -1292,26 +1688,27 @@ p.intersection(a=a, b=b) #=&gt; ['a']
 </ul>
 <p>Requires:</p>
 <ul>
+<li><code>path</code>:<ul>
+<li>Type: list of strs | str</li>
+<li>What: The path to remove from the dictionary</li>
+<li>Note: If a string is passed, assumes a single item path list with that string</li>
+</ul>
+</li>
 <li><code>data</code>:<ul>
 <li>Type: dict</li>
 <li>What: A dictionary with a path to be removed</li>
 </ul>
 </li>
-<li><code>path</code>:<ul>
-<li>Type: list of strs</li>
-<li>What: The path to remove from the dictionary</li>
-</ul>
-</li>
 </ul>
 <p>Example:</p>
 <pre><code>data={'a':{'b':{'c':0,'d':1}}}
-p.dissocPath(data=data, path=['a','b','c']) #=&gt; {'a':{'b':{'d':1}}}
+p.dissocPath(path=['a','b','c'], data=data) #=&gt; {'a':{'b':{'d':1}}}
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def dissocPath(self, data, path):
+<pre><code class="python">def dissocPath(self, path, data):
     &#34;&#34;&#34;
     Function:
 
@@ -1319,20 +1716,23 @@ p.dissocPath(data=data, path=['a','b','c']) #=&gt; {'a':{'b':{'d':1}}}
 
     Requires:
 
+    - `path`:
+        - Type: list of strs | str
+        - What: The path to remove from the dictionary
+        - Note: If a string is passed, assumes a single item path list with that string
     - `data`:
         - Type: dict
         - What: A dictionary with a path to be removed
-    - `path`:
-        - Type: list of strs
-        - What: The path to remove from the dictionary
 
     Example:
 
     ```
     data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:0,&#39;d&#39;:1}}}
-    p.dissocPath(data=data, path=[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;]) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;d&#39;:1}}}
+    p.dissocPath(path=[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;d&#39;:1}}}
     ```
     &#34;&#34;&#34;
+    if isinstance(path, str):
+        path=[path]
     if not self.hasPath(data, path):
         self.warn(message=&#34;Path does not exist&#34;)
         return data
@@ -1386,8 +1786,62 @@ p.flatten(data=data) #=&gt; ['a','b',1,2]
     return [i for sub_list in data for i in sub_list]</code></pre>
 </details>
 </dd>
+<dt id="pamda.pamda_class.pamda_class.getArity"><code class="name flex">
+<span>def <span class="ident">getArity</span></span>(<span>self, fn)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Gets the arity (number of inputs left to be specified) of a function or method (curried or uncurried)</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>fn</code>:<ul>
+<li>Type: function | method</li>
+<li>What: The function or method to get the arity of</li>
+<li>Note: Class methods remove one arity to account for self</li>
+</ul>
+</li>
+</ul>
+<p>Examples:</p>
+<pre><code>p.getArity(p.zip) #=&gt; 2
+curriedZip=p.curry(p.zip)
+ABCuriedZip=curriedZip(['a','b'])
+p.getArity(ABCuriedZip) #=&gt; 1
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getArity(self, fn):
+    &#34;&#34;&#34;
+    Function:
+
+    - Gets the arity (number of inputs left to be specified) of a function or method (curried or uncurried)
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to get the arity of
+        - Note: Class methods remove one arity to account for self
+
+    Examples:
+
+    ```
+    p.getArity(p.zip) #=&gt; 2
+    curriedZip=p.curry(p.zip)
+    ABCuriedZip=curriedZip([&#39;a&#39;,&#39;b&#39;])
+    p.getArity(ABCuriedZip) #=&gt; 1
+    ```
+    &#34;&#34;&#34;
+    if isinstance(fn, curry_class):
+        return fn.arity
+    return curry_class(fn).arity</code></pre>
+</details>
+</dd>
 <dt id="pamda.pamda_class.pamda_class.hasPath"><code class="name flex">
-<span>def <span class="ident">hasPath</span></span>(<span>self, data, path)</span>
+<span>def <span class="ident">hasPath</span></span>(<span>self, path, data)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -1396,27 +1850,28 @@ p.flatten(data=data) #=&gt; ['a','b',1,2]
 </ul>
 <p>Requires:</p>
 <ul>
+<li><code>path</code>:<ul>
+<li>Type: list of strs | str</li>
+<li>What: The path to check</li>
+<li>Note: If a string is passed, assumes a single item path list with that string</li>
+</ul>
+</li>
 <li><code>data</code>:<ul>
 <li>Type: dict</li>
 <li>What: A dictionary to check if the path exists</li>
 </ul>
 </li>
-<li><code>path</code>:<ul>
-<li>Type: list of strs or single str</li>
-<li>What: The path to check</li>
-</ul>
-</li>
 </ul>
 <p>Example:</p>
 <pre><code>data={'a':{'b':1}}
-p.hasPath(data=data, path=['a','b']) #=&gt; True
-p.hasPath(data=data, path=['a','d']) #=&gt; False
+p.hasPath(path=['a','b'], data=data) #=&gt; True
+p.hasPath(path=['a','d'], data=data) #=&gt; False
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def hasPath(self, data, path):
+<pre><code class="python">def hasPath(self, path, data):
     &#34;&#34;&#34;
     Function:
 
@@ -1424,19 +1879,20 @@ p.hasPath(data=data, path=['a','d']) #=&gt; False
 
     Requires:
 
+    - `path`:
+        - Type: list of strs | str
+        - What: The path to check
+        - Note: If a string is passed, assumes a single item path list with that string
     - `data`:
         - Type: dict
         - What: A dictionary to check if the path exists
-    - `path`:
-        - Type: list of strs or single str
-        - What: The path to check
 
     Example:
 
     ```
     data={&#39;a&#39;:{&#39;b&#39;:1}}
-    p.hasPath(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; True
-    p.hasPath(data=data, path=[&#39;a&#39;,&#39;d&#39;]) #=&gt; False
+    p.hasPath(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; True
+    p.hasPath(path=[&#39;a&#39;,&#39;d&#39;], data=data) #=&gt; False
     ```
     &#34;&#34;&#34;
     if isinstance(path, str):
@@ -1560,7 +2016,7 @@ p.intersection(a=a, b=b) #=&gt; ['b']
 </details>
 </dd>
 <dt id="pamda.pamda_class.pamda_class.mergeDeep"><code class="name flex">
-<span>def <span class="ident">mergeDeep</span></span>(<span>self, data, update_data)</span>
+<span>def <span class="ident">mergeDeep</span></span>(<span>self, update_data, data)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -1570,18 +2026,14 @@ p.intersection(a=a, b=b) #=&gt; ['b']
 </ul>
 <p>Requires:</p>
 <ul>
-<li>
-<p><code>data</code>:</p>
-<ul>
+<li><code>update_data</code>:<ul>
 <li>Type: dict</li>
-<li>What: The original data that will be merged into</li>
+<li>What: The new data that will take precedence during merging</li>
 </ul>
 </li>
-<li>
-<p><code>update_data</code>:</p>
-<ul>
+<li><code>data</code>:<ul>
 <li>Type: dict</li>
-<li>What</li>
+<li>What: The original data that will be merged into</li>
 </ul>
 </li>
 </ul>
@@ -1589,15 +2041,15 @@ p.intersection(a=a, b=b) #=&gt; ['b']
 <pre><code>data={'a':{'b':{'c':'d'},'e':'f'}}
 update_data={'a':{'b':{'h':'i'},'e','g'}}
 p.mergeDeep(
-    data=data,
-    update_data=update_data
+    update_data=update_data,
+    data=data
 ) #=&gt; {'a':{'b':{'c':'d','h':'i'},'e':'g'}}
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def mergeDeep(self, data, update_data):
+<pre><code class="python">def mergeDeep(self, update_data, data):
     &#34;&#34;&#34;
     Function:
 
@@ -1606,13 +2058,12 @@ p.mergeDeep(
 
     Requires:
 
+    - `update_data`:
+        - Type: dict
+        - What: The new data that will take precedence during merging
     - `data`:
         - Type: dict
         - What: The original data that will be merged into
-
-    - `update_data`:
-        - Type: dict
-        - What
 
     Example:
 
@@ -1620,8 +2071,8 @@ p.mergeDeep(
     data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:&#39;d&#39;},&#39;e&#39;:&#39;f&#39;}}
     update_data={&#39;a&#39;:{&#39;b&#39;:{&#39;h&#39;:&#39;i&#39;},&#39;e&#39;,&#39;g&#39;}}
     p.mergeDeep(
-        data=data,
-        update_data=update_data
+        update_data=update_data,
+        data=data
     ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:&#39;d&#39;,&#39;h&#39;:&#39;i&#39;},&#39;e&#39;:&#39;g&#39;}}
     ```
     &#34;&#34;&#34;
@@ -1640,7 +2091,7 @@ p.mergeDeep(
 </details>
 </dd>
 <dt id="pamda.pamda_class.pamda_class.nest"><code class="name flex">
-<span>def <span class="ident">nest</span></span>(<span>self, data, nest_by_variables, nest_output_variable)</span>
+<span>def <span class="ident">nest</span></span>(<span>self, path_keys, value_key, data)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -1650,21 +2101,21 @@ p.mergeDeep(
 </ul>
 <p>Requires:</p>
 <ul>
-<li><code>data</code>:<ul>
-<li>Type: list of dicts</li>
-<li>What: A list of dictionaries to use for nesting purposes</li>
-</ul>
-</li>
-<li><code>nest_by_variables</code>:<ul>
+<li><code>path_keys</code>:<ul>
 <li>Type: list of strs</li>
 <li>What: The variables to pull from each item in data</li>
 <li>Note: Used to build out the nested dicitonary</li>
 <li>Note: Order matters as the nesting occurs in order of variable</li>
 </ul>
 </li>
-<li><code>nest_output_variable</code>:<ul>
+<li><code>value_key</code>:<ul>
 <li>Type: str</li>
 <li>What: The variable to add to the list at the end of the nested dictionary path</li>
+</ul>
+</li>
+<li><code>data</code>:<ul>
+<li>Type: list of dicts</li>
+<li>What: A list of dictionaries to use for nesting purposes</li>
 </ul>
 </li>
 </ul>
@@ -1675,16 +2126,16 @@ p.mergeDeep(
     {'x_1':'a','x_2':'e', 'output':'f'}
 ]
 p.nest(
-    data=data,
-    nest_by_variables=['x_1','x_2'],
-    nest_output_variable='output'
+    path_keys=['x_1','x_2'],
+    value_key='output',
+    data=data
 ) #=&gt; {'a':{'b':['c','d'], 'e':['f']}}
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def nest(self, data, nest_by_variables, nest_output_variable):
+<pre><code class="python">def nest(self, path_keys, value_key, data):
     &#34;&#34;&#34;
     Function:
 
@@ -1693,17 +2144,17 @@ p.nest(
 
     Requires:
 
-    - `data`:
-        - Type: list of dicts
-        - What: A list of dictionaries to use for nesting purposes
-    - `nest_by_variables`:
+    - `path_keys`:
         - Type: list of strs
         - What: The variables to pull from each item in data
         - Note: Used to build out the nested dicitonary
         - Note: Order matters as the nesting occurs in order of variable
-    - `nest_output_variable`:
+    - `value_key`:
         - Type: str
         - What: The variable to add to the list at the end of the nested dictionary path
+    - `data`:
+        - Type: list of dicts
+        - What: A list of dictionaries to use for nesting purposes
 
     Example:
 
@@ -1714,9 +2165,9 @@ p.nest(
         {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;e&#39;, &#39;output&#39;:&#39;f&#39;}
     ]
     p.nest(
-        data=data,
-        nest_by_variables=[&#39;x_1&#39;,&#39;x_2&#39;],
-        nest_output_variable=&#39;output&#39;
+        path_keys=[&#39;x_1&#39;,&#39;x_2&#39;],
+        value_key=&#39;output&#39;,
+        data=data
     ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:[&#39;c&#39;,&#39;d&#39;], &#39;e&#39;:[&#39;f&#39;]}}
     ```
     &#34;&#34;&#34;
@@ -1728,15 +2179,15 @@ p.nest(
     for item in data:
         nested_output = self.assocPathComplex(
             data=nested_output,
-            path=[item[key] for key in nest_by_variables],
+            path=[item[key] for key in path_keys],
             default=[],
-            default_func=lambda x: x + [item[nest_output_variable]]
+            default_fn=lambda x: x + [item[value_key]]
         )
     return nested_output</code></pre>
 </details>
 </dd>
 <dt id="pamda.pamda_class.pamda_class.path"><code class="name flex">
-<span>def <span class="ident">path</span></span>(<span>self, data, path, Or=None)</span>
+<span>def <span class="ident">path</span></span>(<span>self, path, data)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -1745,26 +2196,27 @@ p.nest(
 </ul>
 <p>Requires:</p>
 <ul>
+<li><code>path</code>:<ul>
+<li>Type: list of strs | str</li>
+<li>What: The path to pull given the data</li>
+<li>Note: If a string is passed, assumes a single item path list with that string</li>
+</ul>
+</li>
 <li><code>data</code>:<ul>
 <li>Type: dict</li>
 <li>What: A dictionary to get the path from</li>
 </ul>
 </li>
-<li><code>path</code>:<ul>
-<li>Type: list of strs</li>
-<li>What: The path to pull given the data</li>
-</ul>
-</li>
 </ul>
 <p>Example:</p>
 <pre><code>data={'a':{'b':1}}
-p.path(data=data, path=['a','b']) #=&gt; 1
+p.path(path=['a','b'], data=data) #=&gt; 1
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def path(self, data, path, Or=None):
+<pre><code class="python">def path(self, path, data):
     &#34;&#34;&#34;
     Function:
 
@@ -1772,29 +2224,175 @@ p.path(data=data, path=['a','b']) #=&gt; 1
 
     Requires:
 
+    - `path`:
+        - Type: list of strs | str
+        - What: The path to pull given the data
+        - Note: If a string is passed, assumes a single item path list with that string
     - `data`:
         - Type: dict
         - What: A dictionary to get the path from
-    - `path`:
-        - Type: list of strs
-        - What: The path to pull given the data
 
     Example:
 
     ```
     data={&#39;a&#39;:{&#39;b&#39;:1}}
-    p.path(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; 1
+    p.path(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; 1
     ```
     &#34;&#34;&#34;
-    #TODO: Add Or func
-    #TODO: Accept string for path if prop
+    if isinstance(path, str):
+        path=[path]
     if len(path) &gt; 0:
         return self.path(data=data[path[0]], path=path[1:])
     return data</code></pre>
 </details>
 </dd>
+<dt id="pamda.pamda_class.pamda_class.pathOr"><code class="name flex">
+<span>def <span class="ident">pathOr</span></span>(<span>self, default, path, data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Returns the value of a path within a nested dictionary or a default value if that path does not exist</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>default</code>:<ul>
+<li>Type: any</li>
+<li>What: The object to return if the path does not exist</li>
+</ul>
+</li>
+<li><code>path</code>:<ul>
+<li>Type: list of strs | str</li>
+<li>What: The path to pull given the data</li>
+<li>Note: If a string is passed, assumes a single item path list with that string</li>
+</ul>
+</li>
+<li><code>data</code>:<ul>
+<li>Type: dict</li>
+<li>What: A dictionary to get the path from</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>data={'a':{'b':1}}
+p.path(default=2, path=['a','c'], data=data) #=&gt; 2
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pathOr(self, default, path, data):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns the value of a path within a nested dictionary or a default value if that path does not exist
+
+    Requires:
+
+    - `default`:
+        - Type: any
+        - What: The object to return if the path does not exist
+    - `path`:
+        - Type: list of strs | str
+        - What: The path to pull given the data
+        - Note: If a string is passed, assumes a single item path list with that string
+    - `data`:
+        - Type: dict
+        - What: A dictionary to get the path from
+
+    Example:
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:1}}
+    p.path(default=2, path=[&#39;a&#39;,&#39;c&#39;], data=data) #=&gt; 2
+    ```
+    &#34;&#34;&#34;
+    if isinstance(path, str):
+        path=[path]
+    if len(path) &gt; 0:
+        if path[0] in data:
+            return self.path(data=data[path[0]], path=path[1:])
+        else:
+            return default
+    return data</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_class.pamda_class.pipe"><code class="name flex">
+<span>def <span class="ident">pipe</span></span>(<span>self, fns, data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Pipes data through n functions in order (left to right composition) and returns the output</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>fns</code>:<ul>
+<li>Type: list of (functions | methods)</li>
+<li>What: The list of functions and methods to pipe the data through</li>
+</ul>
+</li>
+<li><code>data</code>:<ul>
+<li>Type: any</li>
+<li>What: The data to be piped through the specified <code>fns</code></li>
+</ul>
+</li>
+</ul>
+<p>Examples:</p>
+<pre><code>data=['abc','def']
+p.pipe(fns=[p.head, p.tail], data=data) #=&gt; 'c'
+</code></pre>
+<pre><code>data={'a':{'b':'c'}}
+curriedPath=p.curry(p.path)
+p.pipe(fns=[curriedPath('a'), curriedPath('b')], data=data) #=&gt; 'c'
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pipe(self, fns, data):
+    &#34;&#34;&#34;
+    Function:
+
+    - Pipes data through n functions in order (left to right composition) and returns the output
+
+    Requires:
+
+    - `fns`:
+        - Type: list of (functions | methods)
+        - What: The list of functions and methods to pipe the data through
+    - `data`:
+        - Type: any
+        - What: The data to be piped through the specified `fns`
+
+    Examples:
+
+    ```
+    data=[&#39;abc&#39;,&#39;def&#39;]
+    p.pipe(fns=[p.head, p.tail], data=data) #=&gt; &#39;c&#39;
+    ```
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:&#39;c&#39;}}
+    curriedPath=p.curry(p.path)
+    p.pipe(fns=[curriedPath(&#39;a&#39;), curriedPath(&#39;b&#39;)], data=data) #=&gt; &#39;c&#39;
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(fns, list):
+        self.exception(&#39;`fns` must be a list&#39;)
+    if len(fns)==0:
+        self.exception(&#39;`fns` must be a list with at least one function&#39;)
+    if self.getArity(fns[0])==0:
+        self.exception(&#39;The first function in `fns` can have n arity (accepting n args), but this must be greater than 0.&#39;)
+    if not all([(True if self.getArity(fn)==1 else False) for fn in fns[1:]]):
+        self.exception(&#39;Only the first function in `fns` can have n arity (accept n args). All other functions must have an arity of one (accepting one argument).&#39;)
+    for fn in fns:
+        data=fn(data)
+    return data</code></pre>
+</details>
+</dd>
 <dt id="pamda.pamda_class.pamda_class.pluck"><code class="name flex">
-<span>def <span class="ident">pluck</span></span>(<span>self, data, path, if_path=None, if_vals=[])</span>
+<span>def <span class="ident">pluck</span></span>(<span>self, path, data)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -1803,44 +2401,27 @@ p.path(data=data, path=['a','b']) #=&gt; 1
 </ul>
 <p>Requires:</p>
 <ul>
-<li><code>data</code>:<ul>
-<li>Type: list of dicts</li>
-<li>What: A list of dictionary to get the path from</li>
-</ul>
-</li>
 <li><code>path</code>:<ul>
 <li>Type: list of strs</li>
 <li>What: The path to pull given the data</li>
+<li>Note: If a string is passed, assumes a single item path list with that string</li>
 </ul>
 </li>
-</ul>
-<p>Optional:</p>
-<ul>
-<li><code>if_path</code>:<ul>
-<li>Type: list of strs</li>
-<li>What: Path to check if the <code>if_val</code> matches</li>
-<li>Default: None</li>
-<li>Note: If None, no filtering is applied</li>
-</ul>
-</li>
-<li><code>if_vals</code>:<ul>
-<li>Type: list of any types</li>
-<li>What: If the <code>if_path</code>s value is in this list, this item is returned</li>
-<li>Note: Items should be the same type as objects at end of <code>if_path</code></li>
-<li>Note: If None, no filtering is applied</li>
+<li><code>data</code>:<ul>
+<li>Type: list of dicts</li>
+<li>What: A list of dictionaries to get the path from</li>
 </ul>
 </li>
 </ul>
 <p>Example:</p>
 <pre><code>data=[{'a':{'b':1, 'c':'d'}},{'a':{'b':2, 'c':'e'}}]
-p.pluck(data=data, path=['a','b']) #=&gt; [1,2]
-p.pluck(data=data, path=['a','b'], if_path=['a','c'], if_vals=['d']) #=&gt; [1]
+p.pluck(path=['a','b'], data=data) #=&gt; [1,2]
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def pluck(self, data, path, if_path=None, if_vals=[]):
+<pre><code class="python">def pluck(self, path, data):
     &#34;&#34;&#34;
     Function:
 
@@ -1848,41 +2429,106 @@ p.pluck(data=data, path=['a','b'], if_path=['a','c'], if_vals=['d']) #=&gt; [1]
 
     Requires:
 
-    - `data`:
-        - Type: list of dicts
-        - What: A list of dictionary to get the path from
     - `path`:
         - Type: list of strs
         - What: The path to pull given the data
-
-    Optional:
-    
-    - `if_path`:
-        - Type: list of strs
-        - What: Path to check if the `if_val` matches
-        - Default: None
-        - Note: If None, no filtering is applied
-    - `if_vals`:
-        - Type: list of any types
-        - What: If the `if_path`s value is in this list, this item is returned
-        - Note: Items should be the same type as objects at end of `if_path`
-        - Note: If None, no filtering is applied
+        - Note: If a string is passed, assumes a single item path list with that string
+    - `data`:
+        - Type: list of dicts
+        - What: A list of dictionaries to get the path from
 
     Example:
 
     ```
     data=[{&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:&#39;d&#39;}},{&#39;a&#39;:{&#39;b&#39;:2, &#39;c&#39;:&#39;e&#39;}}]
-    p.pluck(data=data, path=[&#39;a&#39;,&#39;b&#39;]) #=&gt; [1,2]
-    p.pluck(data=data, path=[&#39;a&#39;,&#39;b&#39;], if_path=[&#39;a&#39;,&#39;c&#39;], if_vals=[&#39;d&#39;]) #=&gt; [1]
+    p.pluck(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; [1,2]
     ```
     &#34;&#34;&#34;
     if not isinstance(data, list):
         self.exception(&#34;Attempting to pluck from an object that is not a list&#34;)
     if len(data) == 0:
         self.exception(&#34;Attempting to pluck from an empty list&#34;)
-    if if_path is not None and isinstance(if_vals, list):
-        return [self.path(data=i, path=path) for i in data if self.path(data=i, path=if_path) in if_vals]
     return [self.path(data=i, path=path) for i in data]</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_class.pamda_class.pluckIf"><code class="name flex">
+<span>def <span class="ident">pluckIf</span></span>(<span>self, if_path, if_vals, path, data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Returns the values of a path within a list of nested dictionaries if a path in those same dictionaries matches a value</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>if_path</code>:<ul>
+<li>Type: list of strs</li>
+<li>What: Path to check if the <code>if_val</code> matches</li>
+</ul>
+</li>
+<li><code>if_vals</code>:<ul>
+<li>Type: list of any types</li>
+<li>What: If the <code>if_path</code>s value is in this list, this item is returned</li>
+<li>Note: Items should be the same type as objects at end of <code>if_path</code></li>
+</ul>
+</li>
+<li><code>path</code>:<ul>
+<li>Type: list of strs</li>
+<li>What: The path to pull given the data</li>
+<li>Note: If a string is passed, assumes a single item path list with that string</li>
+</ul>
+</li>
+<li><code>data</code>:<ul>
+<li>Type: list of dicts</li>
+<li>What: A list of dictionary to get the path from</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>data=[{'a':{'b':1, 'c':'d'}},{'a':{'b':2, 'c':'e'}}]
+p.pluck(if_path=['a','c'], if_vals=['d'], path=['a','b'], data=data) #=&gt; [1]
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pluckIf(self, if_path, if_vals, path, data):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns the values of a path within a list of nested dictionaries if a path in those same dictionaries matches a value
+
+    Requires:
+
+    - `if_path`:
+        - Type: list of strs
+        - What: Path to check if the `if_val` matches
+    - `if_vals`:
+        - Type: list of any types
+        - What: If the `if_path`s value is in this list, this item is returned
+        - Note: Items should be the same type as objects at end of `if_path`
+    - `path`:
+        - Type: list of strs
+        - What: The path to pull given the data
+        - Note: If a string is passed, assumes a single item path list with that string
+    - `data`:
+        - Type: list of dicts
+        - What: A list of dictionary to get the path from
+
+    Example:
+
+    ```
+    data=[{&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:&#39;d&#39;}},{&#39;a&#39;:{&#39;b&#39;:2, &#39;c&#39;:&#39;e&#39;}}]
+    p.pluck(if_path=[&#39;a&#39;,&#39;c&#39;], if_vals=[&#39;d&#39;], path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; [1]
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(if_vals, list):
+        self.exception(&#39;`if_vals` must be a list&#39;)
+    if not isinstance(data, list):
+        self.exception(&#34;Attempting to pluck from an object that is not a list&#34;)
+    if len(data) == 0:
+        self.exception(&#34;Attempting to pluck from an empty list&#34;)
+    return [self.path(data=i, path=path) for i in data if self.path(data=i, path=if_path) in if_vals]</code></pre>
 </details>
 </dd>
 <dt id="pamda.pamda_class.pamda_class.symmetricDifference"><code class="name flex">
@@ -1909,7 +2555,7 @@ p.pluck(data=data, path=['a','b'], if_path=['a','c'], if_vals=['d']) #=&gt; [1]
 <p>Example:</p>
 <pre><code>a=['a','b']
 b=['b','c']
-p.intersection(a=a, b=b) #=&gt; ['a','c']
+p.symmetricDifference(a=a, b=b) #=&gt; ['a','c']
 </code></pre></div>
 <details class="source">
 <summary>
@@ -1935,7 +2581,7 @@ p.intersection(a=a, b=b) #=&gt; ['a','c']
     ```
     a=[&#39;a&#39;,&#39;b&#39;]
     b=[&#39;b&#39;,&#39;c&#39;]
-    p.intersection(a=a, b=b) #=&gt; [&#39;a&#39;,&#39;c&#39;]
+    p.symmetricDifference(a=a, b=b) #=&gt; [&#39;a&#39;,&#39;c&#39;]
     ```
     &#34;&#34;&#34;
     return list(set(a).difference(set(b)))+list(set(b).difference(set(a)))</code></pre>
@@ -2076,7 +2722,7 @@ p.zip(a=a, b=b) #=&gt; [['a',1],['b',2]]
 <p>Example:</p>
 <pre><code>a=['a','b']
 b=[1,2]
-p.zip(a=a, b=b) #=&gt; {'a':1, 'b':2}
+p.zipObj(a=a, b=b) #=&gt; {'a':1, 'b':2}
 </code></pre></div>
 <details class="source">
 <summary>
@@ -2103,7 +2749,7 @@ p.zip(a=a, b=b) #=&gt; {'a':1, 'b':2}
     ```
     a=[&#39;a&#39;,&#39;b&#39;]
     b=[1,2]
-    p.zip(a=a, b=b) #=&gt; {&#39;a&#39;:1, &#39;b&#39;:2}
+    p.zipObj(a=a, b=b) #=&gt; {&#39;a&#39;:1, &#39;b&#39;:2}
     ```
     &#34;&#34;&#34;
     return dict(zip(a,b))</code></pre>
@@ -2144,16 +2790,21 @@ p.zip(a=a, b=b) #=&gt; {'a':1, 'b':2}
 <ul class="two-column">
 <li><code><a title="pamda.pamda_class.pamda_class.assocPath" href="#pamda.pamda_class.pamda_class.assocPath">assocPath</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.assocPathComplex" href="#pamda.pamda_class.pamda_class.assocPathComplex">assocPathComplex</a></code></li>
+<li><code><a title="pamda.pamda_class.pamda_class.curry" href="#pamda.pamda_class.pamda_class.curry">curry</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.difference" href="#pamda.pamda_class.pamda_class.difference">difference</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.dissocPath" href="#pamda.pamda_class.pamda_class.dissocPath">dissocPath</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.flatten" href="#pamda.pamda_class.pamda_class.flatten">flatten</a></code></li>
+<li><code><a title="pamda.pamda_class.pamda_class.getArity" href="#pamda.pamda_class.pamda_class.getArity">getArity</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.hasPath" href="#pamda.pamda_class.pamda_class.hasPath">hasPath</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.head" href="#pamda.pamda_class.pamda_class.head">head</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.intersection" href="#pamda.pamda_class.pamda_class.intersection">intersection</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.mergeDeep" href="#pamda.pamda_class.pamda_class.mergeDeep">mergeDeep</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.nest" href="#pamda.pamda_class.pamda_class.nest">nest</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.path" href="#pamda.pamda_class.pamda_class.path">path</a></code></li>
+<li><code><a title="pamda.pamda_class.pamda_class.pathOr" href="#pamda.pamda_class.pamda_class.pathOr">pathOr</a></code></li>
+<li><code><a title="pamda.pamda_class.pamda_class.pipe" href="#pamda.pamda_class.pamda_class.pipe">pipe</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.pluck" href="#pamda.pamda_class.pamda_class.pluck">pluck</a></code></li>
+<li><code><a title="pamda.pamda_class.pamda_class.pluckIf" href="#pamda.pamda_class.pamda_class.pluckIf">pluckIf</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.symmetricDifference" href="#pamda.pamda_class.pamda_class.symmetricDifference">symmetricDifference</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.tail" href="#pamda.pamda_class.pamda_class.tail">tail</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.zip" href="#pamda.pamda_class.pamda_class.zip">zip</a></code></li>

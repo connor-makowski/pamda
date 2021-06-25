@@ -27,6 +27,7 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from pamda.pamda_error import pamda_error
+import types
 
 class pamda_utils(pamda_error):
     def hardRound(self, data, decimal_places=0):
@@ -114,7 +115,34 @@ class pamda_utils(pamda_error):
             self.exception(&#39;`safeDivide` can only be called on `float` or `int` objects&#39;)
         if default_denominator==0:
             self.exception(&#39;`safeDivide` `default_denominator` can not be 0&#39;)
-        return numerator/denominator if denominator!=0 else numerator/default_denominator</code></pre>
+        return numerator/denominator if denominator!=0 else numerator/default_denominator
+
+class curry_class(pamda_utils):
+    def __init__(self, fn, *args, **kwargs):
+        self.fn=fn
+        self.args=args
+        self.kwargs=kwargs
+        self.fnArity=self.getFnArity()
+        self.arity=self.getArity(args, kwargs)
+
+    def __call__(self, *args, **kwargs):
+        new_args=self.args+args
+        new_kwargs=dict(**self.kwargs, **kwargs)
+        self.arity=self.getArity(new_args, new_kwargs)
+        if self.arity&lt;0:
+            self.exception(&#39;Too many arguments wer supplied&#39;)
+        if self.arity==0:
+            return self.fn(*new_args, **new_kwargs)
+        return curry_class(self.fn, *new_args, **new_kwargs)
+
+    def getArity(self, args, kwargs):
+        return self.fnArity-(len(args) + len(kwargs))
+
+    def getFnArity(self):
+        if not isinstance(self.fn, (types.MethodType, types.FunctionType)):
+            self.exception(&#39;A non function was passed as a function and does not have any arity. See the stack trace above for more information.&#39;)
+        extra_method_input_count=1 if isinstance(self.fn, types.MethodType) else 0
+        return self.fn.__code__.co_argcount-extra_method_input_count</code></pre>
 </details>
 </section>
 <section>
@@ -126,6 +154,93 @@ class pamda_utils(pamda_error):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="pamda.pamda_utils.curry_class"><code class="flex name class">
+<span>class <span class="ident">curry_class</span></span>
+<span>(</span><span>fn, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class curry_class(pamda_utils):
+    def __init__(self, fn, *args, **kwargs):
+        self.fn=fn
+        self.args=args
+        self.kwargs=kwargs
+        self.fnArity=self.getFnArity()
+        self.arity=self.getArity(args, kwargs)
+
+    def __call__(self, *args, **kwargs):
+        new_args=self.args+args
+        new_kwargs=dict(**self.kwargs, **kwargs)
+        self.arity=self.getArity(new_args, new_kwargs)
+        if self.arity&lt;0:
+            self.exception(&#39;Too many arguments wer supplied&#39;)
+        if self.arity==0:
+            return self.fn(*new_args, **new_kwargs)
+        return curry_class(self.fn, *new_args, **new_kwargs)
+
+    def getArity(self, args, kwargs):
+        return self.fnArity-(len(args) + len(kwargs))
+
+    def getFnArity(self):
+        if not isinstance(self.fn, (types.MethodType, types.FunctionType)):
+            self.exception(&#39;A non function was passed as a function and does not have any arity. See the stack trace above for more information.&#39;)
+        extra_method_input_count=1 if isinstance(self.fn, types.MethodType) else 0
+        return self.fn.__code__.co_argcount-extra_method_input_count</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pamda.pamda_utils.pamda_utils" href="#pamda.pamda_utils.pamda_utils">pamda_utils</a></li>
+<li><a title="pamda.pamda_error.pamda_error" href="pamda_error.html#pamda.pamda_error.pamda_error">pamda_error</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="pamda.pamda_utils.curry_class.getArity"><code class="name flex">
+<span>def <span class="ident">getArity</span></span>(<span>self, args, kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getArity(self, args, kwargs):
+    return self.fnArity-(len(args) + len(kwargs))</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_utils.curry_class.getFnArity"><code class="name flex">
+<span>def <span class="ident">getFnArity</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getFnArity(self):
+    if not isinstance(self.fn, (types.MethodType, types.FunctionType)):
+        self.exception(&#39;A non function was passed as a function and does not have any arity. See the stack trace above for more information.&#39;)
+    extra_method_input_count=1 if isinstance(self.fn, types.MethodType) else 0
+    return self.fn.__code__.co_argcount-extra_method_input_count</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pamda.pamda_utils.pamda_utils" href="#pamda.pamda_utils.pamda_utils">pamda_utils</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pamda.pamda_utils.pamda_utils.exception" href="pamda_error.html#pamda.pamda_error.pamda_error.exception">exception</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.hardRound" href="#pamda.pamda_utils.pamda_utils.hardRound">hardRound</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.safeDivide" href="#pamda.pamda_utils.pamda_utils.safeDivide">safeDivide</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.vprint" href="pamda_error.html#pamda.pamda_error.pamda_error.vprint">vprint</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.warn" href="pamda_error.html#pamda.pamda_error.pamda_error.warn">warn</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
 <dt id="pamda.pamda_utils.pamda_utils"><code class="flex name class">
 <span>class <span class="ident">pamda_utils</span></span>
 </code></dt>
@@ -230,6 +345,7 @@ class pamda_utils(pamda_error):
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li><a title="pamda.pamda_class.pamda_class" href="pamda_class.html#pamda.pamda_class.pamda_class">pamda_class</a></li>
+<li><a title="pamda.pamda_utils.curry_class" href="#pamda.pamda_utils.curry_class">curry_class</a></li>
 <li><a title="pamda.pamdata_class.pamdata_class" href="pamdata_class.html#pamda.pamdata_class.pamdata_class">pamdata_class</a></li>
 </ul>
 <h3>Methods</h3>
@@ -443,6 +559,13 @@ p.safeDivide(
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="pamda.pamda_utils.curry_class" href="#pamda.pamda_utils.curry_class">curry_class</a></code></h4>
+<ul class="">
+<li><code><a title="pamda.pamda_utils.curry_class.getArity" href="#pamda.pamda_utils.curry_class.getArity">getArity</a></code></li>
+<li><code><a title="pamda.pamda_utils.curry_class.getFnArity" href="#pamda.pamda_utils.curry_class.getFnArity">getFnArity</a></code></li>
+</ul>
+</li>
 <li>
 <h4><code><a title="pamda.pamda_utils.pamda_utils" href="#pamda.pamda_utils.pamda_utils">pamda_utils</a></code></h4>
 <ul class="">

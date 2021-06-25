@@ -1,4 +1,5 @@
 from pamda.pamda_error import pamda_error
+import types
 
 class pamda_utils(pamda_error):
     def hardRound(self, data, decimal_places=0):
@@ -87,3 +88,30 @@ class pamda_utils(pamda_error):
         if default_denominator==0:
             self.exception('`safeDivide` `default_denominator` can not be 0')
         return numerator/denominator if denominator!=0 else numerator/default_denominator
+
+class curry_class(pamda_utils):
+    def __init__(self, fn, *args, **kwargs):
+        self.fn=fn
+        self.args=args
+        self.kwargs=kwargs
+        self.fnArity=self.getFnArity()
+        self.arity=self.getArity(args, kwargs)
+
+    def __call__(self, *args, **kwargs):
+        new_args=self.args+args
+        new_kwargs=dict(**self.kwargs, **kwargs)
+        self.arity=self.getArity(new_args, new_kwargs)
+        if self.arity<0:
+            self.exception('Too many arguments wer supplied')
+        if self.arity==0:
+            return self.fn(*new_args, **new_kwargs)
+        return curry_class(self.fn, *new_args, **new_kwargs)
+
+    def getArity(self, args, kwargs):
+        return self.fnArity-(len(args) + len(kwargs))
+
+    def getFnArity(self):
+        if not isinstance(self.fn, (types.MethodType, types.FunctionType)):
+            self.exception('A non function was passed as a function and does not have any arity. See the stack trace above for more information.')
+        extra_method_input_count=1 if isinstance(self.fn, types.MethodType) else 0
+        return self.fn.__code__.co_argcount-extra_method_input_count
