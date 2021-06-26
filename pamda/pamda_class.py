@@ -50,8 +50,8 @@ class pamda_class(pamda_utils):
             - Type: any
             - What: The default item to add to a path that does not yet exist
         - `default_fn`:
-            - Type: lambda function
-            - What: A single input lambda function that takes in the current path item (or default) and adjusts it
+            - Type: function | method
+            - What: A single input function that takes in the current path item (or default) and adjusts it
             - Example: `lambda x: x` # Returns the value in the dict or the default value if none was present
         - `path`:
             - Type: list of strs
@@ -64,7 +64,7 @@ class pamda_class(pamda_utils):
 
         ```
         data={'a':{'b':1}}
-        p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','d'], data=data) #=> {'a':{'b':1,'c':[],'d':[2,1]}}
+        p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=data) #=> {'a':{'b':1,'c':[2,1]}}
         ```
         """
         if len(path) > 1:
@@ -472,7 +472,7 @@ class pamda_class(pamda_utils):
             - Notes: The first function in the list can be any arity (accepting any number of inputs)
             - Notes: Any further function in the list can only be unary (accepting only one input)
             - Notes: A function can be curried, but is not required to be
-            - Notes: You may opt to curry functions and add inputs to make them unary 
+            - Notes: You may opt to curry functions and add inputs to make them unary
         - `data`:
             - Type: any
             - What: The data to be piped through the specified `fns`
