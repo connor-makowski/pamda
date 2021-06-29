@@ -2,7 +2,7 @@ from pamda.pamda_error import pamda_error
 import types
 
 class pamda_utils(pamda_error):
-    def hardRound(self, data, decimal_places=0):
+    def hardRound(self, decimal_places, data):
         """
         Function:
 
@@ -41,11 +41,11 @@ class pamda_utils(pamda_error):
             self.exception('`hardRound` can only be called on `float` or `int` objects')
         return int(data*(10**decimal_places)+0.5)/(10**decimal_places)
 
-    def safeDivide(self, numerator, denominator, default_denominator=1):
+    def safeDivide(self, numerator, denominator):
         """
         Function:
 
-        - Forces division to work by enforcing a non zero default denominator if the provided denominator is zer
+        - Forces division to work by enforcing a denominator of 1 if the provided denominator is zero
 
         Requires:
 
@@ -57,26 +57,60 @@ class pamda_utils(pamda_error):
             - Type: int | float
             - What: The denominator
 
-        Optional:
-
-        - `default_denominator`:
-            - Type: int | float
-            - What: A non zero denominator to use if denominator is zero
-            - Default: 1
-
         Example:
 
         ```
-        data=12.345
         p.safeDivide(
             numerator=10,
             denominator=2
         ) #=> 5
         p.safeDivide(
             numerator=10,
-            denominator=0,
-            default_denominator=1
+            denominator=0
         ) #=> 10
+        ```
+        """
+        if (
+            not isinstance(numerator, (float, int)) or
+            not isinstance(denominator, (float, int))
+        ):
+            self.exception('`safeDivide` can only be called on `float` or `int` objects')
+        return numerator/denominator if denominator!=0 else numerator
+
+    def safeDivideDefault(self, numerator, denominator, default_denominator=1):
+        """
+        Function:
+
+        - Forces division to work by enforcing a non zero default denominator if the provided denominator is zero
+
+        Requires:
+
+        - `default_denominator`:
+            - Type: int | float
+            - What: A non zero denominator to use if denominator is zero
+            - Default: 1
+
+        - `numerator`:
+            - Type: int | float
+            - What: The numerator
+
+        - `denominator`:
+            - Type: int | float
+            - What: The denominator
+
+        Example:
+
+        ```
+        p.safeDivideDefault(
+            default_denominator=2,
+            numerator=10,
+            denominator=5
+        ) #=> 2
+        p.safeDivideDefault(
+            default_denominator=2,
+            numerator=10,
+            denominator=0
+        ) #=> 5
         ```
         """
         if (
@@ -84,9 +118,9 @@ class pamda_utils(pamda_error):
             not isinstance(denominator, (float, int)) or
             not isinstance(default_denominator, (float, int))
         ):
-            self.exception('`safeDivide` can only be called on `float` or `int` objects')
+            self.exception('`safeDivideDefault` can only be called on `float` or `int` objects')
         if default_denominator==0:
-            self.exception('`safeDivide` `default_denominator` can not be 0')
+            self.exception('`safeDivideDefault` `default_denominator` can not be 0')
         return numerator/denominator if denominator!=0 else numerator/default_denominator
 
 class curry_class(pamda_utils):
