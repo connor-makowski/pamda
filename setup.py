@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'pamda',
   packages = ['pamda'],
-  version = '0.0.4',
+  version = '0.0.5',
   license='MIT',
   description = 'Python wrapper of object oriented processes for functional programming styles similar to Ramda',
   author = 'Connor Makowski',

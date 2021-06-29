@@ -4,6 +4,7 @@ setup.py
 pamda/__init__.py
 pamda/pamda.py
 pamda/pamda_class.py
+pamda/pamda_curried.py
 pamda/pamda_error.py
 pamda/pamda_utils.py
 pamda/pamdata.py
