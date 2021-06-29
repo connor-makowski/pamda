@@ -123,6 +123,35 @@ class pamda_utils(pamda_error):
             self.exception('`safeDivideDefault` `default_denominator` can not be 0')
         return numerator/denominator if denominator!=0 else numerator/default_denominator
 
+    def getMethods(self, object):
+        """
+        Function:
+
+        - Returns the callable methods of a class (dunder-excluded) as a list of strs
+
+        Requires:
+
+        - `object`:
+            - Type: any
+            - What: Any python object
+            - Default: 1
+
+        Example:
+
+        ```
+        class MyClass:
+            def A(self):
+                pass
+
+            def B(self):
+                pass
+
+
+        p.getMethods(MyClass) #=> ['A', 'B']
+        ```
+        """
+        return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith("__")]
+
 class curry_class(pamda_utils):
     def __init__(self, fn, *args, **kwargs):
         self.fn=fn
@@ -136,7 +165,7 @@ class curry_class(pamda_utils):
         new_kwargs=dict(**self.kwargs, **kwargs)
         self.arity=self.getArity(new_args, new_kwargs)
         if self.arity<0:
-            self.exception('Too many arguments wer supplied')
+            self.exception('Too many arguments were supplied')
         if self.arity==0:
             return self.fn(*new_args, **new_kwargs)
         return curry_class(self.fn, *new_args, **new_kwargs)

@@ -51,7 +51,7 @@ class pamda_class(pamda_utils):
             - What: The default item to add to a path that does not yet exist
         - `default_fn`:
             - Type: function | method
-            - What: A single input function that takes in the current path item (or default) and adjusts it
+            - What: A unary (single input) function that takes in the current path item (or default) and adjusts it
             - Example: `lambda x: x` # Returns the value in the dict or the default value if none was present
         - `path`:
             - Type: list of strs
@@ -73,6 +73,8 @@ class pamda_class(pamda_utils):
             data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_fn=default_fn)
             return data
         else:
+            if self.getArity(default_fn)!=1:
+                self.exception('`assocPathComplex` `default_fn` must be an unary (single input) function.')
             if path[0] not in data:
                 data[path[0]] = default
             data[path[0]] = default_fn(data[path[0]])
@@ -95,7 +97,7 @@ class pamda_class(pamda_utils):
 
         ```
         curriedZip=p.curry(p.zip)
-        print(curiedZip(['a','b'])([1,2])) #=> [['a',1],['b',2]]
+        curiedZip(['a','b'])([1,2]) #=> [['a',1],['b',2]]
         ```
 
         ```
@@ -104,13 +106,13 @@ class pamda_class(pamda_utils):
 
         curriedMyFn=p.curry(myFunction)
 
-        print(curriedMyFn(1,2,3)) #=> [1,2,3]
-        print(curriedMyFn(1)(2,3)) #=> [1,2,3]
+        curriedMyFn(1,2,3) #=> [1,2,3]
+        curriedMyFn(1)(2,3) #=> [1,2,3]
 
         x=curriedMyFn(1)
         y=x(2)
-        print(y(3)) #=> [1,2,3]
-        print(y(4)) #=> [1,2,4]
+        y(3) #=> [1,2,3]
+        y(4) #=> [1,2,4]
         ```
         """
         return curry_class(fn)
@@ -470,7 +472,7 @@ class pamda_class(pamda_utils):
             - Type: list of (functions | methods)
             - What: The list of functions and methods to pipe the data through
             - Notes: The first function in the list can be any arity (accepting any number of inputs)
-            - Notes: Any further function in the list can only be unary (accepting only one input)
+            - Notes: Any further function in the list can only be unary (single input)
             - Notes: A function can be curried, but is not required to be
             - Notes: You may opt to curry functions and add inputs to make them unary
         - `data`:
@@ -496,7 +498,7 @@ class pamda_class(pamda_utils):
             self.exception('`fns` must be a list with at least one function')
         if self.getArity(fns[0])==0:
             self.exception('The first function in `fns` can have n arity (accepting n args), but this must be greater than 0.')
-        if not all([(True if self.getArity(fn)==1 else False) for fn in fns[1:]]):
+        if not all([(self.getArity(fn)==1) for fn in fns[1:]]):
             self.exception('Only the first function in `fns` can have n arity (accept n args). All other functions must have an arity of one (accepting one argument).')
         for fn in fns:
             data=fn(data)
