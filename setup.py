@@ -8,7 +8,7 @@ setup(
   author = 'Connor Makowski',
   author_email = 'connor.m.makowski@gmail.com',
   url = 'https://github.com/connor-makowski/pamda',
-  download_url = 'https://github.com/connor-makowski/pamda/dist/pamda-0.0.1.tar.gz',
+  download_url = 'https://github.com/connor-makowski/pamda/dist/pamda-0.0.5.tar.gz',
   keywords = ['data', 'ramda', 'pamda'],
   install_requires=[],
   classifiers=[
