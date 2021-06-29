@@ -78,8 +78,8 @@ class pamda_class(pamda_utils):
             - Type: any
             - What: The default item to add to a path that does not yet exist
         - `default_fn`:
-            - Type: lambda function
-            - What: A single input lambda function that takes in the current path item (or default) and adjusts it
+            - Type: function | method
+            - What: A unary (single input) function that takes in the current path item (or default) and adjusts it
             - Example: `lambda x: x` # Returns the value in the dict or the default value if none was present
         - `path`:
             - Type: list of strs
@@ -92,7 +92,7 @@ class pamda_class(pamda_utils):
 
         ```
         data={&#39;a&#39;:{&#39;b&#39;:1}}
-        p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=[&#39;a&#39;,&#39;d&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[],&#39;d&#39;:[2,1]}}
+        p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=[&#39;a&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[2,1]}}
         ```
         &#34;&#34;&#34;
         if len(path) &gt; 1:
@@ -101,6 +101,8 @@ class pamda_class(pamda_utils):
             data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_fn=default_fn)
             return data
         else:
+            if self.getArity(default_fn)!=1:
+                self.exception(&#39;`assocPathComplex` `default_fn` must be an unary (single input) function.&#39;)
             if path[0] not in data:
                 data[path[0]] = default
             data[path[0]] = default_fn(data[path[0]])
@@ -123,7 +125,7 @@ class pamda_class(pamda_utils):
 
         ```
         curriedZip=p.curry(p.zip)
-        print(curiedZip([&#39;a&#39;,&#39;b&#39;])([1,2])) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+        curiedZip([&#39;a&#39;,&#39;b&#39;])([1,2]) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
         ```
 
         ```
@@ -132,13 +134,13 @@ class pamda_class(pamda_utils):
 
         curriedMyFn=p.curry(myFunction)
 
-        print(curriedMyFn(1,2,3)) #=&gt; [1,2,3]
-        print(curriedMyFn(1)(2,3)) #=&gt; [1,2,3]
+        curriedMyFn(1,2,3) #=&gt; [1,2,3]
+        curriedMyFn(1)(2,3) #=&gt; [1,2,3]
 
         x=curriedMyFn(1)
         y=x(2)
-        print(y(3)) #=&gt; [1,2,3]
-        print(y(4)) #=&gt; [1,2,4]
+        y(3) #=&gt; [1,2,3]
+        y(4) #=&gt; [1,2,4]
         ```
         &#34;&#34;&#34;
         return curry_class(fn)
@@ -497,6 +499,10 @@ class pamda_class(pamda_utils):
         - `fns`:
             - Type: list of (functions | methods)
             - What: The list of functions and methods to pipe the data through
+            - Notes: The first function in the list can be any arity (accepting any number of inputs)
+            - Notes: Any further function in the list can only be unary (single input)
+            - Notes: A function can be curried, but is not required to be
+            - Notes: You may opt to curry functions and add inputs to make them unary
         - `data`:
             - Type: any
             - What: The data to be piped through the specified `fns`
@@ -520,7 +526,7 @@ class pamda_class(pamda_utils):
             self.exception(&#39;`fns` must be a list with at least one function&#39;)
         if self.getArity(fns[0])==0:
             self.exception(&#39;The first function in `fns` can have n arity (accepting n args), but this must be greater than 0.&#39;)
-        if not all([(True if self.getArity(fn)==1 else False) for fn in fns[1:]]):
+        if not all([(self.getArity(fn)==1) for fn in fns[1:]]):
             self.exception(&#39;Only the first function in `fns` can have n arity (accept n args). All other functions must have an arity of one (accepting one argument).&#39;)
         for fn in fns:
             data=fn(data)
@@ -765,8 +771,8 @@ class pamda_class(pamda_utils):
             - Type: any
             - What: The default item to add to a path that does not yet exist
         - `default_fn`:
-            - Type: lambda function
-            - What: A single input lambda function that takes in the current path item (or default) and adjusts it
+            - Type: function | method
+            - What: A unary (single input) function that takes in the current path item (or default) and adjusts it
             - Example: `lambda x: x` # Returns the value in the dict or the default value if none was present
         - `path`:
             - Type: list of strs
@@ -779,7 +785,7 @@ class pamda_class(pamda_utils):
 
         ```
         data={&#39;a&#39;:{&#39;b&#39;:1}}
-        p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=[&#39;a&#39;,&#39;d&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[],&#39;d&#39;:[2,1]}}
+        p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=[&#39;a&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[2,1]}}
         ```
         &#34;&#34;&#34;
         if len(path) &gt; 1:
@@ -788,6 +794,8 @@ class pamda_class(pamda_utils):
             data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_fn=default_fn)
             return data
         else:
+            if self.getArity(default_fn)!=1:
+                self.exception(&#39;`assocPathComplex` `default_fn` must be an unary (single input) function.&#39;)
             if path[0] not in data:
                 data[path[0]] = default
             data[path[0]] = default_fn(data[path[0]])
@@ -810,7 +818,7 @@ class pamda_class(pamda_utils):
 
         ```
         curriedZip=p.curry(p.zip)
-        print(curiedZip([&#39;a&#39;,&#39;b&#39;])([1,2])) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+        curiedZip([&#39;a&#39;,&#39;b&#39;])([1,2]) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
         ```
 
         ```
@@ -819,13 +827,13 @@ class pamda_class(pamda_utils):
 
         curriedMyFn=p.curry(myFunction)
 
-        print(curriedMyFn(1,2,3)) #=&gt; [1,2,3]
-        print(curriedMyFn(1)(2,3)) #=&gt; [1,2,3]
+        curriedMyFn(1,2,3) #=&gt; [1,2,3]
+        curriedMyFn(1)(2,3) #=&gt; [1,2,3]
 
         x=curriedMyFn(1)
         y=x(2)
-        print(y(3)) #=&gt; [1,2,3]
-        print(y(4)) #=&gt; [1,2,4]
+        y(3) #=&gt; [1,2,3]
+        y(4) #=&gt; [1,2,4]
         ```
         &#34;&#34;&#34;
         return curry_class(fn)
@@ -1184,6 +1192,10 @@ class pamda_class(pamda_utils):
         - `fns`:
             - Type: list of (functions | methods)
             - What: The list of functions and methods to pipe the data through
+            - Notes: The first function in the list can be any arity (accepting any number of inputs)
+            - Notes: Any further function in the list can only be unary (single input)
+            - Notes: A function can be curried, but is not required to be
+            - Notes: You may opt to curry functions and add inputs to make them unary
         - `data`:
             - Type: any
             - What: The data to be piped through the specified `fns`
@@ -1207,7 +1219,7 @@ class pamda_class(pamda_utils):
             self.exception(&#39;`fns` must be a list with at least one function&#39;)
         if self.getArity(fns[0])==0:
             self.exception(&#39;The first function in `fns` can have n arity (accepting n args), but this must be greater than 0.&#39;)
-        if not all([(True if self.getArity(fn)==1 else False) for fn in fns[1:]]):
+        if not all([(self.getArity(fn)==1) for fn in fns[1:]]):
             self.exception(&#39;Only the first function in `fns` can have n arity (accept n args). All other functions must have an arity of one (accepting one argument).&#39;)
         for fn in fns:
             data=fn(data)
@@ -1479,8 +1491,8 @@ p.assocPath(path=['a','c'], value=3, data=data) #=&gt; {'a':{'b':1, 'c':3}}
 </ul>
 </li>
 <li><code>default_fn</code>:<ul>
-<li>Type: lambda function</li>
-<li>What: A single input lambda function that takes in the current path item (or default) and adjusts it</li>
+<li>Type: function | method</li>
+<li>What: A unary (single input) function that takes in the current path item (or default) and adjusts it</li>
 <li>Example: <code>lambda x: x</code> # Returns the value in the dict or the default value if none was present</li>
 </ul>
 </li>
@@ -1497,7 +1509,7 @@ p.assocPath(path=['a','c'], value=3, data=data) #=&gt; {'a':{'b':1, 'c':3}}
 </ul>
 <p>Example:</p>
 <pre><code>data={'a':{'b':1}}
-p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','d'], data=data) #=&gt; {'a':{'b':1,'c':[],'d':[2,1]}}
+p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=data) #=&gt; {'a':{'b':1,'c':[2,1]}}
 </code></pre></div>
 <details class="source">
 <summary>
@@ -1515,8 +1527,8 @@ p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','d'], data=
         - Type: any
         - What: The default item to add to a path that does not yet exist
     - `default_fn`:
-        - Type: lambda function
-        - What: A single input lambda function that takes in the current path item (or default) and adjusts it
+        - Type: function | method
+        - What: A unary (single input) function that takes in the current path item (or default) and adjusts it
         - Example: `lambda x: x` # Returns the value in the dict or the default value if none was present
     - `path`:
         - Type: list of strs
@@ -1529,7 +1541,7 @@ p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','d'], data=
 
     ```
     data={&#39;a&#39;:{&#39;b&#39;:1}}
-    p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=[&#39;a&#39;,&#39;d&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[],&#39;d&#39;:[2,1]}}
+    p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=[&#39;a&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[2,1]}}
     ```
     &#34;&#34;&#34;
     if len(path) &gt; 1:
@@ -1538,6 +1550,8 @@ p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','d'], data=
         data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_fn=default_fn)
         return data
     else:
+        if self.getArity(default_fn)!=1:
+            self.exception(&#39;`assocPathComplex` `default_fn` must be an unary (single input) function.&#39;)
         if path[0] not in data:
             data[path[0]] = default
         data[path[0]] = default_fn(data[path[0]])
@@ -1563,20 +1577,20 @@ p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','d'], data=
 </ul>
 <p>Examples:</p>
 <pre><code>curriedZip=p.curry(p.zip)
-print(curiedZip(['a','b'])([1,2])) #=&gt; [['a',1],['b',2]]
+curiedZip(['a','b'])([1,2]) #=&gt; [['a',1],['b',2]]
 </code></pre>
 <pre><code>def myFunction(a,b,c):
     return [a,b,c]
 
 curriedMyFn=p.curry(myFunction)
 
-print(curriedMyFn(1,2,3)) #=&gt; [1,2,3]
-print(curriedMyFn(1)(2,3)) #=&gt; [1,2,3]
+curriedMyFn(1,2,3) #=&gt; [1,2,3]
+curriedMyFn(1)(2,3) #=&gt; [1,2,3]
 
 x=curriedMyFn(1)
 y=x(2)
-print(y(3)) #=&gt; [1,2,3]
-print(y(4)) #=&gt; [1,2,4]
+y(3) #=&gt; [1,2,3]
+y(4) #=&gt; [1,2,4]
 </code></pre></div>
 <details class="source">
 <summary>
@@ -1599,7 +1613,7 @@ print(y(4)) #=&gt; [1,2,4]
 
     ```
     curriedZip=p.curry(p.zip)
-    print(curiedZip([&#39;a&#39;,&#39;b&#39;])([1,2])) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+    curiedZip([&#39;a&#39;,&#39;b&#39;])([1,2]) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
     ```
 
     ```
@@ -1608,13 +1622,13 @@ print(y(4)) #=&gt; [1,2,4]
 
     curriedMyFn=p.curry(myFunction)
 
-    print(curriedMyFn(1,2,3)) #=&gt; [1,2,3]
-    print(curriedMyFn(1)(2,3)) #=&gt; [1,2,3]
+    curriedMyFn(1,2,3) #=&gt; [1,2,3]
+    curriedMyFn(1)(2,3) #=&gt; [1,2,3]
 
     x=curriedMyFn(1)
     y=x(2)
-    print(y(3)) #=&gt; [1,2,3]
-    print(y(4)) #=&gt; [1,2,4]
+    y(3) #=&gt; [1,2,3]
+    y(4) #=&gt; [1,2,4]
     ```
     &#34;&#34;&#34;
     return curry_class(fn)</code></pre>
@@ -2330,6 +2344,10 @@ p.path(default=2, path=['a','c'], data=data) #=&gt; 2
 <li><code>fns</code>:<ul>
 <li>Type: list of (functions | methods)</li>
 <li>What: The list of functions and methods to pipe the data through</li>
+<li>Notes: The first function in the list can be any arity (accepting any number of inputs)</li>
+<li>Notes: Any further function in the list can only be unary (single input)</li>
+<li>Notes: A function can be curried, but is not required to be</li>
+<li>Notes: You may opt to curry functions and add inputs to make them unary</li>
 </ul>
 </li>
 <li><code>data</code>:<ul>
@@ -2361,6 +2379,10 @@ p.pipe(fns=[curriedPath('a'), curriedPath('b')], data=data) #=&gt; 'c'
     - `fns`:
         - Type: list of (functions | methods)
         - What: The list of functions and methods to pipe the data through
+        - Notes: The first function in the list can be any arity (accepting any number of inputs)
+        - Notes: Any further function in the list can only be unary (single input)
+        - Notes: A function can be curried, but is not required to be
+        - Notes: You may opt to curry functions and add inputs to make them unary
     - `data`:
         - Type: any
         - What: The data to be piped through the specified `fns`
@@ -2384,7 +2406,7 @@ p.pipe(fns=[curriedPath('a'), curriedPath('b')], data=data) #=&gt; 'c'
         self.exception(&#39;`fns` must be a list with at least one function&#39;)
     if self.getArity(fns[0])==0:
         self.exception(&#39;The first function in `fns` can have n arity (accepting n args), but this must be greater than 0.&#39;)
-    if not all([(True if self.getArity(fn)==1 else False) for fn in fns[1:]]):
+    if not all([(self.getArity(fn)==1) for fn in fns[1:]]):
         self.exception(&#39;Only the first function in `fns` can have n arity (accept n args). All other functions must have an arity of one (accepting one argument).&#39;)
     for fn in fns:
         data=fn(data)
@@ -2761,8 +2783,10 @@ p.zipObj(a=a, b=b) #=&gt; {'a':1, 'b':2}
 <li><code><b><a title="pamda.pamda_utils.pamda_utils" href="pamda_utils.html#pamda.pamda_utils.pamda_utils">pamda_utils</a></b></code>:
 <ul class="hlist">
 <li><code><a title="pamda.pamda_utils.pamda_utils.exception" href="pamda_error.html#pamda.pamda_error.pamda_error.exception">exception</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.getMethods" href="pamda_utils.html#pamda.pamda_utils.pamda_utils.getMethods">getMethods</a></code></li>
 <li><code><a title="pamda.pamda_utils.pamda_utils.hardRound" href="pamda_utils.html#pamda.pamda_utils.pamda_utils.hardRound">hardRound</a></code></li>
 <li><code><a title="pamda.pamda_utils.pamda_utils.safeDivide" href="pamda_utils.html#pamda.pamda_utils.pamda_utils.safeDivide">safeDivide</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.safeDivideDefault" href="pamda_utils.html#pamda.pamda_utils.pamda_utils.safeDivideDefault">safeDivideDefault</a></code></li>
 <li><code><a title="pamda.pamda_utils.pamda_utils.vprint" href="pamda_error.html#pamda.pamda_error.pamda_error.vprint">vprint</a></code></li>
 <li><code><a title="pamda.pamda_utils.pamda_utils.warn" href="pamda_error.html#pamda.pamda_error.pamda_error.warn">warn</a></code></li>
 </ul>

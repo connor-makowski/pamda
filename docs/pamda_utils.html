@@ -30,7 +30,7 @@
 import types
 
 class pamda_utils(pamda_error):
-    def hardRound(self, data, decimal_places=0):
+    def hardRound(self, decimal_places, data):
         &#34;&#34;&#34;
         Function:
 
@@ -69,11 +69,11 @@ class pamda_utils(pamda_error):
             self.exception(&#39;`hardRound` can only be called on `float` or `int` objects&#39;)
         return int(data*(10**decimal_places)+0.5)/(10**decimal_places)
 
-    def safeDivide(self, numerator, denominator, default_denominator=1):
+    def safeDivide(self, numerator, denominator):
         &#34;&#34;&#34;
         Function:
 
-        - Forces division to work by enforcing a non zero default denominator if the provided denominator is zer
+        - Forces division to work by enforcing a denominator of 1 if the provided denominator is zero
 
         Requires:
 
@@ -85,26 +85,60 @@ class pamda_utils(pamda_error):
             - Type: int | float
             - What: The denominator
 
-        Optional:
-
-        - `default_denominator`:
-            - Type: int | float
-            - What: A non zero denominator to use if denominator is zero
-            - Default: 1
-
         Example:
 
         ```
-        data=12.345
         p.safeDivide(
             numerator=10,
             denominator=2
         ) #=&gt; 5
         p.safeDivide(
             numerator=10,
-            denominator=0,
-            default_denominator=1
+            denominator=0
         ) #=&gt; 10
+        ```
+        &#34;&#34;&#34;
+        if (
+            not isinstance(numerator, (float, int)) or
+            not isinstance(denominator, (float, int))
+        ):
+            self.exception(&#39;`safeDivide` can only be called on `float` or `int` objects&#39;)
+        return numerator/denominator if denominator!=0 else numerator
+
+    def safeDivideDefault(self, numerator, denominator, default_denominator=1):
+        &#34;&#34;&#34;
+        Function:
+
+        - Forces division to work by enforcing a non zero default denominator if the provided denominator is zero
+
+        Requires:
+
+        - `default_denominator`:
+            - Type: int | float
+            - What: A non zero denominator to use if denominator is zero
+            - Default: 1
+
+        - `numerator`:
+            - Type: int | float
+            - What: The numerator
+
+        - `denominator`:
+            - Type: int | float
+            - What: The denominator
+
+        Example:
+
+        ```
+        p.safeDivideDefault(
+            default_denominator=2,
+            numerator=10,
+            denominator=5
+        ) #=&gt; 2
+        p.safeDivideDefault(
+            default_denominator=2,
+            numerator=10,
+            denominator=0
+        ) #=&gt; 5
         ```
         &#34;&#34;&#34;
         if (
@@ -112,10 +146,39 @@ class pamda_utils(pamda_error):
             not isinstance(denominator, (float, int)) or
             not isinstance(default_denominator, (float, int))
         ):
-            self.exception(&#39;`safeDivide` can only be called on `float` or `int` objects&#39;)
+            self.exception(&#39;`safeDivideDefault` can only be called on `float` or `int` objects&#39;)
         if default_denominator==0:
-            self.exception(&#39;`safeDivide` `default_denominator` can not be 0&#39;)
+            self.exception(&#39;`safeDivideDefault` `default_denominator` can not be 0&#39;)
         return numerator/denominator if denominator!=0 else numerator/default_denominator
+
+    def getMethods(self, object):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the callable methods of a class (dunder-excluded) as a list of strs
+
+        Requires:
+
+        - `object`:
+            - Type: any
+            - What: Any python object
+            - Default: 1
+
+        Example:
+
+        ```
+        class MyClass:
+            def A(self):
+                pass
+
+            def B(self):
+                pass
+
+
+        p.getMethods(MyClass) #=&gt; [&#39;A&#39;, &#39;B&#39;]
+        ```
+        &#34;&#34;&#34;
+        return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)]
 
 class curry_class(pamda_utils):
     def __init__(self, fn, *args, **kwargs):
@@ -130,7 +193,7 @@ class curry_class(pamda_utils):
         new_kwargs=dict(**self.kwargs, **kwargs)
         self.arity=self.getArity(new_args, new_kwargs)
         if self.arity&lt;0:
-            self.exception(&#39;Too many arguments wer supplied&#39;)
+            self.exception(&#39;Too many arguments were supplied&#39;)
         if self.arity==0:
             return self.fn(*new_args, **new_kwargs)
         return curry_class(self.fn, *new_args, **new_kwargs)
@@ -177,7 +240,7 @@ class curry_class(pamda_utils):
         new_kwargs=dict(**self.kwargs, **kwargs)
         self.arity=self.getArity(new_args, new_kwargs)
         if self.arity&lt;0:
-            self.exception(&#39;Too many arguments wer supplied&#39;)
+            self.exception(&#39;Too many arguments were supplied&#39;)
         if self.arity==0:
             return self.fn(*new_args, **new_kwargs)
         return curry_class(self.fn, *new_args, **new_kwargs)
@@ -233,8 +296,10 @@ class curry_class(pamda_utils):
 <li><code><b><a title="pamda.pamda_utils.pamda_utils" href="#pamda.pamda_utils.pamda_utils">pamda_utils</a></b></code>:
 <ul class="hlist">
 <li><code><a title="pamda.pamda_utils.pamda_utils.exception" href="pamda_error.html#pamda.pamda_error.pamda_error.exception">exception</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.getMethods" href="#pamda.pamda_utils.pamda_utils.getMethods">getMethods</a></code></li>
 <li><code><a title="pamda.pamda_utils.pamda_utils.hardRound" href="#pamda.pamda_utils.pamda_utils.hardRound">hardRound</a></code></li>
 <li><code><a title="pamda.pamda_utils.pamda_utils.safeDivide" href="#pamda.pamda_utils.pamda_utils.safeDivide">safeDivide</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.safeDivideDefault" href="#pamda.pamda_utils.pamda_utils.safeDivideDefault">safeDivideDefault</a></code></li>
 <li><code><a title="pamda.pamda_utils.pamda_utils.vprint" href="pamda_error.html#pamda.pamda_error.pamda_error.vprint">vprint</a></code></li>
 <li><code><a title="pamda.pamda_utils.pamda_utils.warn" href="pamda_error.html#pamda.pamda_error.pamda_error.warn">warn</a></code></li>
 </ul>
@@ -251,7 +316,7 @@ class curry_class(pamda_utils):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class pamda_utils(pamda_error):
-    def hardRound(self, data, decimal_places=0):
+    def hardRound(self, decimal_places, data):
         &#34;&#34;&#34;
         Function:
 
@@ -290,11 +355,11 @@ class curry_class(pamda_utils):
             self.exception(&#39;`hardRound` can only be called on `float` or `int` objects&#39;)
         return int(data*(10**decimal_places)+0.5)/(10**decimal_places)
 
-    def safeDivide(self, numerator, denominator, default_denominator=1):
+    def safeDivide(self, numerator, denominator):
         &#34;&#34;&#34;
         Function:
 
-        - Forces division to work by enforcing a non zero default denominator if the provided denominator is zer
+        - Forces division to work by enforcing a denominator of 1 if the provided denominator is zero
 
         Requires:
 
@@ -306,26 +371,60 @@ class curry_class(pamda_utils):
             - Type: int | float
             - What: The denominator
 
-        Optional:
-
-        - `default_denominator`:
-            - Type: int | float
-            - What: A non zero denominator to use if denominator is zero
-            - Default: 1
-
         Example:
 
         ```
-        data=12.345
         p.safeDivide(
             numerator=10,
             denominator=2
         ) #=&gt; 5
         p.safeDivide(
             numerator=10,
-            denominator=0,
-            default_denominator=1
+            denominator=0
         ) #=&gt; 10
+        ```
+        &#34;&#34;&#34;
+        if (
+            not isinstance(numerator, (float, int)) or
+            not isinstance(denominator, (float, int))
+        ):
+            self.exception(&#39;`safeDivide` can only be called on `float` or `int` objects&#39;)
+        return numerator/denominator if denominator!=0 else numerator
+
+    def safeDivideDefault(self, numerator, denominator, default_denominator=1):
+        &#34;&#34;&#34;
+        Function:
+
+        - Forces division to work by enforcing a non zero default denominator if the provided denominator is zero
+
+        Requires:
+
+        - `default_denominator`:
+            - Type: int | float
+            - What: A non zero denominator to use if denominator is zero
+            - Default: 1
+
+        - `numerator`:
+            - Type: int | float
+            - What: The numerator
+
+        - `denominator`:
+            - Type: int | float
+            - What: The denominator
+
+        Example:
+
+        ```
+        p.safeDivideDefault(
+            default_denominator=2,
+            numerator=10,
+            denominator=5
+        ) #=&gt; 2
+        p.safeDivideDefault(
+            default_denominator=2,
+            numerator=10,
+            denominator=0
+        ) #=&gt; 5
         ```
         &#34;&#34;&#34;
         if (
@@ -333,10 +432,39 @@ class curry_class(pamda_utils):
             not isinstance(denominator, (float, int)) or
             not isinstance(default_denominator, (float, int))
         ):
-            self.exception(&#39;`safeDivide` can only be called on `float` or `int` objects&#39;)
+            self.exception(&#39;`safeDivideDefault` can only be called on `float` or `int` objects&#39;)
         if default_denominator==0:
-            self.exception(&#39;`safeDivide` `default_denominator` can not be 0&#39;)
-        return numerator/denominator if denominator!=0 else numerator/default_denominator</code></pre>
+            self.exception(&#39;`safeDivideDefault` `default_denominator` can not be 0&#39;)
+        return numerator/denominator if denominator!=0 else numerator/default_denominator
+
+    def getMethods(self, object):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the callable methods of a class (dunder-excluded) as a list of strs
+
+        Requires:
+
+        - `object`:
+            - Type: any
+            - What: Any python object
+            - Default: 1
+
+        Example:
+
+        ```
+        class MyClass:
+            def A(self):
+                pass
+
+            def B(self):
+                pass
+
+
+        p.getMethods(MyClass) #=&gt; [&#39;A&#39;, &#39;B&#39;]
+        ```
+        &#34;&#34;&#34;
+        return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)]</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -350,8 +478,70 @@ class curry_class(pamda_utils):
 </ul>
 <h3>Methods</h3>
 <dl>
+<dt id="pamda.pamda_utils.pamda_utils.getMethods"><code class="name flex">
+<span>def <span class="ident">getMethods</span></span>(<span>self, object)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Returns the callable methods of a class (dunder-excluded) as a list of strs</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>object</code>:<ul>
+<li>Type: any</li>
+<li>What: Any python object</li>
+<li>Default: 1</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>class MyClass:
+    def A(self):
+        pass
+
+    def B(self):
+        pass
+
+
+p.getMethods(MyClass) #=&gt; ['A', 'B']
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getMethods(self, object):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns the callable methods of a class (dunder-excluded) as a list of strs
+
+    Requires:
+
+    - `object`:
+        - Type: any
+        - What: Any python object
+        - Default: 1
+
+    Example:
+
+    ```
+    class MyClass:
+        def A(self):
+            pass
+
+        def B(self):
+            pass
+
+
+    p.getMethods(MyClass) #=&gt; [&#39;A&#39;, &#39;B&#39;]
+    ```
+    &#34;&#34;&#34;
+    return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)]</code></pre>
+</details>
+</dd>
 <dt id="pamda.pamda_utils.pamda_utils.hardRound"><code class="name flex">
-<span>def <span class="ident">hardRound</span></span>(<span>self, data, decimal_places=0)</span>
+<span>def <span class="ident">hardRound</span></span>(<span>self, decimal_places, data)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -392,7 +582,7 @@ p.hardRound(
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def hardRound(self, data, decimal_places=0):
+<pre><code class="python">def hardRound(self, decimal_places, data):
     &#34;&#34;&#34;
     Function:
 
@@ -433,12 +623,12 @@ p.hardRound(
 </details>
 </dd>
 <dt id="pamda.pamda_utils.pamda_utils.safeDivide"><code class="name flex">
-<span>def <span class="ident">safeDivide</span></span>(<span>self, numerator, denominator, default_denominator=1)</span>
+<span>def <span class="ident">safeDivide</span></span>(<span>self, numerator, denominator)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
 <ul>
-<li>Forces division to work by enforcing a non zero default denominator if the provided denominator is zer</li>
+<li>Forces division to work by enforcing a denominator of 1 if the provided denominator is zero</li>
 </ul>
 <p>Requires:</p>
 <ul>
@@ -457,36 +647,25 @@ p.hardRound(
 </ul>
 </li>
 </ul>
-<p>Optional:</p>
-<ul>
-<li><code>default_denominator</code>:<ul>
-<li>Type: int | float</li>
-<li>What: A non zero denominator to use if denominator is zero</li>
-<li>Default: 1</li>
-</ul>
-</li>
-</ul>
 <p>Example:</p>
-<pre><code>data=12.345
-p.safeDivide(
+<pre><code>p.safeDivide(
     numerator=10,
     denominator=2
 ) #=&gt; 5
 p.safeDivide(
     numerator=10,
-    denominator=0,
-    default_denominator=1
+    denominator=0
 ) #=&gt; 10
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def safeDivide(self, numerator, denominator, default_denominator=1):
+<pre><code class="python">def safeDivide(self, numerator, denominator):
     &#34;&#34;&#34;
     Function:
 
-    - Forces division to work by enforcing a non zero default denominator if the provided denominator is zer
+    - Forces division to work by enforcing a denominator of 1 if the provided denominator is zero
 
     Requires:
 
@@ -498,26 +677,110 @@ p.safeDivide(
         - Type: int | float
         - What: The denominator
 
-    Optional:
-
-    - `default_denominator`:
-        - Type: int | float
-        - What: A non zero denominator to use if denominator is zero
-        - Default: 1
-
     Example:
 
     ```
-    data=12.345
     p.safeDivide(
         numerator=10,
         denominator=2
     ) #=&gt; 5
     p.safeDivide(
         numerator=10,
-        denominator=0,
-        default_denominator=1
+        denominator=0
     ) #=&gt; 10
+    ```
+    &#34;&#34;&#34;
+    if (
+        not isinstance(numerator, (float, int)) or
+        not isinstance(denominator, (float, int))
+    ):
+        self.exception(&#39;`safeDivide` can only be called on `float` or `int` objects&#39;)
+    return numerator/denominator if denominator!=0 else numerator</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_utils.pamda_utils.safeDivideDefault"><code class="name flex">
+<span>def <span class="ident">safeDivideDefault</span></span>(<span>self, numerator, denominator, default_denominator=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Forces division to work by enforcing a non zero default denominator if the provided denominator is zero</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li>
+<p><code>default_denominator</code>:</p>
+<ul>
+<li>Type: int | float</li>
+<li>What: A non zero denominator to use if denominator is zero</li>
+<li>Default: 1</li>
+</ul>
+</li>
+<li>
+<p><code>numerator</code>:</p>
+<ul>
+<li>Type: int | float</li>
+<li>What: The numerator</li>
+</ul>
+</li>
+<li>
+<p><code>denominator</code>:</p>
+<ul>
+<li>Type: int | float</li>
+<li>What: The denominator</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>p.safeDivideDefault(
+    default_denominator=2,
+    numerator=10,
+    denominator=5
+) #=&gt; 2
+p.safeDivideDefault(
+    default_denominator=2,
+    numerator=10,
+    denominator=0
+) #=&gt; 5
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def safeDivideDefault(self, numerator, denominator, default_denominator=1):
+    &#34;&#34;&#34;
+    Function:
+
+    - Forces division to work by enforcing a non zero default denominator if the provided denominator is zero
+
+    Requires:
+
+    - `default_denominator`:
+        - Type: int | float
+        - What: A non zero denominator to use if denominator is zero
+        - Default: 1
+
+    - `numerator`:
+        - Type: int | float
+        - What: The numerator
+
+    - `denominator`:
+        - Type: int | float
+        - What: The denominator
+
+    Example:
+
+    ```
+    p.safeDivideDefault(
+        default_denominator=2,
+        numerator=10,
+        denominator=5
+    ) #=&gt; 2
+    p.safeDivideDefault(
+        default_denominator=2,
+        numerator=10,
+        denominator=0
+    ) #=&gt; 5
     ```
     &#34;&#34;&#34;
     if (
@@ -525,9 +788,9 @@ p.safeDivide(
         not isinstance(denominator, (float, int)) or
         not isinstance(default_denominator, (float, int))
     ):
-        self.exception(&#39;`safeDivide` can only be called on `float` or `int` objects&#39;)
+        self.exception(&#39;`safeDivideDefault` can only be called on `float` or `int` objects&#39;)
     if default_denominator==0:
-        self.exception(&#39;`safeDivide` `default_denominator` can not be 0&#39;)
+        self.exception(&#39;`safeDivideDefault` `default_denominator` can not be 0&#39;)
     return numerator/denominator if denominator!=0 else numerator/default_denominator</code></pre>
 </details>
 </dd>
@@ -569,8 +832,10 @@ p.safeDivide(
 <li>
 <h4><code><a title="pamda.pamda_utils.pamda_utils" href="#pamda.pamda_utils.pamda_utils">pamda_utils</a></code></h4>
 <ul class="">
+<li><code><a title="pamda.pamda_utils.pamda_utils.getMethods" href="#pamda.pamda_utils.pamda_utils.getMethods">getMethods</a></code></li>
 <li><code><a title="pamda.pamda_utils.pamda_utils.hardRound" href="#pamda.pamda_utils.pamda_utils.hardRound">hardRound</a></code></li>
 <li><code><a title="pamda.pamda_utils.pamda_utils.safeDivide" href="#pamda.pamda_utils.pamda_utils.safeDivide">safeDivide</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.safeDivideDefault" href="#pamda.pamda_utils.pamda_utils.safeDivideDefault">safeDivideDefault</a></code></li>
 </ul>
 </li>
 </ul>
