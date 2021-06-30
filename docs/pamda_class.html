@@ -29,6 +29,73 @@
 <pre><code class="python">from pamda.pamda_utils import pamda_utils, curry_class
 
 class pamda_class(pamda_utils):
+    def add(self, a, b):
+        &#34;&#34;&#34;
+        Function:
+
+        - Adds two numbers
+
+        Requires:
+
+        - `a`:
+            - Type: int | float
+            - What: The first number to add
+        - `b`:
+            - Type: int | float
+            - What: The second number to add
+
+        Example:
+
+        ```
+        p.add(1, 2) #=&gt; 3
+        ```
+        &#34;&#34;&#34;
+        if not all([isinstance(item, (int,float)) for item in [a, b]]):
+            self.exception(&#39;`a` and `b` both have to be `int`s or `float`s&#39;)
+        return a+b
+
+    def adjust(self, index, fn, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Adjusts an item in a list by applying a function to it
+
+        Requires:
+
+        - `index`:
+            - Type: int
+            - What: The 0 based index of the item in the list to adjust
+            - Note: Indicies are accepted
+            - Note: If the index is out of range, picks the (-)first / (+)last item
+        - `fn`:
+            - Type: function | method
+            - What: The function to apply the index item to
+            - Note: This is automatically curried
+        - `data`:
+            - Type: list
+            - What: The list to adjust
+
+        Example:
+
+        ```
+        data=[1,5,9]
+        p.adjust(
+            index=1,
+            fn=p.inc,
+            data=data
+        ) #=&gt; [1,6,9]
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(index, int):
+            self.exception(&#39;`index` must be an int&#39;)
+        if not isinstance(data, list):
+            self.exception(&#39;`data` must be a list&#39;)
+        if not isinstance(fn, curry_class):
+            fn=curry_class(fn)
+        index=self.clamp(-len(data),len(data)-1,index)
+        data[index]=fn(data[index])
+        return data
+
     def assocPath(self, path, value, data):
         &#34;&#34;&#34;
         Function:
@@ -108,6 +175,35 @@ class pamda_class(pamda_utils):
             data[path[0]] = default_fn(data[path[0]])
             return data
 
+    def clamp(self, minimum, maximum, a):
+        &#34;&#34;&#34;
+        Function:
+
+        - Forces data to be witin minimum and maximum
+
+        Requires:
+
+        - `minimum`:
+            - Type: int | float
+            - What: The minimum number
+        - `maximum`:
+            - Type: int | float
+            - What: The maximum number
+        - `a`:
+            - Type: int | float
+            - What: The number to clamp
+
+        Example:
+
+        ```
+        p.clamp(1, 3, 2) #=&gt; 2
+        p.clamp(1, 3, 5) #=&gt; 3
+        ```
+        &#34;&#34;&#34;
+        if not all([isinstance(item, (int,float)) for item in [minimum, maximum, a]]):
+            self.exception(&#39;`minimum`,`maximum` and `a` all have to be `int`s or `float`s&#39;)
+        return min(max(a,minimum),maximum)
+
     def curry(self, fn):
         &#34;&#34;&#34;
         Function:
@@ -121,11 +217,22 @@ class pamda_class(pamda_utils):
             - What: The function or method to curry
             - Note: Class methods auto apply self during curry
 
+        Notes:
+
+        - Once curried, the function | method becomes a curry_class object
+        - The initial function is only called once all inputs are passed
+
+
         Examples:
 
         ```
         curriedZip=p.curry(p.zip)
-        curiedZip([&#39;a&#39;,&#39;b&#39;])([1,2]) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+        curriedZip([&#39;a&#39;,&#39;b&#39;])([1,2]) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+
+        # Curried functions can be thunkified at any time
+        # See also thunkify
+        zipThunk=curriedZip.thunkify()([&#39;a&#39;,&#39;b&#39;])([1,2])
+        zipThunk() #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
         ```
 
         ```
@@ -137,13 +244,38 @@ class pamda_class(pamda_utils):
         curriedMyFn(1,2,3) #=&gt; [1,2,3]
         curriedMyFn(1)(2,3) #=&gt; [1,2,3]
 
-        x=curriedMyFn(1)
-        y=x(2)
-        y(3) #=&gt; [1,2,3]
-        y(4) #=&gt; [1,2,4]
+        x=curriedMyFn(1)(2)
+        x(3) #=&gt; [1,2,3]
+        x(4) #=&gt; [1,2,4]
+
+
         ```
         &#34;&#34;&#34;
-        return curry_class(fn)
+        if not isinstance(fn, curry_class):
+            return curry_class(fn)
+        return fn
+
+    def dec(self, a):
+        &#34;&#34;&#34;
+        Function:
+
+        - Decrements a number by one
+
+        Requires:
+
+        - `a`:
+            - Type: int | float
+            - What: The number to decrement
+
+        Example:
+
+        ```
+        p.dec(42) #=&gt; 41
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(a, (int, float)):
+            self.exception(&#39;`a` must be an `int` or a `float`&#39;)
+        return a-1
 
     def difference(self, a, b):
         &#34;&#34;&#34;
@@ -308,6 +440,28 @@ class pamda_class(pamda_utils):
         if not len(data)&gt;0:
             self.exception(&#34;Attempting to call `head` on an empty list or str&#34;)
         return data[0]
+
+    def inc(self, a):
+        &#34;&#34;&#34;
+        Function:
+
+        - Increments a number by one
+
+        Requires:
+
+        - `a`:
+            - Type: int | float
+            - What: The number to increment
+
+        Example:
+
+        ```
+        p.inc(42) #=&gt; 43
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(a, (int, float)):
+            self.exception(&#39;`a` must be an `int` or a `float`&#39;)
+        return a+1
 
     def intersection(self, a, b):
         &#34;&#34;&#34;
@@ -650,6 +804,31 @@ class pamda_class(pamda_utils):
         if not len(data)&gt;0:
             self.exception(&#34;Attempting to call `tail` on an empty list or str&#34;)
         return data[-1]
+
+    def thunkify(self, fn):
+        &#34;&#34;&#34;
+        Function:
+
+        - Creates a curried thunk out of a function
+        - Evaluation of the thunk lazy and is delayed until called
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to thunkify
+            - Note: Class methods auto apply self during thunkify
+
+        Examples:
+
+        ```
+        zipThunk=p.thunkify(p.zip)([&#39;a&#39;,&#39;b&#39;])([1,2])
+        zipThunk() #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(fn, curry_class):
+            return curry_class(fn, isThunk=True)
+        return fn.thunkify()
 
     def zip(self, a, b):
         &#34;&#34;&#34;
@@ -722,6 +901,73 @@ class pamda_class(pamda_utils):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class pamda_class(pamda_utils):
+    def add(self, a, b):
+        &#34;&#34;&#34;
+        Function:
+
+        - Adds two numbers
+
+        Requires:
+
+        - `a`:
+            - Type: int | float
+            - What: The first number to add
+        - `b`:
+            - Type: int | float
+            - What: The second number to add
+
+        Example:
+
+        ```
+        p.add(1, 2) #=&gt; 3
+        ```
+        &#34;&#34;&#34;
+        if not all([isinstance(item, (int,float)) for item in [a, b]]):
+            self.exception(&#39;`a` and `b` both have to be `int`s or `float`s&#39;)
+        return a+b
+
+    def adjust(self, index, fn, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Adjusts an item in a list by applying a function to it
+
+        Requires:
+
+        - `index`:
+            - Type: int
+            - What: The 0 based index of the item in the list to adjust
+            - Note: Indicies are accepted
+            - Note: If the index is out of range, picks the (-)first / (+)last item
+        - `fn`:
+            - Type: function | method
+            - What: The function to apply the index item to
+            - Note: This is automatically curried
+        - `data`:
+            - Type: list
+            - What: The list to adjust
+
+        Example:
+
+        ```
+        data=[1,5,9]
+        p.adjust(
+            index=1,
+            fn=p.inc,
+            data=data
+        ) #=&gt; [1,6,9]
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(index, int):
+            self.exception(&#39;`index` must be an int&#39;)
+        if not isinstance(data, list):
+            self.exception(&#39;`data` must be a list&#39;)
+        if not isinstance(fn, curry_class):
+            fn=curry_class(fn)
+        index=self.clamp(-len(data),len(data)-1,index)
+        data[index]=fn(data[index])
+        return data
+
     def assocPath(self, path, value, data):
         &#34;&#34;&#34;
         Function:
@@ -801,6 +1047,35 @@ class pamda_class(pamda_utils):
             data[path[0]] = default_fn(data[path[0]])
             return data
 
+    def clamp(self, minimum, maximum, a):
+        &#34;&#34;&#34;
+        Function:
+
+        - Forces data to be witin minimum and maximum
+
+        Requires:
+
+        - `minimum`:
+            - Type: int | float
+            - What: The minimum number
+        - `maximum`:
+            - Type: int | float
+            - What: The maximum number
+        - `a`:
+            - Type: int | float
+            - What: The number to clamp
+
+        Example:
+
+        ```
+        p.clamp(1, 3, 2) #=&gt; 2
+        p.clamp(1, 3, 5) #=&gt; 3
+        ```
+        &#34;&#34;&#34;
+        if not all([isinstance(item, (int,float)) for item in [minimum, maximum, a]]):
+            self.exception(&#39;`minimum`,`maximum` and `a` all have to be `int`s or `float`s&#39;)
+        return min(max(a,minimum),maximum)
+
     def curry(self, fn):
         &#34;&#34;&#34;
         Function:
@@ -814,11 +1089,22 @@ class pamda_class(pamda_utils):
             - What: The function or method to curry
             - Note: Class methods auto apply self during curry
 
+        Notes:
+
+        - Once curried, the function | method becomes a curry_class object
+        - The initial function is only called once all inputs are passed
+
+
         Examples:
 
         ```
         curriedZip=p.curry(p.zip)
-        curiedZip([&#39;a&#39;,&#39;b&#39;])([1,2]) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+        curriedZip([&#39;a&#39;,&#39;b&#39;])([1,2]) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+
+        # Curried functions can be thunkified at any time
+        # See also thunkify
+        zipThunk=curriedZip.thunkify()([&#39;a&#39;,&#39;b&#39;])([1,2])
+        zipThunk() #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
         ```
 
         ```
@@ -830,13 +1116,38 @@ class pamda_class(pamda_utils):
         curriedMyFn(1,2,3) #=&gt; [1,2,3]
         curriedMyFn(1)(2,3) #=&gt; [1,2,3]
 
-        x=curriedMyFn(1)
-        y=x(2)
-        y(3) #=&gt; [1,2,3]
-        y(4) #=&gt; [1,2,4]
+        x=curriedMyFn(1)(2)
+        x(3) #=&gt; [1,2,3]
+        x(4) #=&gt; [1,2,4]
+
+
         ```
         &#34;&#34;&#34;
-        return curry_class(fn)
+        if not isinstance(fn, curry_class):
+            return curry_class(fn)
+        return fn
+
+    def dec(self, a):
+        &#34;&#34;&#34;
+        Function:
+
+        - Decrements a number by one
+
+        Requires:
+
+        - `a`:
+            - Type: int | float
+            - What: The number to decrement
+
+        Example:
+
+        ```
+        p.dec(42) #=&gt; 41
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(a, (int, float)):
+            self.exception(&#39;`a` must be an `int` or a `float`&#39;)
+        return a-1
 
     def difference(self, a, b):
         &#34;&#34;&#34;
@@ -1001,6 +1312,28 @@ class pamda_class(pamda_utils):
         if not len(data)&gt;0:
             self.exception(&#34;Attempting to call `head` on an empty list or str&#34;)
         return data[0]
+
+    def inc(self, a):
+        &#34;&#34;&#34;
+        Function:
+
+        - Increments a number by one
+
+        Requires:
+
+        - `a`:
+            - Type: int | float
+            - What: The number to increment
+
+        Example:
+
+        ```
+        p.inc(42) #=&gt; 43
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(a, (int, float)):
+            self.exception(&#39;`a` must be an `int` or a `float`&#39;)
+        return a+1
 
     def intersection(self, a, b):
         &#34;&#34;&#34;
@@ -1344,6 +1677,31 @@ class pamda_class(pamda_utils):
             self.exception(&#34;Attempting to call `tail` on an empty list or str&#34;)
         return data[-1]
 
+    def thunkify(self, fn):
+        &#34;&#34;&#34;
+        Function:
+
+        - Creates a curried thunk out of a function
+        - Evaluation of the thunk lazy and is delayed until called
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to thunkify
+            - Note: Class methods auto apply self during thunkify
+
+        Examples:
+
+        ```
+        zipThunk=p.thunkify(p.zip)([&#39;a&#39;,&#39;b&#39;])([1,2])
+        zipThunk() #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(fn, curry_class):
+            return curry_class(fn, isThunk=True)
+        return fn.thunkify()
+
     def zip(self, a, b):
         &#34;&#34;&#34;
         Function:
@@ -1402,6 +1760,144 @@ class pamda_class(pamda_utils):
 </ul>
 <h3>Methods</h3>
 <dl>
+<dt id="pamda.pamda_class.pamda_class.add"><code class="name flex">
+<span>def <span class="ident">add</span></span>(<span>self, a, b)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Adds two numbers</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>a</code>:<ul>
+<li>Type: int | float</li>
+<li>What: The first number to add</li>
+</ul>
+</li>
+<li><code>b</code>:<ul>
+<li>Type: int | float</li>
+<li>What: The second number to add</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>p.add(1, 2) #=&gt; 3
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add(self, a, b):
+    &#34;&#34;&#34;
+    Function:
+
+    - Adds two numbers
+
+    Requires:
+
+    - `a`:
+        - Type: int | float
+        - What: The first number to add
+    - `b`:
+        - Type: int | float
+        - What: The second number to add
+
+    Example:
+
+    ```
+    p.add(1, 2) #=&gt; 3
+    ```
+    &#34;&#34;&#34;
+    if not all([isinstance(item, (int,float)) for item in [a, b]]):
+        self.exception(&#39;`a` and `b` both have to be `int`s or `float`s&#39;)
+    return a+b</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_class.pamda_class.adjust"><code class="name flex">
+<span>def <span class="ident">adjust</span></span>(<span>self, index, fn, data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Adjusts an item in a list by applying a function to it</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>index</code>:<ul>
+<li>Type: int</li>
+<li>What: The 0 based index of the item in the list to adjust</li>
+<li>Note: Indicies are accepted</li>
+<li>Note: If the index is out of range, picks the (-)first / (+)last item</li>
+</ul>
+</li>
+<li><code>fn</code>:<ul>
+<li>Type: function | method</li>
+<li>What: The function to apply the index item to</li>
+<li>Note: This is automatically curried</li>
+</ul>
+</li>
+<li><code>data</code>:<ul>
+<li>Type: list</li>
+<li>What: The list to adjust</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>data=[1,5,9]
+p.adjust(
+    index=1,
+    fn=p.inc,
+    data=data
+) #=&gt; [1,6,9]
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def adjust(self, index, fn, data):
+    &#34;&#34;&#34;
+    Function:
+
+    - Adjusts an item in a list by applying a function to it
+
+    Requires:
+
+    - `index`:
+        - Type: int
+        - What: The 0 based index of the item in the list to adjust
+        - Note: Indicies are accepted
+        - Note: If the index is out of range, picks the (-)first / (+)last item
+    - `fn`:
+        - Type: function | method
+        - What: The function to apply the index item to
+        - Note: This is automatically curried
+    - `data`:
+        - Type: list
+        - What: The list to adjust
+
+    Example:
+
+    ```
+    data=[1,5,9]
+    p.adjust(
+        index=1,
+        fn=p.inc,
+        data=data
+    ) #=&gt; [1,6,9]
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(index, int):
+        self.exception(&#39;`index` must be an int&#39;)
+    if not isinstance(data, list):
+        self.exception(&#39;`data` must be a list&#39;)
+    if not isinstance(fn, curry_class):
+        fn=curry_class(fn)
+    index=self.clamp(-len(data),len(data)-1,index)
+    data[index]=fn(data[index])
+    return data</code></pre>
+</details>
+</dd>
 <dt id="pamda.pamda_class.pamda_class.assocPath"><code class="name flex">
 <span>def <span class="ident">assocPath</span></span>(<span>self, path, value, data)</span>
 </code></dt>
@@ -1558,6 +2054,70 @@ p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=
         return data</code></pre>
 </details>
 </dd>
+<dt id="pamda.pamda_class.pamda_class.clamp"><code class="name flex">
+<span>def <span class="ident">clamp</span></span>(<span>self, minimum, maximum, a)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Forces data to be witin minimum and maximum</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>minimum</code>:<ul>
+<li>Type: int | float</li>
+<li>What: The minimum number</li>
+</ul>
+</li>
+<li><code>maximum</code>:<ul>
+<li>Type: int | float</li>
+<li>What: The maximum number</li>
+</ul>
+</li>
+<li><code>a</code>:<ul>
+<li>Type: int | float</li>
+<li>What: The number to clamp</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>p.clamp(1, 3, 2) #=&gt; 2
+p.clamp(1, 3, 5) #=&gt; 3
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def clamp(self, minimum, maximum, a):
+    &#34;&#34;&#34;
+    Function:
+
+    - Forces data to be witin minimum and maximum
+
+    Requires:
+
+    - `minimum`:
+        - Type: int | float
+        - What: The minimum number
+    - `maximum`:
+        - Type: int | float
+        - What: The maximum number
+    - `a`:
+        - Type: int | float
+        - What: The number to clamp
+
+    Example:
+
+    ```
+    p.clamp(1, 3, 2) #=&gt; 2
+    p.clamp(1, 3, 5) #=&gt; 3
+    ```
+    &#34;&#34;&#34;
+    if not all([isinstance(item, (int,float)) for item in [minimum, maximum, a]]):
+        self.exception(&#39;`minimum`,`maximum` and `a` all have to be `int`s or `float`s&#39;)
+    return min(max(a,minimum),maximum)</code></pre>
+</details>
+</dd>
 <dt id="pamda.pamda_class.pamda_class.curry"><code class="name flex">
 <span>def <span class="ident">curry</span></span>(<span>self, fn)</span>
 </code></dt>
@@ -1575,9 +2135,19 @@ p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=
 </ul>
 </li>
 </ul>
+<p>Notes:</p>
+<ul>
+<li>Once curried, the function | method becomes a curry_class object</li>
+<li>The initial function is only called once all inputs are passed</li>
+</ul>
 <p>Examples:</p>
 <pre><code>curriedZip=p.curry(p.zip)
-curiedZip(['a','b'])([1,2]) #=&gt; [['a',1],['b',2]]
+curriedZip(['a','b'])([1,2]) #=&gt; [['a',1],['b',2]]
+
+# Curried functions can be thunkified at any time
+# See also thunkify
+zipThunk=curriedZip.thunkify()(['a','b'])([1,2])
+zipThunk() #=&gt; [['a',1],['b',2]]
 </code></pre>
 <pre><code>def myFunction(a,b,c):
     return [a,b,c]
@@ -1587,10 +2157,11 @@ curriedMyFn=p.curry(myFunction)
 curriedMyFn(1,2,3) #=&gt; [1,2,3]
 curriedMyFn(1)(2,3) #=&gt; [1,2,3]
 
-x=curriedMyFn(1)
-y=x(2)
-y(3) #=&gt; [1,2,3]
-y(4) #=&gt; [1,2,4]
+x=curriedMyFn(1)(2)
+x(3) #=&gt; [1,2,3]
+x(4) #=&gt; [1,2,4]
+
+
 </code></pre></div>
 <details class="source">
 <summary>
@@ -1609,11 +2180,22 @@ y(4) #=&gt; [1,2,4]
         - What: The function or method to curry
         - Note: Class methods auto apply self during curry
 
+    Notes:
+
+    - Once curried, the function | method becomes a curry_class object
+    - The initial function is only called once all inputs are passed
+
+
     Examples:
 
     ```
     curriedZip=p.curry(p.zip)
-    curiedZip([&#39;a&#39;,&#39;b&#39;])([1,2]) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+    curriedZip([&#39;a&#39;,&#39;b&#39;])([1,2]) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+
+    # Curried functions can be thunkified at any time
+    # See also thunkify
+    zipThunk=curriedZip.thunkify()([&#39;a&#39;,&#39;b&#39;])([1,2])
+    zipThunk() #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
     ```
 
     ```
@@ -1625,13 +2207,62 @@ y(4) #=&gt; [1,2,4]
     curriedMyFn(1,2,3) #=&gt; [1,2,3]
     curriedMyFn(1)(2,3) #=&gt; [1,2,3]
 
-    x=curriedMyFn(1)
-    y=x(2)
-    y(3) #=&gt; [1,2,3]
-    y(4) #=&gt; [1,2,4]
+    x=curriedMyFn(1)(2)
+    x(3) #=&gt; [1,2,3]
+    x(4) #=&gt; [1,2,4]
+
+
     ```
     &#34;&#34;&#34;
-    return curry_class(fn)</code></pre>
+    if not isinstance(fn, curry_class):
+        return curry_class(fn)
+    return fn</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_class.pamda_class.dec"><code class="name flex">
+<span>def <span class="ident">dec</span></span>(<span>self, a)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Decrements a number by one</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>a</code>:<ul>
+<li>Type: int | float</li>
+<li>What: The number to decrement</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>p.dec(42) #=&gt; 41
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dec(self, a):
+    &#34;&#34;&#34;
+    Function:
+
+    - Decrements a number by one
+
+    Requires:
+
+    - `a`:
+        - Type: int | float
+        - What: The number to decrement
+
+    Example:
+
+    ```
+    p.dec(42) #=&gt; 41
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(a, (int, float)):
+        self.exception(&#39;`a` must be an `int` or a `float`&#39;)
+    return a-1</code></pre>
 </details>
 </dd>
 <dt id="pamda.pamda_class.pamda_class.difference"><code class="name flex">
@@ -1971,6 +2602,52 @@ p.first(
     if not len(data)&gt;0:
         self.exception(&#34;Attempting to call `head` on an empty list or str&#34;)
     return data[0]</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_class.pamda_class.inc"><code class="name flex">
+<span>def <span class="ident">inc</span></span>(<span>self, a)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Increments a number by one</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>a</code>:<ul>
+<li>Type: int | float</li>
+<li>What: The number to increment</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>p.inc(42) #=&gt; 43
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def inc(self, a):
+    &#34;&#34;&#34;
+    Function:
+
+    - Increments a number by one
+
+    Requires:
+
+    - `a`:
+        - Type: int | float
+        - What: The number to increment
+
+    Example:
+
+    ```
+    p.inc(42) #=&gt; 43
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(a, (int, float)):
+        self.exception(&#39;`a` must be an `int` or a `float`&#39;)
+    return a+1</code></pre>
 </details>
 </dd>
 <dt id="pamda.pamda_class.pamda_class.intersection"><code class="name flex">
@@ -2663,6 +3340,58 @@ p.first(
     return data[-1]</code></pre>
 </details>
 </dd>
+<dt id="pamda.pamda_class.pamda_class.thunkify"><code class="name flex">
+<span>def <span class="ident">thunkify</span></span>(<span>self, fn)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Creates a curried thunk out of a function</li>
+<li>Evaluation of the thunk lazy and is delayed until called</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>fn</code>:<ul>
+<li>Type: function | method</li>
+<li>What: The function or method to thunkify</li>
+<li>Note: Class methods auto apply self during thunkify</li>
+</ul>
+</li>
+</ul>
+<p>Examples:</p>
+<pre><code>zipThunk=p.thunkify(p.zip)(['a','b'])([1,2])
+zipThunk() #=&gt; [['a',1],['b',2]]
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def thunkify(self, fn):
+    &#34;&#34;&#34;
+    Function:
+
+    - Creates a curried thunk out of a function
+    - Evaluation of the thunk lazy and is delayed until called
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to thunkify
+        - Note: Class methods auto apply self during thunkify
+
+    Examples:
+
+    ```
+    zipThunk=p.thunkify(p.zip)([&#39;a&#39;,&#39;b&#39;])([1,2])
+    zipThunk() #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(fn, curry_class):
+        return curry_class(fn, isThunk=True)
+    return fn.thunkify()</code></pre>
+</details>
+</dd>
 <dt id="pamda.pamda_class.pamda_class.zip"><code class="name flex">
 <span>def <span class="ident">zip</span></span>(<span>self, a, b)</span>
 </code></dt>
@@ -2812,15 +3541,20 @@ p.zipObj(a=a, b=b) #=&gt; {'a':1, 'b':2}
 <li>
 <h4><code><a title="pamda.pamda_class.pamda_class" href="#pamda.pamda_class.pamda_class">pamda_class</a></code></h4>
 <ul class="two-column">
+<li><code><a title="pamda.pamda_class.pamda_class.add" href="#pamda.pamda_class.pamda_class.add">add</a></code></li>
+<li><code><a title="pamda.pamda_class.pamda_class.adjust" href="#pamda.pamda_class.pamda_class.adjust">adjust</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.assocPath" href="#pamda.pamda_class.pamda_class.assocPath">assocPath</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.assocPathComplex" href="#pamda.pamda_class.pamda_class.assocPathComplex">assocPathComplex</a></code></li>
+<li><code><a title="pamda.pamda_class.pamda_class.clamp" href="#pamda.pamda_class.pamda_class.clamp">clamp</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.curry" href="#pamda.pamda_class.pamda_class.curry">curry</a></code></li>
+<li><code><a title="pamda.pamda_class.pamda_class.dec" href="#pamda.pamda_class.pamda_class.dec">dec</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.difference" href="#pamda.pamda_class.pamda_class.difference">difference</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.dissocPath" href="#pamda.pamda_class.pamda_class.dissocPath">dissocPath</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.flatten" href="#pamda.pamda_class.pamda_class.flatten">flatten</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.getArity" href="#pamda.pamda_class.pamda_class.getArity">getArity</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.hasPath" href="#pamda.pamda_class.pamda_class.hasPath">hasPath</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.head" href="#pamda.pamda_class.pamda_class.head">head</a></code></li>
+<li><code><a title="pamda.pamda_class.pamda_class.inc" href="#pamda.pamda_class.pamda_class.inc">inc</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.intersection" href="#pamda.pamda_class.pamda_class.intersection">intersection</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.mergeDeep" href="#pamda.pamda_class.pamda_class.mergeDeep">mergeDeep</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.nest" href="#pamda.pamda_class.pamda_class.nest">nest</a></code></li>
@@ -2831,6 +3565,7 @@ p.zipObj(a=a, b=b) #=&gt; {'a':1, 'b':2}
 <li><code><a title="pamda.pamda_class.pamda_class.pluckIf" href="#pamda.pamda_class.pamda_class.pluckIf">pluckIf</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.symmetricDifference" href="#pamda.pamda_class.pamda_class.symmetricDifference">symmetricDifference</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.tail" href="#pamda.pamda_class.pamda_class.tail">tail</a></code></li>
+<li><code><a title="pamda.pamda_class.pamda_class.thunkify" href="#pamda.pamda_class.pamda_class.thunkify">thunkify</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.zip" href="#pamda.pamda_class.pamda_class.zip">zip</a></code></li>
 <li><code><a title="pamda.pamda_class.pamda_class.zipObj" href="#pamda.pamda_class.pamda_class.zipObj">zipObj</a></code></li>
 </ul>

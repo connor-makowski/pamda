@@ -13,8 +13,9 @@ Key Features
 --------
 
 - Simplified functional programming for python
-- Ability to arbitrarily `curry` methods and functions
-- Ability to `pipe` data iteratively through n functions
+- `curry` arbitrary methods and functions
+- `thunkify` arbitrary methods and functions
+- `pipe` data iteratively through n functions
 - List based path access and features for nested dictionaries
 
 
@@ -73,6 +74,26 @@ def myFunction(a,b,c):
     return [a,b,c]
 
 myFunction(1,2)(4) #=> [1,2,4]
+```
+
+## Thunkify Usage
+```py
+from pamda import pamda as p
+
+# Define a function that you want to thunkify
+# thunkify can be called as a function or decorator
+@p.thunkify
+def myFunction(a,b,c):
+    return [a,b,c]
+
+# The function is now curried and the evaluation is lazy
+# This means the function is not evaluated until called
+x=myFunction(1,2)
+x(3) #=> <pamda.pamda_utils.curry_class object at 0x7fd514e4c820>
+x(3)() #=> [1,2,3]
+
+y=x(4)
+y() #=> [1,2,4]
 ```
 
 ## Pre-curried Pamda Usage

@@ -153,10 +153,11 @@ class pamda_utils(pamda_error):
         return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith("__")]
 
 class curry_class(pamda_utils):
-    def __init__(self, fn, *args, **kwargs):
+    def __init__(self, fn, *args, isThunk=False, **kwargs):
         self.fn=fn
         self.args=args
         self.kwargs=kwargs
+        self.isThunk=isThunk
         self.fnArity=self.getFnArity()
         self.arity=self.getArity(args, kwargs)
 
@@ -167,8 +168,11 @@ class curry_class(pamda_utils):
         if self.arity<0:
             self.exception('Too many arguments were supplied')
         if self.arity==0:
-            return self.fn(*new_args, **new_kwargs)
-        return curry_class(self.fn, *new_args, **new_kwargs)
+            if not self.isThunk:
+                return self.fn(*new_args, **new_kwargs)
+            if len(args)+len(kwargs)==0:
+                return self.fn(*new_args, **new_kwargs)
+        return curry_class(self.fn, *new_args, isThunk=self.isThunk, **new_kwargs)
 
     def getArity(self, args, kwargs):
         return self.fnArity-(len(args) + len(kwargs))
@@ -178,3 +182,7 @@ class curry_class(pamda_utils):
             self.exception('A non function was passed as a function and does not have any arity. See the stack trace above for more information.')
         extra_method_input_count=1 if isinstance(self.fn, types.MethodType) else 0
         return self.fn.__code__.co_argcount-extra_method_input_count
+
+    def thunkify(self):
+        self.isThunk=True
+        return self

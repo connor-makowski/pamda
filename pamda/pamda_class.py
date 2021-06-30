@@ -1,6 +1,73 @@
 from pamda.pamda_utils import pamda_utils, curry_class
 
 class pamda_class(pamda_utils):
+    def add(self, a, b):
+        """
+        Function:
+
+        - Adds two numbers
+
+        Requires:
+
+        - `a`:
+            - Type: int | float
+            - What: The first number to add
+        - `b`:
+            - Type: int | float
+            - What: The second number to add
+
+        Example:
+
+        ```
+        p.add(1, 2) #=> 3
+        ```
+        """
+        if not all([isinstance(item, (int,float)) for item in [a, b]]):
+            self.exception('`a` and `b` both have to be `int`s or `float`s')
+        return a+b
+
+    def adjust(self, index, fn, data):
+        """
+        Function:
+
+        - Adjusts an item in a list by applying a function to it
+
+        Requires:
+
+        - `index`:
+            - Type: int
+            - What: The 0 based index of the item in the list to adjust
+            - Note: Indicies are accepted
+            - Note: If the index is out of range, picks the (-)first / (+)last item
+        - `fn`:
+            - Type: function | method
+            - What: The function to apply the index item to
+            - Note: This is automatically curried
+        - `data`:
+            - Type: list
+            - What: The list to adjust
+
+        Example:
+
+        ```
+        data=[1,5,9]
+        p.adjust(
+            index=1,
+            fn=p.inc,
+            data=data
+        ) #=> [1,6,9]
+        ```
+        """
+        if not isinstance(index, int):
+            self.exception('`index` must be an int')
+        if not isinstance(data, list):
+            self.exception('`data` must be a list')
+        if not isinstance(fn, curry_class):
+            fn=curry_class(fn)
+        index=self.clamp(-len(data),len(data)-1,index)
+        data[index]=fn(data[index])
+        return data
+
     def assocPath(self, path, value, data):
         """
         Function:
@@ -80,6 +147,35 @@ class pamda_class(pamda_utils):
             data[path[0]] = default_fn(data[path[0]])
             return data
 
+    def clamp(self, minimum, maximum, a):
+        """
+        Function:
+
+        - Forces data to be witin minimum and maximum
+
+        Requires:
+
+        - `minimum`:
+            - Type: int | float
+            - What: The minimum number
+        - `maximum`:
+            - Type: int | float
+            - What: The maximum number
+        - `a`:
+            - Type: int | float
+            - What: The number to clamp
+
+        Example:
+
+        ```
+        p.clamp(1, 3, 2) #=> 2
+        p.clamp(1, 3, 5) #=> 3
+        ```
+        """
+        if not all([isinstance(item, (int,float)) for item in [minimum, maximum, a]]):
+            self.exception('`minimum`,`maximum` and `a` all have to be `int`s or `float`s')
+        return min(max(a,minimum),maximum)
+
     def curry(self, fn):
         """
         Function:
@@ -93,11 +189,22 @@ class pamda_class(pamda_utils):
             - What: The function or method to curry
             - Note: Class methods auto apply self during curry
 
+        Notes:
+
+        - Once curried, the function | method becomes a curry_class object
+        - The initial function is only called once all inputs are passed
+
+
         Examples:
 
         ```
         curriedZip=p.curry(p.zip)
-        curiedZip(['a','b'])([1,2]) #=> [['a',1],['b',2]]
+        curriedZip(['a','b'])([1,2]) #=> [['a',1],['b',2]]
+
+        # Curried functions can be thunkified at any time
+        # See also thunkify
+        zipThunk=curriedZip.thunkify()(['a','b'])([1,2])
+        zipThunk() #=> [['a',1],['b',2]]
         ```
 
         ```
@@ -109,13 +216,38 @@ class pamda_class(pamda_utils):
         curriedMyFn(1,2,3) #=> [1,2,3]
         curriedMyFn(1)(2,3) #=> [1,2,3]
 
-        x=curriedMyFn(1)
-        y=x(2)
-        y(3) #=> [1,2,3]
-        y(4) #=> [1,2,4]
+        x=curriedMyFn(1)(2)
+        x(3) #=> [1,2,3]
+        x(4) #=> [1,2,4]
+
+
         ```
         """
-        return curry_class(fn)
+        if not isinstance(fn, curry_class):
+            return curry_class(fn)
+        return fn
+
+    def dec(self, a):
+        """
+        Function:
+
+        - Decrements a number by one
+
+        Requires:
+
+        - `a`:
+            - Type: int | float
+            - What: The number to decrement
+
+        Example:
+
+        ```
+        p.dec(42) #=> 41
+        ```
+        """
+        if not isinstance(a, (int, float)):
+            self.exception('`a` must be an `int` or a `float`')
+        return a-1
 
     def difference(self, a, b):
         """
@@ -280,6 +412,28 @@ class pamda_class(pamda_utils):
         if not len(data)>0:
             self.exception("Attempting to call `head` on an empty list or str")
         return data[0]
+
+    def inc(self, a):
+        """
+        Function:
+
+        - Increments a number by one
+
+        Requires:
+
+        - `a`:
+            - Type: int | float
+            - What: The number to increment
+
+        Example:
+
+        ```
+        p.inc(42) #=> 43
+        ```
+        """
+        if not isinstance(a, (int, float)):
+            self.exception('`a` must be an `int` or a `float`')
+        return a+1
 
     def intersection(self, a, b):
         """
@@ -622,6 +776,31 @@ class pamda_class(pamda_utils):
         if not len(data)>0:
             self.exception("Attempting to call `tail` on an empty list or str")
         return data[-1]
+
+    def thunkify(self, fn):
+        """
+        Function:
+
+        - Creates a curried thunk out of a function
+        - Evaluation of the thunk lazy and is delayed until called
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to thunkify
+            - Note: Class methods auto apply self during thunkify
+
+        Examples:
+
+        ```
+        zipThunk=p.thunkify(p.zip)(['a','b'])([1,2])
+        zipThunk() #=> [['a',1],['b',2]]
+        ```
+        """
+        if not isinstance(fn, curry_class):
+            return curry_class(fn, isThunk=True)
+        return fn.thunkify()
 
     def zip(self, a, b):
         """

@@ -181,10 +181,11 @@ class pamda_utils(pamda_error):
         return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)]
 
 class curry_class(pamda_utils):
-    def __init__(self, fn, *args, **kwargs):
+    def __init__(self, fn, *args, isThunk=False, **kwargs):
         self.fn=fn
         self.args=args
         self.kwargs=kwargs
+        self.isThunk=isThunk
         self.fnArity=self.getFnArity()
         self.arity=self.getArity(args, kwargs)
 
@@ -195,8 +196,11 @@ class curry_class(pamda_utils):
         if self.arity&lt;0:
             self.exception(&#39;Too many arguments were supplied&#39;)
         if self.arity==0:
-            return self.fn(*new_args, **new_kwargs)
-        return curry_class(self.fn, *new_args, **new_kwargs)
+            if not self.isThunk:
+                return self.fn(*new_args, **new_kwargs)
+            if len(args)+len(kwargs)==0:
+                return self.fn(*new_args, **new_kwargs)
+        return curry_class(self.fn, *new_args, isThunk=self.isThunk, **new_kwargs)
 
     def getArity(self, args, kwargs):
         return self.fnArity-(len(args) + len(kwargs))
@@ -205,7 +209,11 @@ class curry_class(pamda_utils):
         if not isinstance(self.fn, (types.MethodType, types.FunctionType)):
             self.exception(&#39;A non function was passed as a function and does not have any arity. See the stack trace above for more information.&#39;)
         extra_method_input_count=1 if isinstance(self.fn, types.MethodType) else 0
-        return self.fn.__code__.co_argcount-extra_method_input_count</code></pre>
+        return self.fn.__code__.co_argcount-extra_method_input_count
+
+    def thunkify(self):
+        self.isThunk=True
+        return self</code></pre>
 </details>
 </section>
 <section>
@@ -219,7 +227,7 @@ class curry_class(pamda_utils):
 <dl>
 <dt id="pamda.pamda_utils.curry_class"><code class="flex name class">
 <span>class <span class="ident">curry_class</span></span>
-<span>(</span><span>fn, *args, **kwargs)</span>
+<span>(</span><span>fn, *args, isThunk=False, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -228,10 +236,11 @@ class curry_class(pamda_utils):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class curry_class(pamda_utils):
-    def __init__(self, fn, *args, **kwargs):
+    def __init__(self, fn, *args, isThunk=False, **kwargs):
         self.fn=fn
         self.args=args
         self.kwargs=kwargs
+        self.isThunk=isThunk
         self.fnArity=self.getFnArity()
         self.arity=self.getArity(args, kwargs)
 
@@ -242,8 +251,11 @@ class curry_class(pamda_utils):
         if self.arity&lt;0:
             self.exception(&#39;Too many arguments were supplied&#39;)
         if self.arity==0:
-            return self.fn(*new_args, **new_kwargs)
-        return curry_class(self.fn, *new_args, **new_kwargs)
+            if not self.isThunk:
+                return self.fn(*new_args, **new_kwargs)
+            if len(args)+len(kwargs)==0:
+                return self.fn(*new_args, **new_kwargs)
+        return curry_class(self.fn, *new_args, isThunk=self.isThunk, **new_kwargs)
 
     def getArity(self, args, kwargs):
         return self.fnArity-(len(args) + len(kwargs))
@@ -252,7 +264,11 @@ class curry_class(pamda_utils):
         if not isinstance(self.fn, (types.MethodType, types.FunctionType)):
             self.exception(&#39;A non function was passed as a function and does not have any arity. See the stack trace above for more information.&#39;)
         extra_method_input_count=1 if isinstance(self.fn, types.MethodType) else 0
-        return self.fn.__code__.co_argcount-extra_method_input_count</code></pre>
+        return self.fn.__code__.co_argcount-extra_method_input_count
+
+    def thunkify(self):
+        self.isThunk=True
+        return self</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -288,6 +304,20 @@ class curry_class(pamda_utils):
         self.exception(&#39;A non function was passed as a function and does not have any arity. See the stack trace above for more information.&#39;)
     extra_method_input_count=1 if isinstance(self.fn, types.MethodType) else 0
     return self.fn.__code__.co_argcount-extra_method_input_count</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_utils.curry_class.thunkify"><code class="name flex">
+<span>def <span class="ident">thunkify</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def thunkify(self):
+    self.isThunk=True
+    return self</code></pre>
 </details>
 </dd>
 </dl>
@@ -827,6 +857,7 @@ p.safeDivideDefault(
 <ul class="">
 <li><code><a title="pamda.pamda_utils.curry_class.getArity" href="#pamda.pamda_utils.curry_class.getArity">getArity</a></code></li>
 <li><code><a title="pamda.pamda_utils.curry_class.getFnArity" href="#pamda.pamda_utils.curry_class.getFnArity">getFnArity</a></code></li>
+<li><code><a title="pamda.pamda_utils.curry_class.thunkify" href="#pamda.pamda_utils.curry_class.thunkify">thunkify</a></code></li>
 </ul>
 </li>
 <li>
