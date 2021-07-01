@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
-<title>pamda.pamda_class API documentation</title>
+<title>pamda.pamda_core API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,16 +19,17 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>pamda.pamda_class</code></h1>
+<h1 class="title">Module <code>pamda.pamda_core</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from pamda.pamda_utils import pamda_utils, curry_class
+<pre><code class="python">from pamda.utils import utils
+from pamda.curry_fn import curry_fn
 
-class pamda_class(pamda_utils):
+class pamda_core(utils):
     def add(self, a, b):
         &#34;&#34;&#34;
         Function:
@@ -90,8 +91,8 @@ class pamda_class(pamda_utils):
             self.exception(&#39;`index` must be an int&#39;)
         if not isinstance(data, list):
             self.exception(&#39;`data` must be a list&#39;)
-        if not isinstance(fn, curry_class):
-            fn=curry_class(fn)
+        if not isinstance(fn, curry_fn):
+            fn=curry_fn(fn)
         index=self.clamp(-len(data),len(data)-1,index)
         data[index]=fn(data[index])
         return data
@@ -219,7 +220,7 @@ class pamda_class(pamda_utils):
 
         Notes:
 
-        - Once curried, the function | method becomes a curry_class object
+        - Once curried, the function | method becomes a curry_fn object
         - The initial function is only called once all inputs are passed
 
 
@@ -251,8 +252,8 @@ class pamda_class(pamda_utils):
 
         ```
         &#34;&#34;&#34;
-        if not isinstance(fn, curry_class):
-            return curry_class(fn)
+        if not isinstance(fn, curry_fn):
+            return curry_fn(fn)
         return fn
 
     def dec(self, a):
@@ -377,9 +378,9 @@ class pamda_class(pamda_utils):
         p.getArity(ABCuriedZip) #=&gt; 1
         ```
         &#34;&#34;&#34;
-        if isinstance(fn, curry_class):
+        if isinstance(fn, curry_fn):
             return fn.arity
-        return curry_class(fn).arity
+        return curry_fn(fn).arity
 
     def hasPath(self, path, data):
         &#34;&#34;&#34;
@@ -413,6 +414,38 @@ class pamda_class(pamda_utils):
             else:
                 return False
         return True
+
+    def hardRound(self, decimal_places, a):
+        &#34;&#34;&#34;
+        Function:
+
+        - Rounds to a set number of decimal places regardless of floating point math in python
+
+        Requires:
+
+        - `a`:
+            - Type: int | float
+            - What: The number to round
+
+        Optional:
+
+        - `decimal_places`:
+            - Type: int
+            - What: The number of decimal places to round to
+            - Default: 0
+            - Notes: Negative numbers accepted (EG -1 rounds to the nearest 10)
+
+        Example:
+
+        ```
+        a=12.345
+        p.hardRound(1,a) #=&gt; 12.3
+        p.hardRound(-1,a) #=&gt; 10
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(a, (float, int)):
+            self.exception(&#39;`hardRound` can only be called on `float` or `int` objects&#39;)
+        return int(a*(10**decimal_places)+0.5)/(10**decimal_places)
 
     def head(self, data):
         &#34;&#34;&#34;
@@ -753,6 +786,72 @@ class pamda_class(pamda_utils):
             self.exception(&#34;Attempting to pluck from an empty list&#34;)
         return [self.path(data=i, path=path) for i in data if self.path(data=i, path=if_path) in if_vals]
 
+    def safeDivide(self, denominator, a):
+        &#34;&#34;&#34;
+        Function:
+
+        - Forces division to work by enforcing a denominator of 1 if the provided denominator is zero
+
+        Requires:
+
+        - `denominator`:
+            - Type: int | float
+            - What: The denominator
+
+        - `a`:
+            - Type: int | float
+            - What: The numerator
+
+        Example:
+
+        ```
+        p.safeDivide(2,10) #=&gt; 5
+        p.safeDivide(0,10) #=&gt; 10
+        ```
+        &#34;&#34;&#34;
+        if (
+            not isinstance(a, (float, int)) or
+            not isinstance(denominator, (float, int))
+        ):
+            self.exception(&#39;`safeDivide` can only be called on `float` or `int` objects&#39;)
+        return a/denominator if denominator!=0 else a
+
+    def safeDivideDefault(self, default_denominator, denominator, a):
+        &#34;&#34;&#34;
+        Function:
+
+        - Forces division to work by enforcing a non zero default denominator if the provided denominator is zero
+
+        Requires:
+
+        - `default_denominator`:
+            - Type: int | float
+            - What: A non zero denominator to use if denominator is zero
+            - Default: 1
+        - `denominator`:
+            - Type: int | float
+            - What: The denominator
+        - `a`:
+            - Type: int | float
+            - What: The numerator
+
+        Example:
+
+        ```
+        p.safeDivideDefault(2,5,10) #=&gt; 2
+        p.safeDivideDefault(2,0,10) #=&gt; 5
+        ```
+        &#34;&#34;&#34;
+        if (
+            not isinstance(a, (float, int)) or
+            not isinstance(denominator, (float, int)) or
+            not isinstance(default_denominator, (float, int))
+        ):
+            self.exception(&#39;`safeDivideDefault` can only be called on `float` or `int` objects&#39;)
+        if default_denominator==0:
+            self.exception(&#39;`safeDivideDefault` `default_denominator` can not be 0&#39;)
+        return a/denominator if denominator!=0 else a/default_denominator
+
     def symmetricDifference(self, a, b):
         &#34;&#34;&#34;
         Function:
@@ -826,8 +925,8 @@ class pamda_class(pamda_utils):
         zipThunk() #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
         ```
         &#34;&#34;&#34;
-        if not isinstance(fn, curry_class):
-            return curry_class(fn, isThunk=True)
+        if not isinstance(fn, curry_fn):
+            return curry_fn(fn, isThunk=True)
         return fn.thunkify()
 
     def zip(self, a, b):
@@ -891,8 +990,8 @@ class pamda_class(pamda_utils):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="pamda.pamda_class.pamda_class"><code class="flex name class">
-<span>class <span class="ident">pamda_class</span></span>
+<dt id="pamda.pamda_core.pamda_core"><code class="flex name class">
+<span>class <span class="ident">pamda_core</span></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -900,7 +999,7 @@ class pamda_class(pamda_utils):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class pamda_class(pamda_utils):
+<pre><code class="python">class pamda_core(utils):
     def add(self, a, b):
         &#34;&#34;&#34;
         Function:
@@ -962,8 +1061,8 @@ class pamda_class(pamda_utils):
             self.exception(&#39;`index` must be an int&#39;)
         if not isinstance(data, list):
             self.exception(&#39;`data` must be a list&#39;)
-        if not isinstance(fn, curry_class):
-            fn=curry_class(fn)
+        if not isinstance(fn, curry_fn):
+            fn=curry_fn(fn)
         index=self.clamp(-len(data),len(data)-1,index)
         data[index]=fn(data[index])
         return data
@@ -1091,7 +1190,7 @@ class pamda_class(pamda_utils):
 
         Notes:
 
-        - Once curried, the function | method becomes a curry_class object
+        - Once curried, the function | method becomes a curry_fn object
         - The initial function is only called once all inputs are passed
 
 
@@ -1123,8 +1222,8 @@ class pamda_class(pamda_utils):
 
         ```
         &#34;&#34;&#34;
-        if not isinstance(fn, curry_class):
-            return curry_class(fn)
+        if not isinstance(fn, curry_fn):
+            return curry_fn(fn)
         return fn
 
     def dec(self, a):
@@ -1249,9 +1348,9 @@ class pamda_class(pamda_utils):
         p.getArity(ABCuriedZip) #=&gt; 1
         ```
         &#34;&#34;&#34;
-        if isinstance(fn, curry_class):
+        if isinstance(fn, curry_fn):
             return fn.arity
-        return curry_class(fn).arity
+        return curry_fn(fn).arity
 
     def hasPath(self, path, data):
         &#34;&#34;&#34;
@@ -1285,6 +1384,38 @@ class pamda_class(pamda_utils):
             else:
                 return False
         return True
+
+    def hardRound(self, decimal_places, a):
+        &#34;&#34;&#34;
+        Function:
+
+        - Rounds to a set number of decimal places regardless of floating point math in python
+
+        Requires:
+
+        - `a`:
+            - Type: int | float
+            - What: The number to round
+
+        Optional:
+
+        - `decimal_places`:
+            - Type: int
+            - What: The number of decimal places to round to
+            - Default: 0
+            - Notes: Negative numbers accepted (EG -1 rounds to the nearest 10)
+
+        Example:
+
+        ```
+        a=12.345
+        p.hardRound(1,a) #=&gt; 12.3
+        p.hardRound(-1,a) #=&gt; 10
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(a, (float, int)):
+            self.exception(&#39;`hardRound` can only be called on `float` or `int` objects&#39;)
+        return int(a*(10**decimal_places)+0.5)/(10**decimal_places)
 
     def head(self, data):
         &#34;&#34;&#34;
@@ -1625,6 +1756,72 @@ class pamda_class(pamda_utils):
             self.exception(&#34;Attempting to pluck from an empty list&#34;)
         return [self.path(data=i, path=path) for i in data if self.path(data=i, path=if_path) in if_vals]
 
+    def safeDivide(self, denominator, a):
+        &#34;&#34;&#34;
+        Function:
+
+        - Forces division to work by enforcing a denominator of 1 if the provided denominator is zero
+
+        Requires:
+
+        - `denominator`:
+            - Type: int | float
+            - What: The denominator
+
+        - `a`:
+            - Type: int | float
+            - What: The numerator
+
+        Example:
+
+        ```
+        p.safeDivide(2,10) #=&gt; 5
+        p.safeDivide(0,10) #=&gt; 10
+        ```
+        &#34;&#34;&#34;
+        if (
+            not isinstance(a, (float, int)) or
+            not isinstance(denominator, (float, int))
+        ):
+            self.exception(&#39;`safeDivide` can only be called on `float` or `int` objects&#39;)
+        return a/denominator if denominator!=0 else a
+
+    def safeDivideDefault(self, default_denominator, denominator, a):
+        &#34;&#34;&#34;
+        Function:
+
+        - Forces division to work by enforcing a non zero default denominator if the provided denominator is zero
+
+        Requires:
+
+        - `default_denominator`:
+            - Type: int | float
+            - What: A non zero denominator to use if denominator is zero
+            - Default: 1
+        - `denominator`:
+            - Type: int | float
+            - What: The denominator
+        - `a`:
+            - Type: int | float
+            - What: The numerator
+
+        Example:
+
+        ```
+        p.safeDivideDefault(2,5,10) #=&gt; 2
+        p.safeDivideDefault(2,0,10) #=&gt; 5
+        ```
+        &#34;&#34;&#34;
+        if (
+            not isinstance(a, (float, int)) or
+            not isinstance(denominator, (float, int)) or
+            not isinstance(default_denominator, (float, int))
+        ):
+            self.exception(&#39;`safeDivideDefault` can only be called on `float` or `int` objects&#39;)
+        if default_denominator==0:
+            self.exception(&#39;`safeDivideDefault` `default_denominator` can not be 0&#39;)
+        return a/denominator if denominator!=0 else a/default_denominator
+
     def symmetricDifference(self, a, b):
         &#34;&#34;&#34;
         Function:
@@ -1698,8 +1895,8 @@ class pamda_class(pamda_utils):
         zipThunk() #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
         ```
         &#34;&#34;&#34;
-        if not isinstance(fn, curry_class):
-            return curry_class(fn, isThunk=True)
+        if not isinstance(fn, curry_fn):
+            return curry_fn(fn, isThunk=True)
         return fn.thunkify()
 
     def zip(self, a, b):
@@ -1755,12 +1952,12 @@ class pamda_class(pamda_utils):
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="pamda.pamda_utils.pamda_utils" href="pamda_utils.html#pamda.pamda_utils.pamda_utils">pamda_utils</a></li>
-<li><a title="pamda.pamda_error.pamda_error" href="pamda_error.html#pamda.pamda_error.pamda_error">pamda_error</a></li>
+<li><a title="pamda.utils.utils" href="utils.html#pamda.utils.utils">utils</a></li>
+<li><a title="pamda.utils.error" href="utils.html#pamda.utils.error">error</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="pamda.pamda_class.pamda_class.add"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.add"><code class="name flex">
 <span>def <span class="ident">add</span></span>(<span>self, a, b)</span>
 </code></dt>
 <dd>
@@ -1814,7 +2011,7 @@ class pamda_class(pamda_utils):
     return a+b</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.adjust"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.adjust"><code class="name flex">
 <span>def <span class="ident">adjust</span></span>(<span>self, index, fn, data)</span>
 </code></dt>
 <dd>
@@ -1891,14 +2088,14 @@ p.adjust(
         self.exception(&#39;`index` must be an int&#39;)
     if not isinstance(data, list):
         self.exception(&#39;`data` must be a list&#39;)
-    if not isinstance(fn, curry_class):
-        fn=curry_class(fn)
+    if not isinstance(fn, curry_fn):
+        fn=curry_fn(fn)
     index=self.clamp(-len(data),len(data)-1,index)
     data[index]=fn(data[index])
     return data</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.assocPath"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.assocPath"><code class="name flex">
 <span>def <span class="ident">assocPath</span></span>(<span>self, path, value, data)</span>
 </code></dt>
 <dd>
@@ -1971,7 +2168,7 @@ p.assocPath(path=['a','c'], value=3, data=data) #=&gt; {'a':{'b':1, 'c':3}}
         return data</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.assocPathComplex"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.assocPathComplex"><code class="name flex">
 <span>def <span class="ident">assocPathComplex</span></span>(<span>self, default, default_fn, path, data)</span>
 </code></dt>
 <dd>
@@ -2054,7 +2251,7 @@ p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=
         return data</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.clamp"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.clamp"><code class="name flex">
 <span>def <span class="ident">clamp</span></span>(<span>self, minimum, maximum, a)</span>
 </code></dt>
 <dd>
@@ -2118,7 +2315,7 @@ p.clamp(1, 3, 5) #=&gt; 3
     return min(max(a,minimum),maximum)</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.curry"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.curry"><code class="name flex">
 <span>def <span class="ident">curry</span></span>(<span>self, fn)</span>
 </code></dt>
 <dd>
@@ -2137,7 +2334,7 @@ p.clamp(1, 3, 5) #=&gt; 3
 </ul>
 <p>Notes:</p>
 <ul>
-<li>Once curried, the function | method becomes a curry_class object</li>
+<li>Once curried, the function | method becomes a curry_fn object</li>
 <li>The initial function is only called once all inputs are passed</li>
 </ul>
 <p>Examples:</p>
@@ -2182,7 +2379,7 @@ x(4) #=&gt; [1,2,4]
 
     Notes:
 
-    - Once curried, the function | method becomes a curry_class object
+    - Once curried, the function | method becomes a curry_fn object
     - The initial function is only called once all inputs are passed
 
 
@@ -2214,12 +2411,12 @@ x(4) #=&gt; [1,2,4]
 
     ```
     &#34;&#34;&#34;
-    if not isinstance(fn, curry_class):
-        return curry_class(fn)
+    if not isinstance(fn, curry_fn):
+        return curry_fn(fn)
     return fn</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.dec"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.dec"><code class="name flex">
 <span>def <span class="ident">dec</span></span>(<span>self, a)</span>
 </code></dt>
 <dd>
@@ -2265,7 +2462,7 @@ x(4) #=&gt; [1,2,4]
     return a-1</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.difference"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.difference"><code class="name flex">
 <span>def <span class="ident">difference</span></span>(<span>self, a, b)</span>
 </code></dt>
 <dd>
@@ -2323,7 +2520,7 @@ p.difference(a=b, b=a) #=&gt; ['c']
     return list(set(a).difference(set(b)))</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.dissocPath"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.dissocPath"><code class="name flex">
 <span>def <span class="ident">dissocPath</span></span>(<span>self, path, data)</span>
 </code></dt>
 <dd>
@@ -2386,7 +2583,7 @@ p.dissocPath(path=['a','b','c'], data=data) #=&gt; {'a':{'b':{'d':1}}}
     return self.assocPath(data=data, path=path[:-1], value={key:value for key, value in self.path(data, path=path[:-1]).items() if key!=path[-1]})</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.flatten"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.flatten"><code class="name flex">
 <span>def <span class="ident">flatten</span></span>(<span>self, data)</span>
 </code></dt>
 <dd>
@@ -2431,7 +2628,7 @@ p.flatten(data=data) #=&gt; ['a','b',1,2]
     return [i for sub_list in data for i in sub_list]</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.getArity"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.getArity"><code class="name flex">
 <span>def <span class="ident">getArity</span></span>(<span>self, fn)</span>
 </code></dt>
 <dd>
@@ -2480,12 +2677,80 @@ p.getArity(ABCuriedZip) #=&gt; 1
     p.getArity(ABCuriedZip) #=&gt; 1
     ```
     &#34;&#34;&#34;
-    if isinstance(fn, curry_class):
+    if isinstance(fn, curry_fn):
         return fn.arity
-    return curry_class(fn).arity</code></pre>
+    return curry_fn(fn).arity</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.hasPath"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.hardRound"><code class="name flex">
+<span>def <span class="ident">hardRound</span></span>(<span>self, decimal_places, a)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Rounds to a set number of decimal places regardless of floating point math in python</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>a</code>:<ul>
+<li>Type: int | float</li>
+<li>What: The number to round</li>
+</ul>
+</li>
+</ul>
+<p>Optional:</p>
+<ul>
+<li><code>decimal_places</code>:<ul>
+<li>Type: int</li>
+<li>What: The number of decimal places to round to</li>
+<li>Default: 0</li>
+<li>Notes: Negative numbers accepted (EG -1 rounds to the nearest 10)</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>a=12.345
+p.hardRound(1,a) #=&gt; 12.3
+p.hardRound(-1,a) #=&gt; 10
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hardRound(self, decimal_places, a):
+    &#34;&#34;&#34;
+    Function:
+
+    - Rounds to a set number of decimal places regardless of floating point math in python
+
+    Requires:
+
+    - `a`:
+        - Type: int | float
+        - What: The number to round
+
+    Optional:
+
+    - `decimal_places`:
+        - Type: int
+        - What: The number of decimal places to round to
+        - Default: 0
+        - Notes: Negative numbers accepted (EG -1 rounds to the nearest 10)
+
+    Example:
+
+    ```
+    a=12.345
+    p.hardRound(1,a) #=&gt; 12.3
+    p.hardRound(-1,a) #=&gt; 10
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(a, (float, int)):
+        self.exception(&#39;`hardRound` can only be called on `float` or `int` objects&#39;)
+    return int(a*(10**decimal_places)+0.5)/(10**decimal_places)</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_core.pamda_core.hasPath"><code class="name flex">
 <span>def <span class="ident">hasPath</span></span>(<span>self, path, data)</span>
 </code></dt>
 <dd>
@@ -2550,7 +2815,7 @@ p.hasPath(path=['a','d'], data=data) #=&gt; False
     return True</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.head"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.head"><code class="name flex">
 <span>def <span class="ident">head</span></span>(<span>self, data)</span>
 </code></dt>
 <dd>
@@ -2604,7 +2869,7 @@ p.first(
     return data[0]</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.inc"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.inc"><code class="name flex">
 <span>def <span class="ident">inc</span></span>(<span>self, a)</span>
 </code></dt>
 <dd>
@@ -2650,7 +2915,7 @@ p.first(
     return a+1</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.intersection"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.intersection"><code class="name flex">
 <span>def <span class="ident">intersection</span></span>(<span>self, a, b)</span>
 </code></dt>
 <dd>
@@ -2706,7 +2971,7 @@ p.intersection(a=a, b=b) #=&gt; ['b']
     return list(set(a).intersection(set(b)))</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.mergeDeep"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.mergeDeep"><code class="name flex">
 <span>def <span class="ident">mergeDeep</span></span>(<span>self, update_data, data)</span>
 </code></dt>
 <dd>
@@ -2781,7 +3046,7 @@ p.mergeDeep(
     return output</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.nest"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.nest"><code class="name flex">
 <span>def <span class="ident">nest</span></span>(<span>self, path_keys, value_key, data)</span>
 </code></dt>
 <dd>
@@ -2877,7 +3142,7 @@ p.nest(
     return nested_output</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.path"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.path"><code class="name flex">
 <span>def <span class="ident">path</span></span>(<span>self, path, data)</span>
 </code></dt>
 <dd>
@@ -2937,7 +3202,7 @@ p.path(path=['a','b'], data=data) #=&gt; 1
     return data</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.pathOr"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.pathOr"><code class="name flex">
 <span>def <span class="ident">pathOr</span></span>(<span>self, default, path, data)</span>
 </code></dt>
 <dd>
@@ -3008,7 +3273,7 @@ p.path(default=2, path=['a','c'], data=data) #=&gt; 2
     return data</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.pipe"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.pipe"><code class="name flex">
 <span>def <span class="ident">pipe</span></span>(<span>self, fns, data)</span>
 </code></dt>
 <dd>
@@ -3090,7 +3355,7 @@ p.pipe(fns=[curriedPath('a'), curriedPath('b')], data=data) #=&gt; 'c'
     return data</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.pluck"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.pluck"><code class="name flex">
 <span>def <span class="ident">pluck</span></span>(<span>self, path, data)</span>
 </code></dt>
 <dd>
@@ -3150,7 +3415,7 @@ p.pluck(path=['a','b'], data=data) #=&gt; [1,2]
     return [self.path(data=i, path=path) for i in data]</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.pluckIf"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.pluckIf"><code class="name flex">
 <span>def <span class="ident">pluckIf</span></span>(<span>self, if_path, if_vals, path, data)</span>
 </code></dt>
 <dd>
@@ -3230,7 +3495,143 @@ p.pluck(if_path=['a','c'], if_vals=['d'], path=['a','b'], data=data) #=&gt; [1]
     return [self.path(data=i, path=path) for i in data if self.path(data=i, path=if_path) in if_vals]</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.symmetricDifference"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.safeDivide"><code class="name flex">
+<span>def <span class="ident">safeDivide</span></span>(<span>self, denominator, a)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Forces division to work by enforcing a denominator of 1 if the provided denominator is zero</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li>
+<p><code>denominator</code>:</p>
+<ul>
+<li>Type: int | float</li>
+<li>What: The denominator</li>
+</ul>
+</li>
+<li>
+<p><code>a</code>:</p>
+<ul>
+<li>Type: int | float</li>
+<li>What: The numerator</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>p.safeDivide(2,10) #=&gt; 5
+p.safeDivide(0,10) #=&gt; 10
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def safeDivide(self, denominator, a):
+    &#34;&#34;&#34;
+    Function:
+
+    - Forces division to work by enforcing a denominator of 1 if the provided denominator is zero
+
+    Requires:
+
+    - `denominator`:
+        - Type: int | float
+        - What: The denominator
+
+    - `a`:
+        - Type: int | float
+        - What: The numerator
+
+    Example:
+
+    ```
+    p.safeDivide(2,10) #=&gt; 5
+    p.safeDivide(0,10) #=&gt; 10
+    ```
+    &#34;&#34;&#34;
+    if (
+        not isinstance(a, (float, int)) or
+        not isinstance(denominator, (float, int))
+    ):
+        self.exception(&#39;`safeDivide` can only be called on `float` or `int` objects&#39;)
+    return a/denominator if denominator!=0 else a</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_core.pamda_core.safeDivideDefault"><code class="name flex">
+<span>def <span class="ident">safeDivideDefault</span></span>(<span>self, default_denominator, denominator, a)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Forces division to work by enforcing a non zero default denominator if the provided denominator is zero</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>default_denominator</code>:<ul>
+<li>Type: int | float</li>
+<li>What: A non zero denominator to use if denominator is zero</li>
+<li>Default: 1</li>
+</ul>
+</li>
+<li><code>denominator</code>:<ul>
+<li>Type: int | float</li>
+<li>What: The denominator</li>
+</ul>
+</li>
+<li><code>a</code>:<ul>
+<li>Type: int | float</li>
+<li>What: The numerator</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>p.safeDivideDefault(2,5,10) #=&gt; 2
+p.safeDivideDefault(2,0,10) #=&gt; 5
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def safeDivideDefault(self, default_denominator, denominator, a):
+    &#34;&#34;&#34;
+    Function:
+
+    - Forces division to work by enforcing a non zero default denominator if the provided denominator is zero
+
+    Requires:
+
+    - `default_denominator`:
+        - Type: int | float
+        - What: A non zero denominator to use if denominator is zero
+        - Default: 1
+    - `denominator`:
+        - Type: int | float
+        - What: The denominator
+    - `a`:
+        - Type: int | float
+        - What: The numerator
+
+    Example:
+
+    ```
+    p.safeDivideDefault(2,5,10) #=&gt; 2
+    p.safeDivideDefault(2,0,10) #=&gt; 5
+    ```
+    &#34;&#34;&#34;
+    if (
+        not isinstance(a, (float, int)) or
+        not isinstance(denominator, (float, int)) or
+        not isinstance(default_denominator, (float, int))
+    ):
+        self.exception(&#39;`safeDivideDefault` can only be called on `float` or `int` objects&#39;)
+    if default_denominator==0:
+        self.exception(&#39;`safeDivideDefault` `default_denominator` can not be 0&#39;)
+    return a/denominator if denominator!=0 else a/default_denominator</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_core.pamda_core.symmetricDifference"><code class="name flex">
 <span>def <span class="ident">symmetricDifference</span></span>(<span>self, a, b)</span>
 </code></dt>
 <dd>
@@ -3286,7 +3687,7 @@ p.symmetricDifference(a=a, b=b) #=&gt; ['a','c']
     return list(set(a).difference(set(b)))+list(set(b).difference(set(a)))</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.tail"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.tail"><code class="name flex">
 <span>def <span class="ident">tail</span></span>(<span>self, data)</span>
 </code></dt>
 <dd>
@@ -3340,7 +3741,7 @@ p.first(
     return data[-1]</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.thunkify"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.thunkify"><code class="name flex">
 <span>def <span class="ident">thunkify</span></span>(<span>self, fn)</span>
 </code></dt>
 <dd>
@@ -3387,12 +3788,12 @@ zipThunk() #=&gt; [['a',1],['b',2]]
     zipThunk() #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
     ```
     &#34;&#34;&#34;
-    if not isinstance(fn, curry_class):
-        return curry_class(fn, isThunk=True)
+    if not isinstance(fn, curry_fn):
+        return curry_fn(fn, isThunk=True)
     return fn.thunkify()</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.zip"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.zip"><code class="name flex">
 <span>def <span class="ident">zip</span></span>(<span>self, a, b)</span>
 </code></dt>
 <dd>
@@ -3448,7 +3849,7 @@ p.zip(a=a, b=b) #=&gt; [['a',1],['b',2]]
     return [list(item) for item in zip(a,b)]</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_class.pamda_class.zipObj"><code class="name flex">
+<dt id="pamda.pamda_core.pamda_core.zipObj"><code class="name flex">
 <span>def <span class="ident">zipObj</span></span>(<span>self, a, b)</span>
 </code></dt>
 <dd>
@@ -3509,15 +3910,16 @@ p.zipObj(a=a, b=b) #=&gt; {'a':1, 'b':2}
 </dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
-<li><code><b><a title="pamda.pamda_utils.pamda_utils" href="pamda_utils.html#pamda.pamda_utils.pamda_utils">pamda_utils</a></b></code>:
+<li><code><b><a title="pamda.utils.utils" href="utils.html#pamda.utils.utils">utils</a></b></code>:
 <ul class="hlist">
-<li><code><a title="pamda.pamda_utils.pamda_utils.exception" href="pamda_error.html#pamda.pamda_error.pamda_error.exception">exception</a></code></li>
-<li><code><a title="pamda.pamda_utils.pamda_utils.getMethods" href="pamda_utils.html#pamda.pamda_utils.pamda_utils.getMethods">getMethods</a></code></li>
-<li><code><a title="pamda.pamda_utils.pamda_utils.hardRound" href="pamda_utils.html#pamda.pamda_utils.pamda_utils.hardRound">hardRound</a></code></li>
-<li><code><a title="pamda.pamda_utils.pamda_utils.safeDivide" href="pamda_utils.html#pamda.pamda_utils.pamda_utils.safeDivide">safeDivide</a></code></li>
-<li><code><a title="pamda.pamda_utils.pamda_utils.safeDivideDefault" href="pamda_utils.html#pamda.pamda_utils.pamda_utils.safeDivideDefault">safeDivideDefault</a></code></li>
-<li><code><a title="pamda.pamda_utils.pamda_utils.vprint" href="pamda_error.html#pamda.pamda_error.pamda_error.vprint">vprint</a></code></li>
-<li><code><a title="pamda.pamda_utils.pamda_utils.warn" href="pamda_error.html#pamda.pamda_error.pamda_error.warn">warn</a></code></li>
+<li><code><a title="pamda.utils.utils.exception" href="utils.html#pamda.utils.error.exception">exception</a></code></li>
+<li><code><a title="pamda.utils.utils.getMethods" href="utils.html#pamda.utils.utils.getMethods">getMethods</a></code></li>
+<li><code><a title="pamda.utils.utils.read_csv" href="utils.html#pamda.utils.utils.read_csv">read_csv</a></code></li>
+<li><code><a title="pamda.utils.utils.read_json" href="utils.html#pamda.utils.utils.read_json">read_json</a></code></li>
+<li><code><a title="pamda.utils.utils.vprint" href="utils.html#pamda.utils.error.vprint">vprint</a></code></li>
+<li><code><a title="pamda.utils.utils.warn" href="utils.html#pamda.utils.error.warn">warn</a></code></li>
+<li><code><a title="pamda.utils.utils.write_csv" href="utils.html#pamda.utils.utils.write_csv">write_csv</a></code></li>
+<li><code><a title="pamda.utils.utils.write_json" href="utils.html#pamda.utils.utils.write_json">write_json</a></code></li>
 </ul>
 </li>
 </ul>
@@ -3539,35 +3941,38 @@ p.zipObj(a=a, b=b) #=&gt; {'a':1, 'b':2}
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="pamda.pamda_class.pamda_class" href="#pamda.pamda_class.pamda_class">pamda_class</a></code></h4>
+<h4><code><a title="pamda.pamda_core.pamda_core" href="#pamda.pamda_core.pamda_core">pamda_core</a></code></h4>
 <ul class="two-column">
-<li><code><a title="pamda.pamda_class.pamda_class.add" href="#pamda.pamda_class.pamda_class.add">add</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.adjust" href="#pamda.pamda_class.pamda_class.adjust">adjust</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.assocPath" href="#pamda.pamda_class.pamda_class.assocPath">assocPath</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.assocPathComplex" href="#pamda.pamda_class.pamda_class.assocPathComplex">assocPathComplex</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.clamp" href="#pamda.pamda_class.pamda_class.clamp">clamp</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.curry" href="#pamda.pamda_class.pamda_class.curry">curry</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.dec" href="#pamda.pamda_class.pamda_class.dec">dec</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.difference" href="#pamda.pamda_class.pamda_class.difference">difference</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.dissocPath" href="#pamda.pamda_class.pamda_class.dissocPath">dissocPath</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.flatten" href="#pamda.pamda_class.pamda_class.flatten">flatten</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.getArity" href="#pamda.pamda_class.pamda_class.getArity">getArity</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.hasPath" href="#pamda.pamda_class.pamda_class.hasPath">hasPath</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.head" href="#pamda.pamda_class.pamda_class.head">head</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.inc" href="#pamda.pamda_class.pamda_class.inc">inc</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.intersection" href="#pamda.pamda_class.pamda_class.intersection">intersection</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.mergeDeep" href="#pamda.pamda_class.pamda_class.mergeDeep">mergeDeep</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.nest" href="#pamda.pamda_class.pamda_class.nest">nest</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.path" href="#pamda.pamda_class.pamda_class.path">path</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.pathOr" href="#pamda.pamda_class.pamda_class.pathOr">pathOr</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.pipe" href="#pamda.pamda_class.pamda_class.pipe">pipe</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.pluck" href="#pamda.pamda_class.pamda_class.pluck">pluck</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.pluckIf" href="#pamda.pamda_class.pamda_class.pluckIf">pluckIf</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.symmetricDifference" href="#pamda.pamda_class.pamda_class.symmetricDifference">symmetricDifference</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.tail" href="#pamda.pamda_class.pamda_class.tail">tail</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.thunkify" href="#pamda.pamda_class.pamda_class.thunkify">thunkify</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.zip" href="#pamda.pamda_class.pamda_class.zip">zip</a></code></li>
-<li><code><a title="pamda.pamda_class.pamda_class.zipObj" href="#pamda.pamda_class.pamda_class.zipObj">zipObj</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.add" href="#pamda.pamda_core.pamda_core.add">add</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.adjust" href="#pamda.pamda_core.pamda_core.adjust">adjust</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.assocPath" href="#pamda.pamda_core.pamda_core.assocPath">assocPath</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.assocPathComplex" href="#pamda.pamda_core.pamda_core.assocPathComplex">assocPathComplex</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.clamp" href="#pamda.pamda_core.pamda_core.clamp">clamp</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.curry" href="#pamda.pamda_core.pamda_core.curry">curry</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.dec" href="#pamda.pamda_core.pamda_core.dec">dec</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.difference" href="#pamda.pamda_core.pamda_core.difference">difference</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.dissocPath" href="#pamda.pamda_core.pamda_core.dissocPath">dissocPath</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.flatten" href="#pamda.pamda_core.pamda_core.flatten">flatten</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.getArity" href="#pamda.pamda_core.pamda_core.getArity">getArity</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.hardRound" href="#pamda.pamda_core.pamda_core.hardRound">hardRound</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.hasPath" href="#pamda.pamda_core.pamda_core.hasPath">hasPath</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.head" href="#pamda.pamda_core.pamda_core.head">head</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.inc" href="#pamda.pamda_core.pamda_core.inc">inc</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.intersection" href="#pamda.pamda_core.pamda_core.intersection">intersection</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.mergeDeep" href="#pamda.pamda_core.pamda_core.mergeDeep">mergeDeep</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.nest" href="#pamda.pamda_core.pamda_core.nest">nest</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.path" href="#pamda.pamda_core.pamda_core.path">path</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.pathOr" href="#pamda.pamda_core.pamda_core.pathOr">pathOr</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.pipe" href="#pamda.pamda_core.pamda_core.pipe">pipe</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.pluck" href="#pamda.pamda_core.pamda_core.pluck">pluck</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.pluckIf" href="#pamda.pamda_core.pamda_core.pluckIf">pluckIf</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.safeDivide" href="#pamda.pamda_core.pamda_core.safeDivide">safeDivide</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.safeDivideDefault" href="#pamda.pamda_core.pamda_core.safeDivideDefault">safeDivideDefault</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.symmetricDifference" href="#pamda.pamda_core.pamda_core.symmetricDifference">symmetricDifference</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.tail" href="#pamda.pamda_core.pamda_core.tail">tail</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.thunkify" href="#pamda.pamda_core.pamda_core.thunkify">thunkify</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.zip" href="#pamda.pamda_core.pamda_core.zip">zip</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.zipObj" href="#pamda.pamda_core.pamda_core.zipObj">zipObj</a></code></li>
 </ul>
 </li>
 </ul>

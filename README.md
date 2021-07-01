@@ -7,15 +7,16 @@ Inspired heavily by [Ramda](https://ramdajs.com/docs/).
 
 Documentation for Pamda
 --------
-https://connor-makowski.github.io/pamda/pamda_class.html
+https://connor-makowski.github.io/pamda
 
 Key Features
 --------
 
 - Simplified functional programming for python
-- `curry` arbitrary methods and functions
-- `thunkify` arbitrary methods and functions
-- `pipe` data iteratively through n functions
+- Core Functions include:
+  - `curry` arbitrary methods and functions
+  - `thunkify` arbitrary methods and functions
+  - `pipe` data iteratively through n functions
 - List based path access and features for nested dictionaries
 
 
@@ -37,10 +38,11 @@ pip install pamda
 from pamda import pamda as p
 
 data={'a':{'b':1, 'c':2}}
-# Access a data path from a dictionary
-p.path(path=['a','b'], data=data) #=> 1
-# See all pamda functions at
-# https://connor-makowski.github.io/pamda/pamda_class.html
+# Example: Select data given a path and a dictionary
+p.path(['a','b'])(data) #=> 1
+
+# See documentation for all core pamda functions at
+# https://connor-makowski.github.io/pamda/pamda_core.html
 ```
 
 ## Curry Usage
@@ -60,7 +62,7 @@ x=curriedMyFn(1,2)
 x(3) #=> [1,2,3]
 x(4) #=> [1,2,4]
 
-# Each set of inputs returns a function
+# Each set of inputs returns a callable function
 # You can stack inputs on a single line for clean functional programming
 curriedMyFn(1,2)(3) #=> [1,2,3]
 ```
@@ -89,29 +91,16 @@ def myFunction(a,b,c):
 # The function is now curried and the evaluation is lazy
 # This means the function is not evaluated until called
 x=myFunction(1,2)
-x(3) #=> <pamda.pamda_utils.curry_class object at 0x7fd514e4c820>
+x(3) #=> <pamda.curry_fn object at 0x7fd514e4c820>
 x(3)() #=> [1,2,3]
 
 y=x(4)
 y() #=> [1,2,4]
 ```
 
-## Pre-curried Pamda Usage
-```py
-# Pamda functions are not curried by default
-# Instead of
-# from pamda import pamda as p
-# You can use:
-from pamda import pamda_curried as p
-# This curries all pamda functions for you automatically
-# Note: help functions currently break when importing from pamda_curried
-data={'a':{'b':1, 'c':2}}
-p.path(['a','b'])(data) #=> 1
-```
-
 ## Pipe
 ```py
-from pamda import pamda_curried as p
+from pamda import pamda as p
 
 def square(x):
   return x**2
@@ -127,14 +116,44 @@ data=6
 p.pipe([square, half, negate])(data) #=> -18
 ```
 
-# Pamdata getting Started
+# Pamda Core Usage
 
-- Pamda also ships with a few helpful data utilities
-- Check out the documentation here:
-  - https://connor-makowski.github.io/pamda/pamdata_class.html
+Importing `pamda` or `pamda_uncurried` creates an initialized `pamda_core` instance. If you want access to the uninitialized `pamda` class methods, you can access them via `pamda_core`
 
+`pamda_core`:
+  - Contains all `pamda` methods
+  - All methods are not curried by default
+  - Can be used for a subclass for inheritence purposes
+
+## Create your own uncurried pamda instance
 ```py
-from pamda import pamdata as pdata
-
-pdata.read_csv(filename='myfile.csv')
+from pamda import pamda_core
+p=pamda_core()
+data={'a':{'b':1, 'c':2}}
+# Remember that pamda_core methods are not curried by default
+p.path(['a','b'], data) #=> 1
 ```
+
+## Use pamda_core as a subclass
+```py
+from pamda import pamda_core
+
+class myClass(pamda_core):
+  def myFunction(self, a):
+    return self.inc(a)
+
+mc=myClass()
+mc.myFunction(2) #=> 3
+
+@mc.curry
+def addUp(a,b):
+  return a+b
+
+addUp(1)(2) #=> 3
+```
+
+# Pamda Utils
+
+- Pamda also ships with a few helpful utilities
+- Check out the documentation here:
+  - https://connor-makowski.github.io/pamda/utils.html

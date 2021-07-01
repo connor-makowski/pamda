@@ -28,51 +28,29 @@
 </summary>
 <pre><code class="python">import sys
 if sys.version_info[0] == 3:
-    from pamda.pamda import pamda
-    from pamda.pamda_curried import pamda_curried
-    from pamda.pamdata import pamdata
-    from pamda.pamda_error import pamda_error
-    from pamda.pamda_utils import pamda_utils, curry_class
-    from pamda.pamda_class import pamda_class
-    from pamda.pamdata_class import pamdata_class
+    from pamda.pamda import pamda, pamda_uncurried
+    from pamda.pamda_core import pamda_core
 elif sys.version_info[0] &lt; 3:
-    from pamda import pamda
-    from pamda_curried import pamda_curried
-    from pamdata import pamdata
-    from pamda_error import pamda_error
-    from pamda_utils import pamda_utils, curry_class
-    from pamda_class import pamda_class
-    from pamdata_class import pamdata_class</code></pre>
+    from pamda import pamda, pamda_uncurried
+    from pamda_core import pamda_core</code></pre>
 </details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
+<dt><code class="name"><a title="pamda.curry_fn" href="curry_fn.html">pamda.curry_fn</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="pamda.pamda" href="pamda.html">pamda.pamda</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt><code class="name"><a title="pamda.pamda_class" href="pamda_class.html">pamda.pamda_class</a></code></dt>
+<dt><code class="name"><a title="pamda.pamda_core" href="pamda_core.html">pamda.pamda_core</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt><code class="name"><a title="pamda.pamda_curried" href="pamda_curried.html">pamda.pamda_curried</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="pamda.pamda_error" href="pamda_error.html">pamda.pamda_error</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="pamda.pamda_utils" href="pamda_utils.html">pamda.pamda_utils</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="pamda.pamdata" href="pamdata.html">pamda.pamdata</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="pamda.pamdata_class" href="pamdata_class.html">pamda.pamdata_class</a></code></dt>
+<dt><code class="name"><a title="pamda.utils" href="utils.html">pamda.utils</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -93,13 +71,10 @@ elif sys.version_info[0] &lt; 3:
 <ul id="index">
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
+<li><code><a title="pamda.curry_fn" href="curry_fn.html">pamda.curry_fn</a></code></li>
 <li><code><a title="pamda.pamda" href="pamda.html">pamda.pamda</a></code></li>
-<li><code><a title="pamda.pamda_class" href="pamda_class.html">pamda.pamda_class</a></code></li>
-<li><code><a title="pamda.pamda_curried" href="pamda_curried.html">pamda.pamda_curried</a></code></li>
-<li><code><a title="pamda.pamda_error" href="pamda_error.html">pamda.pamda_error</a></code></li>
-<li><code><a title="pamda.pamda_utils" href="pamda_utils.html">pamda.pamda_utils</a></code></li>
-<li><code><a title="pamda.pamdata" href="pamdata.html">pamda.pamdata</a></code></li>
-<li><code><a title="pamda.pamdata_class" href="pamdata_class.html">pamda.pamdata_class</a></code></li>
+<li><code><a title="pamda.pamda_core" href="pamda_core.html">pamda.pamda_core</a></code></li>
+<li><code><a title="pamda.utils" href="utils.html">pamda.utils</a></code></li>
 </ul>
 </li>
 </ul>

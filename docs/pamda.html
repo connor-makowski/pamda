@@ -26,9 +26,15 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from pamda.pamda_class import pamda_class
+<pre><code class="python">from pamda.pamda_core import pamda_core
 
-pamda=pamda_class()</code></pre>
+class pamda_core_curried:
+    def __init__(self, pamda, *args, **kwargs):
+        for method in pamda.getMethods(pamda):
+            setattr(self, method, pamda.curry(getattr(pamda, method)))
+
+pamda_uncurried=pamda_core()
+pamda=pamda_core_curried(pamda=pamda_uncurried)</code></pre>
 </details>
 </section>
 <section>
@@ -38,6 +44,25 @@ pamda=pamda_class()</code></pre>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="pamda.pamda.pamda_core_curried"><code class="flex name class">
+<span>class <span class="ident">pamda_core_curried</span></span>
+<span>(</span><span>pamda, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class pamda_core_curried:
+    def __init__(self, pamda, *args, **kwargs):
+        for method in pamda.getMethods(pamda):
+            setattr(self, method, pamda.curry(getattr(pamda, method)))</code></pre>
+</details>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -49,6 +74,13 @@ pamda=pamda_class()</code></pre>
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="pamda" href="index.html">pamda</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="pamda.pamda.pamda_core_curried" href="#pamda.pamda.pamda_core_curried">pamda_core_curried</a></code></h4>
+</li>
 </ul>
 </li>
 </ul>

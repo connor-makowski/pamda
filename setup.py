@@ -2,13 +2,13 @@ from distutils.core import setup
 setup(
   name = 'pamda',
   packages = ['pamda'],
-  version = '0.0.6',
+  version = '0.0.7',
   license='MIT',
   description = 'Python wrapper of object oriented processes for functional programming styles similar to Ramda',
   author = 'Connor Makowski',
   author_email = 'connor.m.makowski@gmail.com',
   url = 'https://github.com/connor-makowski/pamda',
-  download_url = 'https://github.com/connor-makowski/pamda/dist/pamda-0.0.6.tar.gz',
+  download_url = 'https://github.com/connor-makowski/pamda/dist/pamda-0.0.7.tar.gz',
   keywords = ['data', 'ramda', 'pamda','functional'],
   install_requires=[],
   classifiers=[
