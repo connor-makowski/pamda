@@ -152,7 +152,7 @@ class pamda_core(utils):
         """
         Function:
 
-        - Forces data to be witin minimum and maximum
+        - Forces data to be within minimum and maximum
 
         Requires:
 
