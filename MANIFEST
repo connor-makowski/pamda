@@ -2,10 +2,7 @@
 setup.cfg
 setup.py
 pamda/__init__.py
+pamda/curry_fn.py
 pamda/pamda.py
 pamda/pamda_core.py
-pamda/pamda_curried.py
-pamda/error.py
 pamda/utils.py
-pamda/pamdata.py
-pamda/pamdata_core.py

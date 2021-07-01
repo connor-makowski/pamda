@@ -5,9 +5,9 @@ Python wrapper for functional programming in object oriented structures
 Inspired heavily by [Ramda](https://ramdajs.com/docs/).
 
 
-Documentation for Pamda
+Documentation for Pamda Functions
 --------
-https://connor-makowski.github.io/pamda
+https://connor-makowski.github.io/pamda/pamda_core.html
 
 Key Features
 --------
