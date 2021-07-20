@@ -865,7 +865,7 @@ class pamda_core(utils):
 
         ```
         data=['fe','fi','fo','fum']
-        p.first(
+        p.tail(
             data=data
         ) #=> fum
         ```
