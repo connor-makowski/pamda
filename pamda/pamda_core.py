@@ -354,6 +354,152 @@ class pamda_core(utils):
             return fn.arity
         return curry_fn(fn).arity
 
+    def groupBy(self, fn, data):
+        """
+        Function:
+
+        - Splits a list into a dictionary of sublists keyed by the return string of a provided function
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to group by
+            - Note: Must return a string
+            - Note: This function must be unary (take one input)
+            - Note: This function is applied to each item in the list recursively
+        - `data`:
+            - Type: list
+            - What: List of items to apply the function to and then group by the results
+
+        Examples:
+
+        ```
+        def getGrade(item):
+            score=item['score']
+            if score>90:
+                return 'A'
+            elif score>80:
+                return 'B'
+            elif score>70:
+                return 'C'
+            elif score>60:
+                return 'D'
+            else:
+                return 'F'
+
+        data=[
+            {'name':'Connor', 'score':75},
+            {'name':'Fred', 'score':79},
+            {'name':'Joe', 'score':84},
+        ]
+        p.groupBy(getGrade,data)
+        #=>{
+        #=>    'B':[{'name':'Joe', 'score':84}]
+        #=>    'C':[{'name':'Connor', 'score':75},{'name':'Fred', 'score':79}]
+        #=>}
+        ```
+        """
+        if not isinstance(fn, curry_fn):
+            fn=self.curry(fn)
+        if fn.arity!=1:
+            self.exception('groupBy `fn` must only take one parameter as its input')
+        output={}
+        for i in data:
+            path=fn(i)
+            if not isinstance(path, str):
+                self.exception('groupBy `fn` must return a str but instead returned {}'.format(path) )
+            output=self.assocPathComplex(default=[], default_fn=lambda x:x+[i], path=[fn(i)], data=output)
+        return output
+
+    def groupKeys(self, keys, data):
+        """
+        Function:
+
+        - Splits a list of dicts into a list of sublists of dicts separated by values with equal keys
+
+        Requires:
+
+        - `keys`:
+            - Type: list of strs
+            - What: The keys to group by
+        - `data`:
+            - Type: list of dicts
+            - What: List of dictionaries with which to match keys
+
+        Examples:
+
+        ```
+        data=[
+            {'color':'red', 'size':9, 'shape':'ball'},
+            {'color':'red', 'size':10, 'shape':'ball'},
+            {'color':'green', 'size':11, 'shape':'ball'},
+            {'color':'green', 'size':12, 'shape':'square'}
+        ]
+        p.groupKeys(['color','shape'],data)
+        #=> [
+        #=>     [{'color': 'red', 'size': 9, 'shape': 'ball'}, {'color': 'red', 'size': 10, 'shape': 'ball'}],
+        #=>     [{'color': 'green', 'size': 11, 'shape': 'ball'}],
+        #=>     [{'color': 'green', 'size': 12, 'shape': 'square'}]
+        #=> ]
+        ```
+        """
+        if not isinstance(keys,list):
+            self.exception('groupKeys `keys` must be a list')
+        if len(keys)==0:
+            self.exception('groupKeys `keys` list must have at least one string in it')
+        output=list(self.nestItem(keys, data).values())
+        for i in range(len(keys)-1):
+            output=self.unnest([list(i.values()) for i in output])
+        return output
+
+    def groupWith(self, fn, data):
+        """
+        Function:
+
+        - Splits a list into a list of sublists where each sublist is determined by adjacent pairwise comparisons from a provided function
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to groub with
+            - Note: Must return a boolean value
+            - Note: This function must have an arity of two (take two inputs)
+            - Note: This function is applied to each item plus the next adjacent item in the list recursively
+        - `data`:
+            - Type: list
+            - What: List of items to apply the function to and then group the results
+
+        Examples:
+
+        ```
+        def areEqual(a,b):
+            return a==b
+
+        data=[1,2,3,1,1,2,2,3,3,3]
+        p.groupWith(areEqual,data) #=> [[1], [2], [3], [1, 1], [2, 2], [3, 3, 3]]
+        ```
+        """
+        if not isinstance(fn, curry_fn):
+            fn=self.curry(fn)
+        if fn.arity!=2:
+            self.exception('groupWith `fn` must take exactly two parameters')
+        output=[]
+        start=True
+        for i in data:
+            if start:
+                sublist=[i]
+                start=False
+            elif fn(i,previous):
+                sublist.append(i)
+            else:
+                output.append(sublist)
+                sublist=[i]
+            previous=i
+        output.append(sublist)
+        return output
+
     def hasPath(self, path, data):
         """
         Function:
@@ -580,6 +726,55 @@ class pamda_core(utils):
                 path=[item[key] for key in path_keys],
                 default=[],
                 default_fn=lambda x: x + [item[value_key]]
+            )
+        return nested_output
+
+    def nestItem(self, path_keys, data):
+        """
+        Function:
+
+        - Nests a list of dictionaries into a nested dictionary
+        - Similar items are appended to a list in the end of the nested dictionary
+        - Similar to `nest`, except no values are plucked for the aggregated list
+
+        Requires:
+
+        - `path_keys`:
+            - Type: list of strs
+            - What: The variables to pull from each item in data
+            - Note: Used to build out the nested dicitonary
+            - Note: Order matters as the nesting occurs in order of variable
+        - `data`:
+            - Type: list of dicts
+            - What: A list of dictionaries to use for nesting purposes
+
+        Example:
+
+        ```
+        data=[
+            {'x_1':'a','x_2':'b'},
+            {'x_1':'a','x_2':'b'},
+            {'x_1':'a','x_2':'e'}
+        ]
+        p.nest(
+            path_keys=['x_1','x_2'],
+            data=data
+        )
+        #=> {'a': {'b': [{'x_1': 'a', 'x_2': 'b'}, {'x_1': 'a', 'x_2': 'b'}], 'e': [{'x_1': 'a', 'x_2': 'e'}]}}
+
+        ```
+        """
+        if not isinstance(data, list):
+            self.exception("Attempting to `nestItem` an object that is not a list")
+        if len(data) == 0:
+            self.exception("Attempting to `nestItem` from an empty list")
+        nested_output = {}
+        for item in data:
+            nested_output = self.assocPathComplex(
+                data=nested_output,
+                path=[item[key] for key in path_keys],
+                default=[],
+                default_fn=lambda x: x + [item]
             )
         return nested_output
 
@@ -900,6 +1095,40 @@ class pamda_core(utils):
         if not isinstance(fn, curry_fn):
             return curry_fn(fn, isThunk=True)
         return fn.thunkify()
+
+    def unnest(self, data):
+        """
+        Function:
+
+        - Removes one level of depth for all items in a list
+
+        Requires:
+
+        - `data`:
+            - Type: list
+            - What: A list of items to unnest by one level
+
+        Examples:
+
+        ```
+        data=['fe','fi',['fo',['fum']]]
+        p.unnest(
+            data=data
+        ) #=> =['fe','fi','fo',['fum']]
+        ```
+        """
+        if not isinstance(data, (list)):
+            self.exception("`unnest` can only be called on a `list`")
+        if not len(data)>0:
+            self.exception("Attempting to call `unnest` on an empty list")
+        output=[]
+        for i in data:
+            if isinstance(i, list):
+                output+=i
+            else:
+                output.append(i)
+        return output
+
 
     def zip(self, a, b):
         """
