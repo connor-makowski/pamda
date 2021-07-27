@@ -36,6 +36,7 @@ class error:
         - Creates a class based warning message
 
         Requires:
+
         - `message`:
             - Type: str
             - What: The message to warn users with
@@ -50,6 +51,7 @@ class error:
 
         - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
         - If `self.show_warnings=False`, supresses all warnings
+        
         &#34;&#34;&#34;
         if self.__dict__.get(&#39;show_warnings&#39;,True):
             kwargs={
@@ -91,6 +93,7 @@ class error:
             - What: Force a print statement even if not in verbose
             - Note: For formatting purposes
             - Default: False
+
         &#34;&#34;&#34;
         if self.verbose or force:
             kwargs={
@@ -123,10 +126,6 @@ class error:
             - Note: Depth starts at 0 (indicating the current method in the stack)
             - Default: 0
 
-        Notes:
-
-        - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
-        - If `self.show_warnings=False`, supresses all warnings
         &#34;&#34;&#34;
         kwargs={
             &#39;class_name&#39;:self.__class__.__name__,
@@ -306,6 +305,7 @@ class utils(error):
         - Creates a class based warning message
 
         Requires:
+
         - `message`:
             - Type: str
             - What: The message to warn users with
@@ -320,6 +320,7 @@ class utils(error):
 
         - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
         - If `self.show_warnings=False`, supresses all warnings
+        
         &#34;&#34;&#34;
         if self.__dict__.get(&#39;show_warnings&#39;,True):
             kwargs={
@@ -361,6 +362,7 @@ class utils(error):
             - What: Force a print statement even if not in verbose
             - Note: For formatting purposes
             - Default: False
+
         &#34;&#34;&#34;
         if self.verbose or force:
             kwargs={
@@ -393,10 +395,6 @@ class utils(error):
             - Note: Depth starts at 0 (indicating the current method in the stack)
             - Default: 0
 
-        Notes:
-
-        - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
-        - If `self.show_warnings=False`, supresses all warnings
         &#34;&#34;&#34;
         kwargs={
             &#39;class_name&#39;:self.__class__.__name__,
@@ -440,11 +438,6 @@ class utils(error):
 <li>Default: 0</li>
 </ul>
 </li>
-</ul>
-<p>Notes:</p>
-<ul>
-<li>If <code>self.show_warning_stack=True</code>, also prints the stack trace up to 10 layers deep</li>
-<li>If <code>self.show_warnings=False</code>, supresses all warnings</li>
 </ul></div>
 <details class="source">
 <summary>
@@ -468,10 +461,6 @@ class utils(error):
         - Note: Depth starts at 0 (indicating the current method in the stack)
         - Default: 0
 
-    Notes:
-
-    - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
-    - If `self.show_warnings=False`, supresses all warnings
     &#34;&#34;&#34;
     kwargs={
         &#39;class_name&#39;:self.__class__.__name__,
@@ -549,6 +538,7 @@ class utils(error):
         - What: Force a print statement even if not in verbose
         - Note: For formatting purposes
         - Default: False
+
     &#34;&#34;&#34;
     if self.verbose or force:
         kwargs={
@@ -572,16 +562,22 @@ class utils(error):
 <ul>
 <li>Creates a class based warning message</li>
 </ul>
-<p>Requires:
-- <code>message</code>:
-- Type: str
-- What: The message to warn users with
-- Note: Messages with <code>{class_name}</code> and <code>{method_name}</code> in them are formatted appropriately
-- <code>depth</code>:
-- Type: int
-- What: The depth of the nth call below the top of the method stack
-- Note: Depth starts at 0 (indicating the current method in the stack)
-- Default: 0</p>
+<p>Requires:</p>
+<ul>
+<li><code>message</code>:<ul>
+<li>Type: str</li>
+<li>What: The message to warn users with</li>
+<li>Note: Messages with <code>{class_name}</code> and <code>{method_name}</code> in them are formatted appropriately</li>
+</ul>
+</li>
+<li><code>depth</code>:<ul>
+<li>Type: int</li>
+<li>What: The depth of the nth call below the top of the method stack</li>
+<li>Note: Depth starts at 0 (indicating the current method in the stack)</li>
+<li>Default: 0</li>
+</ul>
+</li>
+</ul>
 <p>Notes:</p>
 <ul>
 <li>If <code>self.show_warning_stack=True</code>, also prints the stack trace up to 10 layers deep</li>
@@ -598,6 +594,7 @@ class utils(error):
     - Creates a class based warning message
 
     Requires:
+
     - `message`:
         - Type: str
         - What: The message to warn users with
@@ -612,6 +609,7 @@ class utils(error):
 
     - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
     - If `self.show_warnings=False`, supresses all warnings
+    
     &#34;&#34;&#34;
     if self.__dict__.get(&#39;show_warnings&#39;,True):
         kwargs={

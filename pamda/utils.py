@@ -8,6 +8,7 @@ class error:
         - Creates a class based warning message
 
         Requires:
+
         - `message`:
             - Type: str
             - What: The message to warn users with
@@ -22,6 +23,7 @@ class error:
 
         - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
         - If `self.show_warnings=False`, supresses all warnings
+        
         """
         if self.__dict__.get('show_warnings',True):
             kwargs={
@@ -63,6 +65,7 @@ class error:
             - What: Force a print statement even if not in verbose
             - Note: For formatting purposes
             - Default: False
+
         """
         if self.verbose or force:
             kwargs={
@@ -95,10 +98,6 @@ class error:
             - Note: Depth starts at 0 (indicating the current method in the stack)
             - Default: 0
 
-        Notes:
-
-        - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
-        - If `self.show_warnings=False`, supresses all warnings
         """
         kwargs={
             'class_name':self.__class__.__name__,
