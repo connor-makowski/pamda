@@ -659,7 +659,7 @@ class pamda_core(utils):
 
         ```
         data={'a':{'b':{'c':'d'},'e':'f'}}
-        update_data={'a':{'b':{'h':'i'},'e','g'}}
+        update_data={'a':{'b':{'h':'i'},'e':'g'}}
         p.mergeDeep(
             update_data=update_data,
             data=data
@@ -672,7 +672,7 @@ class pamda_core(utils):
         keys_original=set(data.keys())
         keys_update=set(update_data.keys())
         similar_keys=keys_original.intersection(keys_update)
-        similar_dict={key:self.mergeDeep(data[key], update_data[key]) for key in similar_keys}
+        similar_dict={key:self.mergeDeep(update_data[key], data[key]) for key in similar_keys}
         new_keys=keys_update.difference(keys_original)
         new_dict={key:update_data[key] for key in new_keys}
         output.update(similar_dict)
