@@ -639,6 +639,133 @@ class pamda_core(utils):
         """
         return list(set(a).intersection(set(b)))
 
+    def map(self, fn, data):
+        """
+        Function:
+
+        - Maps a function over a list or a dictionary
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to map over the list or dictionary
+            - Note: This function should have an arity of 1
+        - `data`:
+            - Type: list | dict
+            - What: The list or dict of items to map the function over
+
+        Examples:
+
+        ```
+        data=[1,2,3]
+        p.map(
+            fn=p.inc,
+            data=data
+        )
+        #=> [2,3,4]
+        ```
+
+        ```
+        data={'a':1,'b':2,'c':3}
+        p.map(
+            fn=p.inc,
+            data=data
+        )
+        #=> {'a':2,'b':3,'c':4}
+        ```
+
+        """
+        if not isinstance(fn, curry_fn):
+            fn=curry_fn(fn)
+        if fn.arity!=1:
+            self.exception('`map` `fn` must be unary (take one input)')
+        if not isinstance(data, (list,dict)):
+            self.exception('`map` `data` must be a list or a dict')
+        if not len(data)>0:
+            self.exception('`map` `data` has a length of 0 or is an empty dictionary, however it must have at least one element in it')
+        if isinstance(data, dict):
+            return {key:fn(value) for key, value in data.items()}
+        else:
+            return [fn(i) for i in data]
+
+    def mean(self, data):
+        """
+        Function:
+
+        - Calculates the mean of a given list
+
+        Requires:
+
+        - `data`:
+            - Type: list of (floats | ints)
+            - What: The list with wich to calculate the mean
+            - Note: If the length of this list is 0, returns None
+
+        Example:
+
+        ```
+        data=[1,2,3]
+        p.mean(data=data)
+        #=> 2
+        ```
+
+        ```
+        data=[]
+        p.mean(data=data)
+        #=> None
+        ```
+        """
+        if not isinstance(data, (list)):
+            self.exception('`mean` `data` must be a list')
+        if len(data)==0:
+            return None
+        return sum(data)/len(data)
+
+    def median(self, data):
+        """
+        Function:
+
+        - Calculates the median of a given list
+        - If the length of the list is even, calculates the mean of the two central values
+
+        Requires:
+
+        - `data`:
+            - Type: list of (floats | ints)
+            - What: The list with wich to calculate the mean
+            - Note: If the length of this list is 0, returns None
+
+        Examples:
+
+        ```
+        data=[7,2,8,9]
+        p.median(data=data)
+        #=> 7.5
+        ```
+
+        ```
+        data=[7,8,9]
+        p.median(data=data)
+        #=> 8
+        ```
+
+        ```
+        data=[]
+        p.median(data=data)
+        #=> None
+        ```
+        """
+        if not isinstance(data, (list)):
+            self.exception('`median` `data` must be a list')
+        length=len(data)
+        if length==0:
+            return None
+        data=sorted(data)
+        if length%2==0:
+            return (data[int(length/2)]+data[int(length/2)-1])/2
+        return data[int(length/2)]
+
     def mergeDeep(self, update_data, data):
         """
         Function:
@@ -777,6 +904,53 @@ class pamda_core(utils):
                 default_fn=lambda x: x + [item]
             )
         return nested_output
+
+    def reduce(self, fn, initial_accumulator, data):
+        """
+        Function:
+
+        - Returns a single item by iterating a function starting with an accumulator over a list
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to reduce
+            - Note: This function should have an arity of 2 (take two inputs)
+            - Note: The first input should take the accumulator value
+            - Note: The second input should take the data value
+        -`initial_accumulator`:
+            - Type: any
+            - What: The initial item to pass into the function when starting the accumulation process
+        - `data`:
+            - Type: list
+            - What: The list of items to iterate over
+
+        Example:
+
+        ```
+        data=[1,2,3,4]
+        p.reduce(
+            fn=p.add,
+            initial_accumulator=0
+            data=data
+        )
+        #=> 10
+
+        ```
+        """
+        if not isinstance(fn, curry_fn):
+            fn=curry_fn(fn)
+        if fn.arity!=2:
+            self.exception('`reduce` `fn` must have an arity of 2 (take two inputs)')
+        if not isinstance(data, (list)):
+            self.exception('`reduce` `data` must be a list')
+        if not len(data)>0:
+            self.exception('`reduce` `data` has a length of 0, however it must have a length of at least 1')
+        acc=initial_accumulator
+        for i in data:
+            acc=fn(acc,i)
+        return acc
 
     def path(self, path, data):
         """
