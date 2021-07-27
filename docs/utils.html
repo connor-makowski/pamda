@@ -41,6 +41,9 @@ class error:
             - Type: str
             - What: The message to warn users with
             - Note: Messages with `{class_name}` and `{method_name}` in them are formatted appropriately
+
+        Optional:
+
         - `depth`:
             - Type: int
             - What: The depth of the nth call below the top of the method stack
@@ -51,7 +54,7 @@ class error:
 
         - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
         - If `self.show_warnings=False`, supresses all warnings
-        
+
         &#34;&#34;&#34;
         if self.__dict__.get(&#39;show_warnings&#39;,True):
             kwargs={
@@ -120,6 +123,9 @@ class error:
             - Type: str
             - What: The message to warn users with
             - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+
+        Optional:
+        
         - `depth`:
             - Type: int
             - What: The depth of the nth call below the top of the method stack
@@ -310,6 +316,9 @@ class utils(error):
             - Type: str
             - What: The message to warn users with
             - Note: Messages with `{class_name}` and `{method_name}` in them are formatted appropriately
+
+        Optional:
+
         - `depth`:
             - Type: int
             - What: The depth of the nth call below the top of the method stack
@@ -320,7 +329,7 @@ class utils(error):
 
         - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
         - If `self.show_warnings=False`, supresses all warnings
-        
+
         &#34;&#34;&#34;
         if self.__dict__.get(&#39;show_warnings&#39;,True):
             kwargs={
@@ -389,6 +398,9 @@ class utils(error):
             - Type: str
             - What: The message to warn users with
             - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+
+        Optional:
+        
         - `depth`:
             - Type: int
             - What: The depth of the nth call below the top of the method stack
@@ -431,6 +443,9 @@ class utils(error):
 <li>Note: Messages with <code>{{class_name}}</code> and <code>{{method_name}}</code> in them are formatted appropriately</li>
 </ul>
 </li>
+</ul>
+<p>Optional:</p>
+<ul>
 <li><code>depth</code>:<ul>
 <li>Type: int</li>
 <li>What: The depth of the nth call below the top of the method stack</li>
@@ -455,6 +470,9 @@ class utils(error):
         - Type: str
         - What: The message to warn users with
         - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+
+    Optional:
+    
     - `depth`:
         - Type: int
         - What: The depth of the nth call below the top of the method stack
@@ -570,6 +588,9 @@ class utils(error):
 <li>Note: Messages with <code>{class_name}</code> and <code>{method_name}</code> in them are formatted appropriately</li>
 </ul>
 </li>
+</ul>
+<p>Optional:</p>
+<ul>
 <li><code>depth</code>:<ul>
 <li>Type: int</li>
 <li>What: The depth of the nth call below the top of the method stack</li>
@@ -599,6 +620,9 @@ class utils(error):
         - Type: str
         - What: The message to warn users with
         - Note: Messages with `{class_name}` and `{method_name}` in them are formatted appropriately
+
+    Optional:
+
     - `depth`:
         - Type: int
         - What: The depth of the nth call below the top of the method stack
@@ -609,7 +633,7 @@ class utils(error):
 
     - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
     - If `self.show_warnings=False`, supresses all warnings
-    
+
     &#34;&#34;&#34;
     if self.__dict__.get(&#39;show_warnings&#39;,True):
         kwargs={

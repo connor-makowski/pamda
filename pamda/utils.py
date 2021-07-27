@@ -13,6 +13,9 @@ class error:
             - Type: str
             - What: The message to warn users with
             - Note: Messages with `{class_name}` and `{method_name}` in them are formatted appropriately
+
+        Optional:
+
         - `depth`:
             - Type: int
             - What: The depth of the nth call below the top of the method stack
@@ -23,7 +26,7 @@ class error:
 
         - If `self.show_warning_stack=True`, also prints the stack trace up to 10 layers deep
         - If `self.show_warnings=False`, supresses all warnings
-        
+
         """
         if self.__dict__.get('show_warnings',True):
             kwargs={
@@ -92,6 +95,9 @@ class error:
             - Type: str
             - What: The message to warn users with
             - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
+
+        Optional:
+        
         - `depth`:
             - Type: int
             - What: The depth of the nth call below the top of the method stack
