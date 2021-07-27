@@ -1129,7 +1129,6 @@ class pamda_core(utils):
                 output.append(i)
         return output
 
-
     def zip(self, a, b):
         """
         Function:
