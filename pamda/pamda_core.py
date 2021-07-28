@@ -2,6 +2,55 @@ from pamda.utils import utils
 from pamda.curry_fn import curry_fn
 
 class pamda_core(utils):
+    def accumulate(self, fn, initial_accumulator, data):
+        """
+        Function:
+
+        - Returns an accumulated list of items by iterating a function starting with an accumulator over a list
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to reduce
+            - Note: This function should have an arity of 2 (take two inputs)
+            - Note: The first input should take the accumulator value
+            - Note: The second input should take the data value
+        -`initial_accumulator`:
+            - Type: any
+            - What: The initial item to pass into the function when starting the accumulation process
+        - `data`:
+            - Type: list
+            - What: The list of items to iterate over
+
+        Example:
+
+        ```
+        data=[1,2,3,4]
+        p.accumulate(
+            fn=p.add,
+            initial_accumulator=0,
+            data=data
+        )
+        #=> [1,3,6,10]
+
+        ```
+        """
+        if not isinstance(fn, curry_fn):
+            fn=curry_fn(fn)
+        if fn.__arity__!=2:
+            self.exception('`reduce` `fn` must have an arity of 2 (take two inputs)')
+        if not isinstance(data, (list)):
+            self.exception('`reduce` `data` must be a list')
+        if not len(data)>0:
+            self.exception('`reduce` `data` has a length of 0, however it must have a length of at least 1')
+        acc=initial_accumulator
+        out=[]
+        for i in data:
+            acc=fn(acc,i)
+            out.append(acc)
+        return out
+
     def add(self, a, b):
         """
         Function:
@@ -328,6 +377,78 @@ class pamda_core(utils):
         """
         return [i for sub_list in data for i in sub_list]
 
+    def flip(self, fn):
+        """
+        Function:
+
+        - Returns a new function equivalent to the supplied function except that the first two inputs are flipped
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to flip
+            - Note: This function must have an arity of at least 2 (take two inputs)
+            - Note: Only args are flipped, kwargs are passed as normal
+
+        Notes:
+
+        - Input functions are not flipped in place
+        - The returned function is a flipped version of the input function
+        - A curried function can be flipped in place by calling fn.flip()
+        - A function can be flipped multiple times:
+            - At each flip, the first and second inputs for the function as it is currently curried are switched
+            - Flipping a function two times before adding an input will return the initial value
+
+        Examples:
+
+        ```
+        def concat(a,b,c,d):
+            return str(a)+str(b)+str(c)+str(d)
+
+        flip_concat=p.flip(concat)
+
+        concat('fe-','fi-','fo-','fum') #=> 'fe-fi-fo-fum'
+        flip_concat('fe-','fi-','fo-','fum') #=> 'fi-fe-fo-fum'
+        ```
+
+        ```
+        @p.curry
+        def concat(a,b,c,d):
+            return str(a)+str(b)+str(c)+str(d)
+
+        concat('fe-','fi-','fo-','fum') #=> 'fe-fi-fo-fum'
+
+        concat.flip()
+
+        concat('fe-','fi-','fo-','fum') #=> 'fi-fe-fo-fum'
+        ```
+
+        ```
+        @p.curry
+        def concat(a,b,c,d):
+            return str(a)+str(b)+str(c)+str(d)
+
+        a=p.flip(concat)('fi-')
+        b=p.flip(a)('fo-')
+        c=p.flip(b)('fum')
+        c('fe-') #=> 'fi-fe-fo-fum'
+        ```
+
+        ```
+        def concat(a,b,c,d):
+            return str(a)+str(b)+str(c)+str(d)
+
+        a=p.flip(concat)('fi-').flip()('fo-').flip()('fum')
+        a('fe-') #=> 'fi-fe-fo-fum'
+        ```
+        """
+        if not isinstance(fn, curry_fn):
+            fn=curry_fn(fn)
+        else:
+            fn=fn()
+        return fn.flip()
+
     def getArity(self, fn):
         """
         Function:
@@ -351,8 +472,8 @@ class pamda_core(utils):
         ```
         """
         if isinstance(fn, curry_fn):
-            return fn.arity
-        return curry_fn(fn).arity
+            return fn.__arity__
+        return curry_fn(fn).__arity__
 
     def groupBy(self, fn, data):
         """
@@ -402,7 +523,7 @@ class pamda_core(utils):
         """
         if not isinstance(fn, curry_fn):
             fn=self.curry(fn)
-        if fn.arity!=1:
+        if fn.__arity__!=1:
             self.exception('groupBy `fn` must only take one parameter as its input')
         output={}
         for i in data:
@@ -483,7 +604,7 @@ class pamda_core(utils):
         """
         if not isinstance(fn, curry_fn):
             fn=self.curry(fn)
-        if fn.arity!=2:
+        if fn.__arity__!=2:
             self.exception('groupWith `fn` must take exactly two parameters')
         output=[]
         start=True
@@ -678,7 +799,7 @@ class pamda_core(utils):
         """
         if not isinstance(fn, curry_fn):
             fn=curry_fn(fn)
-        if fn.arity!=1:
+        if fn.__arity__!=1:
             self.exception('`map` `fn` must be unary (take one input)')
         if not isinstance(data, (list,dict)):
             self.exception('`map` `data` must be a list or a dict')
@@ -905,53 +1026,6 @@ class pamda_core(utils):
             )
         return nested_output
 
-    def reduce(self, fn, initial_accumulator, data):
-        """
-        Function:
-
-        - Returns a single item by iterating a function starting with an accumulator over a list
-
-        Requires:
-
-        - `fn`:
-            - Type: function | method
-            - What: The function or method to reduce
-            - Note: This function should have an arity of 2 (take two inputs)
-            - Note: The first input should take the accumulator value
-            - Note: The second input should take the data value
-        -`initial_accumulator`:
-            - Type: any
-            - What: The initial item to pass into the function when starting the accumulation process
-        - `data`:
-            - Type: list
-            - What: The list of items to iterate over
-
-        Example:
-
-        ```
-        data=[1,2,3,4]
-        p.reduce(
-            fn=p.add,
-            initial_accumulator=0
-            data=data
-        )
-        #=> 10
-
-        ```
-        """
-        if not isinstance(fn, curry_fn):
-            fn=curry_fn(fn)
-        if fn.arity!=2:
-            self.exception('`reduce` `fn` must have an arity of 2 (take two inputs)')
-        if not isinstance(data, (list)):
-            self.exception('`reduce` `data` must be a list')
-        if not len(data)>0:
-            self.exception('`reduce` `data` has a length of 0, however it must have a length of at least 1')
-        acc=initial_accumulator
-        for i in data:
-            acc=fn(acc,i)
-        return acc
-
     def path(self, path, data):
         """
         Function:
@@ -1127,6 +1201,53 @@ class pamda_core(utils):
             self.exception("Attempting to pluck from an empty list")
         return [self.path(data=i, path=path) for i in data if self.path(data=i, path=if_path) in if_vals]
 
+    def reduce(self, fn, initial_accumulator, data):
+        """
+        Function:
+
+        - Returns a single item by iterating a function starting with an accumulator over a list
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to reduce
+            - Note: This function should have an arity of 2 (take two inputs)
+            - Note: The first input should take the accumulator value
+            - Note: The second input should take the data value
+        -`initial_accumulator`:
+            - Type: any
+            - What: The initial item to pass into the function when starting the accumulation process
+        - `data`:
+            - Type: list
+            - What: The list of items to iterate over
+
+        Example:
+
+        ```
+        data=[1,2,3,4]
+        p.reduce(
+            fn=p.add,
+            initial_accumulator=0,
+            data=data
+        )
+        #=> 10
+
+        ```
+        """
+        if not isinstance(fn, curry_fn):
+            fn=curry_fn(fn)
+        if fn.__arity__!=2:
+            self.exception('`reduce` `fn` must have an arity of 2 (take two inputs)')
+        if not isinstance(data, (list)):
+            self.exception('`reduce` `data` must be a list')
+        if not len(data)>0:
+            self.exception('`reduce` `data` has a length of 0, however it must have a length of at least 1')
+        acc=initial_accumulator
+        for i in data:
+            acc=fn(acc,i)
+        return acc
+
     def safeDivide(self, denominator, a):
         """
         Function:
@@ -1257,18 +1378,49 @@ class pamda_core(utils):
         - `fn`:
             - Type: function | method
             - What: The function or method to thunkify
+            - Note: Thunkified functions are automatically curried
             - Note: Class methods auto apply self during thunkify
+
+        Notes:
+
+        - Input functions are not thunkified in place
+        - The returned function is a thunkified version of the input function
+        - A curried function can be thunkified in place by calling fn.thunkify()
 
         Examples:
 
         ```
-        zipThunk=p.thunkify(p.zip)(['a','b'])([1,2])
-        zipThunk() #=> [['a',1],['b',2]]
+        def add(a,b):
+            return a+b
+
+        addThunk=p.thunkify(add)
+
+        add(1,2) #=> 3
+        addThunk(1,2)
+        addThunk(1,2)() #=> 3
+
+        x=addThunk(1,2)
+        x() #=> 3
+        ```
+
+        ```
+        @p.curry
+        def add(a,b):
+            return a+b
+
+        add(1,2) #=> 3
+
+        add.thunkify()
+
+        add(1,2)
+        add(1,2)() #=> 3
         ```
         """
         if not isinstance(fn, curry_fn):
-            return curry_fn(fn, isThunk=True)
-        return fn.thunkify()
+            fn=curry_fn(fn)
+        else:
+            fn=fn()
+        return fn.__thunkify__()
 
     def unnest(self, data):
         """
