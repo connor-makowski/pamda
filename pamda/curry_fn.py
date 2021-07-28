@@ -1,10 +1,9 @@
-from pamda.utils import error
 import types
 
-class curry_fn(error):
+class curry_fn:
     def __init__(self, __fn__, *__args__, __flips__=[], __isThunk__=False, **__kwargs__):
         self.__doc__=__fn__.__doc__
-        self.__name__=__fn__.__name__+" (curried)"
+        self.__name__=__fn__.__name__+"_curried"
         self.__fn__=__fn__
         self.__args__=__args__
         self.__kwargs__=__kwargs__
@@ -18,7 +17,7 @@ class curry_fn(error):
         new_kwargs=dict(**self.__kwargs__, **kwargs)
         self.__arity__=self.__getArity__(new_args, new_kwargs)
         if self.__arity__<0:
-            self.exception('Too many arguments were supplied')
+            self.__exception__('Too many arguments were supplied')
         if self.__arity__==0:
             if len(self.__flips__)>0:
                 new_args=self.__unflipArgs__(new_args)
@@ -36,7 +35,7 @@ class curry_fn(error):
 
     def __getFnArity__(self):
         if not isinstance(self.__fn__, (types.MethodType, types.FunctionType)):
-            self.exception('A non function was passed as a function and does not have any arity. See the stack trace above for more information.')
+            self.__exception__('A non function was passed as a function and does not have any arity. See the stack trace above for more information.')
         extra_method_input_count=1 if isinstance(self.__fn__, types.MethodType) else 0
         return self.__fn__.__code__.co_argcount-extra_method_input_count
 
@@ -46,7 +45,7 @@ class curry_fn(error):
 
     def flip(self):
         if self.__arity__<2:
-            self.exception('To `flip` a function, it  must have an arity of at least 2 (take two or more inputs)')
+            self.__exception__('To `flip` a function, it  must have an arity of at least 2 (take two or more inputs)')
         self.__flips__=[len(self.__args__)]+self.__flips__
         return self
 
@@ -56,3 +55,7 @@ class curry_fn(error):
             arg=args.pop(flip+1)
             args.insert(flip, arg)
         return tuple(args)
+
+    def __exception__(self, message, depth=0):
+        pre_message=f"({self.__fn__.__module__}.{self.__fn__.__qualname__}_curried): "
+        raise Exception(pre_message+message)
