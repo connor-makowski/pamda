@@ -432,7 +432,7 @@ class pamda_core(utils):
         a=p.flip(concat)('fi-')
         b=p.flip(a)('fo-')
         c=p.flip(b)('fum')
-        c('fe-') #=> 'fi-fe-fo-fum'
+        c('fe-') #=> 'fe-fi-fo-fum'
         ```
 
         ```
@@ -440,7 +440,7 @@ class pamda_core(utils):
             return str(a)+str(b)+str(c)+str(d)
 
         a=p.flip(concat)('fi-').flip()('fo-').flip()('fum')
-        a('fe-') #=> 'fi-fe-fo-fum'
+        a('fe-') #=> 'fe-fi-fo-fum'
         ```
         """
         if not isinstance(fn, curry_fn):

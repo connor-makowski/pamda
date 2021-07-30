@@ -460,7 +460,7 @@ class pamda_core(utils):
         a=p.flip(concat)(&#39;fi-&#39;)
         b=p.flip(a)(&#39;fo-&#39;)
         c=p.flip(b)(&#39;fum&#39;)
-        c(&#39;fe-&#39;) #=&gt; &#39;fi-fe-fo-fum&#39;
+        c(&#39;fe-&#39;) #=&gt; &#39;fe-fi-fo-fum&#39;
         ```
 
         ```
@@ -468,7 +468,7 @@ class pamda_core(utils):
             return str(a)+str(b)+str(c)+str(d)
 
         a=p.flip(concat)(&#39;fi-&#39;).flip()(&#39;fo-&#39;).flip()(&#39;fum&#39;)
-        a(&#39;fe-&#39;) #=&gt; &#39;fi-fe-fo-fum&#39;
+        a(&#39;fe-&#39;) #=&gt; &#39;fe-fi-fo-fum&#39;
         ```
         &#34;&#34;&#34;
         if not isinstance(fn, curry_fn):
@@ -1984,7 +1984,7 @@ class pamda_core(utils):
         a=p.flip(concat)(&#39;fi-&#39;)
         b=p.flip(a)(&#39;fo-&#39;)
         c=p.flip(b)(&#39;fum&#39;)
-        c(&#39;fe-&#39;) #=&gt; &#39;fi-fe-fo-fum&#39;
+        c(&#39;fe-&#39;) #=&gt; &#39;fe-fi-fo-fum&#39;
         ```
 
         ```
@@ -1992,7 +1992,7 @@ class pamda_core(utils):
             return str(a)+str(b)+str(c)+str(d)
 
         a=p.flip(concat)(&#39;fi-&#39;).flip()(&#39;fo-&#39;).flip()(&#39;fum&#39;)
-        a(&#39;fe-&#39;) #=&gt; &#39;fi-fe-fo-fum&#39;
+        a(&#39;fe-&#39;) #=&gt; &#39;fe-fi-fo-fum&#39;
         ```
         &#34;&#34;&#34;
         if not isinstance(fn, curry_fn):
@@ -3882,13 +3882,13 @@ def concat(a,b,c,d):
 a=p.flip(concat)('fi-')
 b=p.flip(a)('fo-')
 c=p.flip(b)('fum')
-c('fe-') #=&gt; 'fi-fe-fo-fum'
+c('fe-') #=&gt; 'fe-fi-fo-fum'
 </code></pre>
 <pre><code>def concat(a,b,c,d):
     return str(a)+str(b)+str(c)+str(d)
 
 a=p.flip(concat)('fi-').flip()('fo-').flip()('fum')
-a('fe-') #=&gt; 'fi-fe-fo-fum'
+a('fe-') #=&gt; 'fe-fi-fo-fum'
 </code></pre></div>
 <details class="source">
 <summary>
@@ -3949,7 +3949,7 @@ a('fe-') #=&gt; 'fi-fe-fo-fum'
     a=p.flip(concat)(&#39;fi-&#39;)
     b=p.flip(a)(&#39;fo-&#39;)
     c=p.flip(b)(&#39;fum&#39;)
-    c(&#39;fe-&#39;) #=&gt; &#39;fi-fe-fo-fum&#39;
+    c(&#39;fe-&#39;) #=&gt; &#39;fe-fi-fo-fum&#39;
     ```
 
     ```
@@ -3957,7 +3957,7 @@ a('fe-') #=&gt; 'fi-fe-fo-fum'
         return str(a)+str(b)+str(c)+str(d)
 
     a=p.flip(concat)(&#39;fi-&#39;).flip()(&#39;fo-&#39;).flip()(&#39;fum&#39;)
-    a(&#39;fe-&#39;) #=&gt; &#39;fi-fe-fo-fum&#39;
+    a(&#39;fe-&#39;) #=&gt; &#39;fe-fi-fo-fum&#39;
     ```
     &#34;&#34;&#34;
     if not isinstance(fn, curry_fn):
