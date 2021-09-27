@@ -1448,7 +1448,7 @@ class pamda_core(utils):
             fn=curry_fn(fn)
         else:
             fn=fn()
-        return fn.__thunkify__()
+        return fn.thunkify()
 
     def unnest(self, data):
         &#34;&#34;&#34;
@@ -2972,7 +2972,7 @@ class pamda_core(utils):
             fn=curry_fn(fn)
         else:
             fn=fn()
-        return fn.__thunkify__()
+        return fn.thunkify()
 
     def unnest(self, data):
         &#34;&#34;&#34;
@@ -5880,7 +5880,7 @@ add(1,2)() #=&gt; 3
         fn=curry_fn(fn)
     else:
         fn=fn()
-    return fn.__thunkify__()</code></pre>
+    return fn.thunkify()</code></pre>
 </details>
 </dd>
 <dt id="pamda.pamda_core.pamda_core.unnest"><code class="name flex">
