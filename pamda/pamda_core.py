@@ -1420,7 +1420,7 @@ class pamda_core(utils):
             fn=curry_fn(fn)
         else:
             fn=fn()
-        return fn.__thunkify__()
+        return fn.thunkify()
 
     def unnest(self, data):
         """

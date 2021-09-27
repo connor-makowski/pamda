@@ -21,9 +21,7 @@ class curry_fn:
         if self.__arity__==0:
             if len(self.__flips__)>0:
                 new_args=self.__unflipArgs__(new_args)
-            if not self.__isThunk__:
-                return self.__fn__(*new_args, **new_kwargs)
-            if len(args)+len(kwargs)==0:
+            if (not self.__isThunk__) or (len(args)+len(kwargs)==0):
                 return self.__fn__(*new_args, **new_kwargs)
         return curry_fn(self.__fn__, *new_args, __flips__=self.__flips__, __isThunk__=self.__isThunk__, **new_kwargs)
 
