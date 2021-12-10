@@ -1,6 +1,6 @@
 Pamda
 ==========
-Python wrapper for functional programming in object oriented structures
+Python wrapper for functional programming in object oriented structures.
 
 Inspired heavily by [Ramda](https://ramdajs.com/docs/).
 
