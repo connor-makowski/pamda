@@ -145,16 +145,9 @@ class pamda_core(utils):
         p.assocPath(path=['a','c'], value=3, data=data) #=> {'a':{'b':1, 'c':3}}
         ```
         """
-        def force_dict(d, key):
-            """
-            A helper to force a key to be a dictionary
-            """
-            if not isinstance(d.get(key), dict):
-                d.__setitem__(key, {})
-            return d.get(key)
         if isinstance(path, str):
             path=[path]
-        reduce(lambda x,y: force_dict(x,y), path[:-1], data).__setitem__(path[-1],value)
+        reduce(self.getForceDict, path[:-1], data).__setitem__(path[-1],value)
         return data
 
     def assocPathComplex(self, default, default_fn, path, data):
@@ -186,16 +179,12 @@ class pamda_core(utils):
         p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=data) #=> {'a':{'b':1,'c':[2,1]}}
         ```
         """
-        if len(path) > 1:
-            if path[0] not in data:
-                data[path[0]] = {}
-            data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_fn=default_fn)
-        else:
-            if self.getArity(default_fn)!=1:
-                self.exception('`assocPathComplex` `default_fn` must be an unary (single input) function.')
-            if path[0] not in data:
-                data[path[0]] = default
-            data[path[0]] = default_fn(data[path[0]])
+        if self.getArity(default_fn)!=1:
+            self.exception('`assocPathComplex` `default_fn` must be an unary (single input) function.')
+        if isinstance(path, str):
+            path=[path]
+        path_object = reduce(self.getForceDict, path[:-1], data)
+        path_object.__setitem__(path[-1], default_fn(path_object.get(path[-1],default)))
         return data
 
     def clamp(self, minimum, maximum, a):
@@ -351,12 +340,11 @@ class pamda_core(utils):
         """
         if isinstance(path, str):
             path=[path]
-        if not self.hasPath(data, path):
+        if not self.hasPath(path=path, data=data):
             self.warn(message="Path does not exist")
-            return data
-        if len(path)==0:
-            return {}
-        return self.assocPath(data=data, path=path[:-1], value={key:value for key, value in self.path(data, path=path[:-1]).items() if key!=path[-1]})
+        else:
+            reduce(self.getForceDict, path[:-1], data).pop(path[-1])
+        return data
 
     def flatten(self, data):
         """
@@ -648,12 +636,7 @@ class pamda_core(utils):
         """
         if isinstance(path, str):
             path=[path]
-        if len(path) > 0:
-            if path[0] in data:
-                return self.hasPath(data=data[path[0]], path=path[1:])
-            else:
-                return False
-        return True
+        return path[-1] in reduce(lambda x,y: x.get(y,{}), path[:-1], data)
 
     def hardRound(self, decimal_places, a):
         """

@@ -43,3 +43,14 @@ data={'a':{'b':1}}
 out=p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=data)
 if out!={'a':{'b':1,'c':[2,1]}}:
     print('assocPathComplex failed')
+
+#dissocPath
+data={'a':{'b':1, 'c':2}}
+out=p.dissocPath(path=['a','c'], data=data)
+if out!={'a':{'b':1}}:
+    print('dissocPath failed')
+
+#hasPath
+data={'a':{'b':1}}
+if not p.hasPath(path=['a','b'], data=data) or p.hasPath(path=['a','c'], data=data):
+    print('hasPath failed')

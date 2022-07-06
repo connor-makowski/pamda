@@ -97,7 +97,7 @@ class error:
             - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
 
         Optional:
-        
+
         - `depth`:
             - Type: int
             - What: The depth of the nth call below the top of the method stack
@@ -255,3 +255,35 @@ class utils(error):
         ```
         """
         return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith("__")]
+
+    def getForceDict(self, object, key):
+        """
+        Function:
+
+        - Returns a value from a dictionary given a key and forces that value to be a dictionary
+        - Note: This updates the object in place to force the value from the key to be a dictionary
+
+        Requires:
+
+        - `object`:
+            - Type: dict
+            - What: The object from which to look for a key
+        - `key`:
+            - Type: str
+            - What: The key to look up in the object
+
+        Example:
+
+        ```
+        data = {'a':{}, 'b':1}
+
+        p.getForceDict(data, 'a') #=> {}
+        p.getForceDict(data, 'b') #=> {}
+
+        # Note that the object has been updated in place
+        data #=> {'a':{}, 'b':{}}
+        ```
+        """
+        if not isinstance(object.get(key), dict):
+            object.__setitem__(key, {})
+        return object.get(key)
