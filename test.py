@@ -33,6 +33,11 @@ out=p.assocPath(path=['a','c'], value=3, data=data)
 if out!={'a':{'b':1, 'c':3}}:
     print('assocPath failed')
 
+data={'a':{'b':1}}
+out=p.assocPath(path=['a','b','c'], value=3, data=data)
+if out!={'a':{'b':{'c':3}}}:
+    print('assocPath failed')
+
 #assocPathComplex
 data={'a':{'b':1}}
 out=p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=data)

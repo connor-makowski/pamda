@@ -1,3 +1,4 @@
+from functools import reduce
 from pamda.utils import utils
 from pamda.curry_fn import curry_fn
 
@@ -135,7 +136,7 @@ class pamda_core(utils):
             - What: The value to appropriate to the end of the path
         - `data`:
             - Type: dict
-            - What: A dictionary to check if the path exists
+            - What: A dictionary in which to associate the given value to the given path
 
         Example:
 
@@ -144,16 +145,17 @@ class pamda_core(utils):
         p.assocPath(path=['a','c'], value=3, data=data) #=> {'a':{'b':1, 'c':3}}
         ```
         """
+        def force_dict(d, key):
+            """
+            A helper to force a key to be a dictionary
+            """
+            if not isinstance(d.get(key), dict):
+                d.__setitem__(key, {})
+            return d.get(key)
         if isinstance(path, str):
             path=[path]
-        if len(path) > 1:
-            if path[0] not in data:
-                data[path[0]] = {}
-            data[path[0]] = self.assocPath(data=data[path[0]], path=path[1:],value=value)
-            return data
-        else:
-            data[path[0]] = value
-            return data
+        reduce(lambda x,y: force_dict(x,y), path[:-1], data).__setitem__(path[-1],value)
+        return data
 
     def assocPathComplex(self, default, default_fn, path, data):
         """
@@ -188,14 +190,13 @@ class pamda_core(utils):
             if path[0] not in data:
                 data[path[0]] = {}
             data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_fn=default_fn)
-            return data
         else:
             if self.getArity(default_fn)!=1:
                 self.exception('`assocPathComplex` `default_fn` must be an unary (single input) function.')
             if path[0] not in data:
                 data[path[0]] = default
             data[path[0]] = default_fn(data[path[0]])
-            return data
+        return data
 
     def clamp(self, minimum, maximum, a):
         """
@@ -1030,7 +1031,7 @@ class pamda_core(utils):
         """
         Function:
 
-        - Returns the value of a path within a nested dictionary
+        - Returns the value of a path within a nested dictionary or None if the path does not exist
 
         Requires:
 
@@ -1049,11 +1050,7 @@ class pamda_core(utils):
         p.path(path=['a','b'], data=data) #=> 1
         ```
         """
-        if isinstance(path, str):
-            path=[path]
-        if len(path) > 0:
-            return self.path(data=data[path[0]], path=path[1:])
-        return data
+        return self.pathOr(None, path, data)
 
     def pathOr(self, default, path, data):
         """
@@ -1083,12 +1080,7 @@ class pamda_core(utils):
         """
         if isinstance(path, str):
             path=[path]
-        if len(path) > 0:
-            if path[0] in data:
-                return self.path(data=data[path[0]], path=path[1:])
-            else:
-                return default
-        return data
+        return reduce(lambda x, y: x.get(y, {}), path[:-1], data).get(path[-1], default)
 
     def pipe(self, fns, data):
         """
