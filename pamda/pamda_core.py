@@ -213,7 +213,7 @@ class pamda_core(utils):
 
         - To pass inputs to a function in asyncRun, first thunkify the function and pass all arguments before calling `asyncRun` on it
         - To get the results of an `asyncRun` call `asyncWait`
-        - A thunkified function with arity of 0 can call `asyncRun` in place
+        - A thunkified function with arity of 0 can call `asyncRun` on itself
 
         Examples:
 
@@ -285,7 +285,7 @@ class pamda_core(utils):
 
         Notes:
 
-        - A thunkified function that has called `asyncRun` can call `asyncWait` in place
+        - A thunkified function that has called `asyncRun` can call `asyncWait` on itself
 
         Examples:
 

@@ -241,7 +241,7 @@ class pamda_core(utils):
 
         - To pass inputs to a function in asyncRun, first thunkify the function and pass all arguments before calling `asyncRun` on it
         - To get the results of an `asyncRun` call `asyncWait`
-        - A thunkified function with arity of 0 can call `asyncRun` in place
+        - A thunkified function with arity of 0 can call `asyncRun` on itself
 
         Examples:
 
@@ -313,7 +313,7 @@ class pamda_core(utils):
 
         Notes:
 
-        - A thunkified function that has called `asyncRun` can call `asyncWait` in place
+        - A thunkified function that has called `asyncRun` can call `asyncWait` on itself
 
         Examples:
 
@@ -1918,7 +1918,7 @@ class pamda_core(utils):
 
         - To pass inputs to a function in asyncRun, first thunkify the function and pass all arguments before calling `asyncRun` on it
         - To get the results of an `asyncRun` call `asyncWait`
-        - A thunkified function with arity of 0 can call `asyncRun` in place
+        - A thunkified function with arity of 0 can call `asyncRun` on itself
 
         Examples:
 
@@ -1990,7 +1990,7 @@ class pamda_core(utils):
 
         Notes:
 
-        - A thunkified function that has called `asyncRun` can call `asyncWait` in place
+        - A thunkified function that has called `asyncRun` can call `asyncWait` on itself
 
         Examples:
 
@@ -3776,7 +3776,7 @@ p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=
 <ul>
 <li>To pass inputs to a function in asyncRun, first thunkify the function and pass all arguments before calling <code>asyncRun</code> on it</li>
 <li>To get the results of an <code>asyncRun</code> call <code>asyncWait</code></li>
-<li>A thunkified function with arity of 0 can call <code>asyncRun</code> in place</li>
+<li>A thunkified function with arity of 0 can call <code>asyncRun</code> on itself</li>
 </ul>
 <p>Examples:</p>
 <p>Input:</p>
@@ -3840,7 +3840,7 @@ print(async_test.asyncWait()) #=&gt; a: 2
 
     - To pass inputs to a function in asyncRun, first thunkify the function and pass all arguments before calling `asyncRun` on it
     - To get the results of an `asyncRun` call `asyncWait`
-    - A thunkified function with arity of 0 can call `asyncRun` in place
+    - A thunkified function with arity of 0 can call `asyncRun` on itself
 
     Examples:
 
@@ -3917,7 +3917,7 @@ print(async_test.asyncWait()) #=&gt; a: 2
 </ul>
 <p>Notes:</p>
 <ul>
-<li>A thunkified function that has called <code>asyncRun</code> can call <code>asyncWait</code> in place</li>
+<li>A thunkified function that has called <code>asyncRun</code> can call <code>asyncWait</code> on itself</li>
 </ul>
 <p>Examples:</p>
 <pre><code>import time
@@ -3959,7 +3959,7 @@ print(async_test.asyncWait()) #=&gt; a: 2
 
     Notes:
 
-    - A thunkified function that has called `asyncRun` can call `asyncWait` in place
+    - A thunkified function that has called `asyncRun` can call `asyncWait` on itself
 
     Examples:
 
