@@ -187,6 +187,128 @@ class pamda_core(utils):
         path_object.__setitem__(path[-1], default_fn(path_object.get(path[-1],default)))
         return data
 
+    def asyncRun(self, fn):
+        """
+        Function:
+
+        - Runs the supplied function asychronously
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to run asychronously
+            - Note: The supplied `fn` must have an arity of 0
+
+        Notes:
+
+        - To pass inputs to a function in asyncRun, first thunkify the function and pass all arguments before calling `asyncRun` on it
+        - To get the results of an `asyncRun` call `asyncWait`
+        - A thunkified function with arity of 0 can call `asyncRun` in place
+
+        Examples:
+
+        Input:
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            print(f'{name} start')
+            time.sleep(wait)
+            print(f'{name} end')
+
+        async_test = p.asyncRun(test('a',2))
+        sync_test = test('b',1)()
+        ```
+        Output:
+        ```
+        a start
+        b start
+        b end
+        a end
+        ```
+
+
+        Input:
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            time.sleep(wait)
+            return f"{name}: {wait}"
+
+        async_test = p.asyncRun(test('a',2))
+        print(async_test.asyncWait()) #=> a: 2
+        ```
+
+
+        Input:
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            time.sleep(wait)
+            return f"{name}: {wait}"
+
+        async_test = test('a',2).asyncRun()
+        print(async_test.asyncWait()) #=> a: 2
+        ```
+        """
+        if not isinstance(fn, curry_fn):
+            self.exception('`fn` must be a thunk')
+        return fn.asyncRun()
+
+    def asyncWait(self, fn):
+        """
+        Function:
+
+        - Waits for a supplied function (if needed) and returns the results
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method for which to wait
+            - Note: The supplied `fn` must have previously called `asyncRun`
+
+        Notes:
+
+        - A thunkified function that has called `asyncRun` can call `asyncWait` in place
+
+        Examples:
+
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            time.sleep(wait)
+            return f"{name}: {wait}"
+
+        async_test = p.asyncRun(test('a',2))
+        print(p.asyncWait(async_test)) #=> a: 2
+        ```
+
+
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            time.sleep(wait)
+            return f"{name}: {wait}"
+
+        async_test = p.asyncRun(test('a',2))
+        print(async_test.asyncWait()) #=> a: 2
+        ```
+        """
+        if not isinstance(fn, curry_fn):
+            self.exception('`fn` must be a thunk')
+        return fn.asyncWait()
+
     def clamp(self, minimum, maximum, a):
         """
         Function:

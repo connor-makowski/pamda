@@ -125,7 +125,7 @@ class error:
             - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
 
         Optional:
-        
+
         - `depth`:
             - Type: int
             - What: The depth of the nth call below the top of the method stack
@@ -282,7 +282,39 @@ class utils(error):
         p.getMethods(MyClass) #=&gt; [&#39;A&#39;, &#39;B&#39;]
         ```
         &#34;&#34;&#34;
-        return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)]</code></pre>
+        return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)]
+
+    def getForceDict(self, object, key):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns a value from a dictionary given a key and forces that value to be a dictionary
+        - Note: This updates the object in place to force the value from the key to be a dictionary
+
+        Requires:
+
+        - `object`:
+            - Type: dict
+            - What: The object from which to look for a key
+        - `key`:
+            - Type: str
+            - What: The key to look up in the object
+
+        Example:
+
+        ```
+        data = {&#39;a&#39;:{}, &#39;b&#39;:1}
+
+        p.getForceDict(data, &#39;a&#39;) #=&gt; {}
+        p.getForceDict(data, &#39;b&#39;) #=&gt; {}
+
+        # Note that the object has been updated in place
+        data #=&gt; {&#39;a&#39;:{}, &#39;b&#39;:{}}
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(object.get(key), dict):
+            object.__setitem__(key, {})
+        return object.get(key)</code></pre>
 </details>
 </section>
 <section>
@@ -400,7 +432,7 @@ class utils(error):
             - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
 
         Optional:
-        
+
         - `depth`:
             - Type: int
             - What: The depth of the nth call below the top of the method stack
@@ -471,7 +503,7 @@ class utils(error):
         - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
 
     Optional:
-    
+
     - `depth`:
         - Type: int
         - What: The depth of the nth call below the top of the method stack
@@ -798,7 +830,39 @@ class utils(error):
         p.getMethods(MyClass) #=&gt; [&#39;A&#39;, &#39;B&#39;]
         ```
         &#34;&#34;&#34;
-        return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)]</code></pre>
+        return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)]
+
+    def getForceDict(self, object, key):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns a value from a dictionary given a key and forces that value to be a dictionary
+        - Note: This updates the object in place to force the value from the key to be a dictionary
+
+        Requires:
+
+        - `object`:
+            - Type: dict
+            - What: The object from which to look for a key
+        - `key`:
+            - Type: str
+            - What: The key to look up in the object
+
+        Example:
+
+        ```
+        data = {&#39;a&#39;:{}, &#39;b&#39;:1}
+
+        p.getForceDict(data, &#39;a&#39;) #=&gt; {}
+        p.getForceDict(data, &#39;b&#39;) #=&gt; {}
+
+        # Note that the object has been updated in place
+        data #=&gt; {&#39;a&#39;:{}, &#39;b&#39;:{}}
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(object.get(key), dict):
+            object.__setitem__(key, {})
+        return object.get(key)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -810,6 +874,74 @@ class utils(error):
 </ul>
 <h3>Methods</h3>
 <dl>
+<dt id="pamda.utils.utils.getForceDict"><code class="name flex">
+<span>def <span class="ident">getForceDict</span></span>(<span>self, object, key)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Returns a value from a dictionary given a key and forces that value to be a dictionary</li>
+<li>Note: This updates the object in place to force the value from the key to be a dictionary</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>object</code>:<ul>
+<li>Type: dict</li>
+<li>What: The object from which to look for a key</li>
+</ul>
+</li>
+<li><code>key</code>:<ul>
+<li>Type: str</li>
+<li>What: The key to look up in the object</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>data = {'a':{}, 'b':1}
+
+p.getForceDict(data, 'a') #=&gt; {}
+p.getForceDict(data, 'b') #=&gt; {}
+
+# Note that the object has been updated in place
+data #=&gt; {'a':{}, 'b':{}}
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getForceDict(self, object, key):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns a value from a dictionary given a key and forces that value to be a dictionary
+    - Note: This updates the object in place to force the value from the key to be a dictionary
+
+    Requires:
+
+    - `object`:
+        - Type: dict
+        - What: The object from which to look for a key
+    - `key`:
+        - Type: str
+        - What: The key to look up in the object
+
+    Example:
+
+    ```
+    data = {&#39;a&#39;:{}, &#39;b&#39;:1}
+
+    p.getForceDict(data, &#39;a&#39;) #=&gt; {}
+    p.getForceDict(data, &#39;b&#39;) #=&gt; {}
+
+    # Note that the object has been updated in place
+    data #=&gt; {&#39;a&#39;:{}, &#39;b&#39;:{}}
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(object.get(key), dict):
+        object.__setitem__(key, {})
+    return object.get(key)</code></pre>
+</details>
+</dd>
 <dt id="pamda.utils.utils.getMethods"><code class="name flex">
 <span>def <span class="ident">getMethods</span></span>(<span>self, object)</span>
 </code></dt>
@@ -1125,7 +1257,8 @@ p.getMethods(MyClass) #=&gt; ['A', 'B']
 </li>
 <li>
 <h4><code><a title="pamda.utils.utils" href="#pamda.utils.utils">utils</a></code></h4>
-<ul class="">
+<ul class="two-column">
+<li><code><a title="pamda.utils.utils.getForceDict" href="#pamda.utils.utils.getForceDict">getForceDict</a></code></li>
 <li><code><a title="pamda.utils.utils.getMethods" href="#pamda.utils.utils.getMethods">getMethods</a></code></li>
 <li><code><a title="pamda.utils.utils.read_csv" href="#pamda.utils.utils.read_csv">read_csv</a></code></li>
 <li><code><a title="pamda.utils.utils.read_json" href="#pamda.utils.utils.read_json">read_json</a></code></li>

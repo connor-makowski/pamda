@@ -1,4 +1,4 @@
-import types
+import types, threading
 
 class curry_fn:
     def __init__(self, __fn__, *__args__, __flips__=[], __isThunk__=False, **__kwargs__):
@@ -11,6 +11,8 @@ class curry_fn:
         self.__flips__=__flips__
         self.__fnArity__=self.__getFnArity__()
         self.__arity__=self.__getArity__(__args__, __kwargs__)
+        self.__thread__=None
+        self.__thread_results__=None
 
     def __call__(self, *args, **kwargs):
         new_args=self.__args__+args
@@ -22,7 +24,10 @@ class curry_fn:
             if len(self.__flips__)>0:
                 new_args=self.__unflipArgs__(new_args)
             if (not self.__isThunk__) or (len(args)+len(kwargs)==0):
-                return self.__fn__(*new_args, **new_kwargs)
+                results = self.__fn__(*new_args, **new_kwargs)
+                if self.__thread__!=None:
+                    self.__thread_results__=results
+                return results
         return curry_fn(self.__fn__, *new_args, __flips__=self.__flips__, __isThunk__=self.__isThunk__, **new_kwargs)
 
     def __repr__(self):
@@ -57,3 +62,19 @@ class curry_fn:
     def __exception__(self, message, depth=0):
         pre_message=f"({self.__fn__.__module__}.{self.__fn__.__qualname__}_curried): "
         raise Exception(pre_message+message)
+
+    def asyncRun(self, daemon=False):
+        if not self.__isThunk__ and self.__arity__==0:
+            self.__exception__(f"To `asyncRun` a Function, it must be a thunk with arity 0")
+        if self.__thread__ is not None:
+            self.__exception__("`asyncRun` has already been executed on this thunk")
+        self.__thread__=threading.Thread(target=self)
+        self.__thread__.setDaemon(daemon)
+        self.__thread__.start()
+        return self
+
+    def asyncWait(self):
+        if self.__thread__==None:
+            self.__exception__(f"To `asyncWait` a Function, it must be `asyncRun` first")
+        self.__thread__.join()
+        return self.__thread_results__

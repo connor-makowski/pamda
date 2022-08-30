@@ -26,7 +26,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from pamda.utils import utils
+<pre><code class="python">from functools import reduce
+from pamda.utils import utils
 from pamda.curry_fn import curry_fn
 
 class pamda_core(utils):
@@ -163,7 +164,7 @@ class pamda_core(utils):
             - What: The value to appropriate to the end of the path
         - `data`:
             - Type: dict
-            - What: A dictionary to check if the path exists
+            - What: A dictionary in which to associate the given value to the given path
 
         Example:
 
@@ -174,14 +175,8 @@ class pamda_core(utils):
         &#34;&#34;&#34;
         if isinstance(path, str):
             path=[path]
-        if len(path) &gt; 1:
-            if path[0] not in data:
-                data[path[0]] = {}
-            data[path[0]] = self.assocPath(data=data[path[0]], path=path[1:],value=value)
-            return data
-        else:
-            data[path[0]] = value
-            return data
+        reduce(self.getForceDict, path[:-1], data).__setitem__(path[-1],value)
+        return data
 
     def assocPathComplex(self, default, default_fn, path, data):
         &#34;&#34;&#34;
@@ -212,18 +207,135 @@ class pamda_core(utils):
         p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=[&#39;a&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[2,1]}}
         ```
         &#34;&#34;&#34;
-        if len(path) &gt; 1:
-            if path[0] not in data:
-                data[path[0]] = {}
-            data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_fn=default_fn)
-            return data
-        else:
-            if self.getArity(default_fn)!=1:
-                self.exception(&#39;`assocPathComplex` `default_fn` must be an unary (single input) function.&#39;)
-            if path[0] not in data:
-                data[path[0]] = default
-            data[path[0]] = default_fn(data[path[0]])
-            return data
+        if self.getArity(default_fn)!=1:
+            self.exception(&#39;`assocPathComplex` `default_fn` must be an unary (single input) function.&#39;)
+        if isinstance(path, str):
+            path=[path]
+        path_object = reduce(self.getForceDict, path[:-1], data)
+        path_object.__setitem__(path[-1], default_fn(path_object.get(path[-1],default)))
+        return data
+
+    def asyncRun(self, fn):
+        &#34;&#34;&#34;
+        Function:
+
+        - Runs the supplied function asychronously
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to run asychronously
+            - Note: The supplied `fn` must have an arity of 0
+
+        Notes:
+
+        - To pass inputs to a function in asyncRun, first thunkify the function and pass all arguments before calling `asyncRun` on it
+        - To get the results of an `asyncRun` call `asyncWait`
+        - A thunkified function with arity of 0 can call `asyncRun` in place
+
+        Examples:
+
+        Input:
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            print(f&#39;{name} start&#39;)
+            time.sleep(wait)
+            print(f&#39;{name} end&#39;)
+
+        async_test = p.asyncRun(test(&#39;a&#39;,2))
+        sync_test = test(&#39;b&#39;,1)()
+        ```
+        Output:
+        ```
+        a start
+        b start
+        b end
+        a end
+        ```
+
+
+        Input:
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            time.sleep(wait)
+            return f&#34;{name}: {wait}&#34;
+
+        async_test = p.asyncRun(test(&#39;a&#39;,2))
+        print(async_test.asyncWait()) #=&gt; a: 2
+        ```
+
+
+        Input:
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            time.sleep(wait)
+            return f&#34;{name}: {wait}&#34;
+
+        async_test = test(&#39;a&#39;,2).asyncRun()
+        print(async_test.asyncWait()) #=&gt; a: 2
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(fn, curry_fn):
+            self.exception(&#39;`fn` must be a thunk&#39;)
+        return fn.asyncRun()
+
+    def asyncWait(self, fn):
+        &#34;&#34;&#34;
+        Function:
+
+        - Waits for a supplied function (if needed) and returns the results
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method for which to wait
+            - Note: The supplied `fn` must have previously called `asyncRun`
+
+        Notes:
+
+        - A thunkified function that has called `asyncRun` can call `asyncWait` in place
+
+        Examples:
+
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            time.sleep(wait)
+            return f&#34;{name}: {wait}&#34;
+
+        async_test = p.asyncRun(test(&#39;a&#39;,2))
+        print(p.asyncWait(async_test)) #=&gt; a: 2
+        ```
+
+
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            time.sleep(wait)
+            return f&#34;{name}: {wait}&#34;
+
+        async_test = p.asyncRun(test(&#39;a&#39;,2))
+        print(async_test.asyncWait()) #=&gt; a: 2
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(fn, curry_fn):
+            self.exception(&#39;`fn` must be a thunk&#39;)
+        return fn.asyncWait()
 
     def clamp(self, minimum, maximum, a):
         &#34;&#34;&#34;
@@ -378,12 +490,11 @@ class pamda_core(utils):
         &#34;&#34;&#34;
         if isinstance(path, str):
             path=[path]
-        if not self.hasPath(data, path):
+        if not self.hasPath(path=path, data=data):
             self.warn(message=&#34;Path does not exist&#34;)
-            return data
-        if len(path)==0:
-            return {}
-        return self.assocPath(data=data, path=path[:-1], value={key:value for key, value in self.path(data, path=path[:-1]).items() if key!=path[-1]})
+        else:
+            reduce(self.getForceDict, path[:-1], data).pop(path[-1])
+        return data
 
     def flatten(self, data):
         &#34;&#34;&#34;
@@ -675,12 +786,7 @@ class pamda_core(utils):
         &#34;&#34;&#34;
         if isinstance(path, str):
             path=[path]
-        if len(path) &gt; 0:
-            if path[0] in data:
-                return self.hasPath(data=data[path[0]], path=path[1:])
-            else:
-                return False
-        return True
+        return path[-1] in reduce(lambda x,y: x.get(y,{}), path[:-1], data)
 
     def hardRound(self, decimal_places, a):
         &#34;&#34;&#34;
@@ -1058,7 +1164,7 @@ class pamda_core(utils):
         &#34;&#34;&#34;
         Function:
 
-        - Returns the value of a path within a nested dictionary
+        - Returns the value of a path within a nested dictionary or None if the path does not exist
 
         Requires:
 
@@ -1077,11 +1183,7 @@ class pamda_core(utils):
         p.path(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; 1
         ```
         &#34;&#34;&#34;
-        if isinstance(path, str):
-            path=[path]
-        if len(path) &gt; 0:
-            return self.path(data=data[path[0]], path=path[1:])
-        return data
+        return self.pathOr(None, path, data)
 
     def pathOr(self, default, path, data):
         &#34;&#34;&#34;
@@ -1111,12 +1213,7 @@ class pamda_core(utils):
         &#34;&#34;&#34;
         if isinstance(path, str):
             path=[path]
-        if len(path) &gt; 0:
-            if path[0] in data:
-                return self.path(data=data[path[0]], path=path[1:])
-            else:
-                return default
-        return data
+        return reduce(lambda x, y: x.get(y, {}), path[:-1], data).get(path[-1], default)
 
     def pipe(self, fns, data):
         &#34;&#34;&#34;
@@ -1687,7 +1784,7 @@ class pamda_core(utils):
             - What: The value to appropriate to the end of the path
         - `data`:
             - Type: dict
-            - What: A dictionary to check if the path exists
+            - What: A dictionary in which to associate the given value to the given path
 
         Example:
 
@@ -1698,14 +1795,8 @@ class pamda_core(utils):
         &#34;&#34;&#34;
         if isinstance(path, str):
             path=[path]
-        if len(path) &gt; 1:
-            if path[0] not in data:
-                data[path[0]] = {}
-            data[path[0]] = self.assocPath(data=data[path[0]], path=path[1:],value=value)
-            return data
-        else:
-            data[path[0]] = value
-            return data
+        reduce(self.getForceDict, path[:-1], data).__setitem__(path[-1],value)
+        return data
 
     def assocPathComplex(self, default, default_fn, path, data):
         &#34;&#34;&#34;
@@ -1736,18 +1827,135 @@ class pamda_core(utils):
         p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=[&#39;a&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[2,1]}}
         ```
         &#34;&#34;&#34;
-        if len(path) &gt; 1:
-            if path[0] not in data:
-                data[path[0]] = {}
-            data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_fn=default_fn)
-            return data
-        else:
-            if self.getArity(default_fn)!=1:
-                self.exception(&#39;`assocPathComplex` `default_fn` must be an unary (single input) function.&#39;)
-            if path[0] not in data:
-                data[path[0]] = default
-            data[path[0]] = default_fn(data[path[0]])
-            return data
+        if self.getArity(default_fn)!=1:
+            self.exception(&#39;`assocPathComplex` `default_fn` must be an unary (single input) function.&#39;)
+        if isinstance(path, str):
+            path=[path]
+        path_object = reduce(self.getForceDict, path[:-1], data)
+        path_object.__setitem__(path[-1], default_fn(path_object.get(path[-1],default)))
+        return data
+
+    def asyncRun(self, fn):
+        &#34;&#34;&#34;
+        Function:
+
+        - Runs the supplied function asychronously
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to run asychronously
+            - Note: The supplied `fn` must have an arity of 0
+
+        Notes:
+
+        - To pass inputs to a function in asyncRun, first thunkify the function and pass all arguments before calling `asyncRun` on it
+        - To get the results of an `asyncRun` call `asyncWait`
+        - A thunkified function with arity of 0 can call `asyncRun` in place
+
+        Examples:
+
+        Input:
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            print(f&#39;{name} start&#39;)
+            time.sleep(wait)
+            print(f&#39;{name} end&#39;)
+
+        async_test = p.asyncRun(test(&#39;a&#39;,2))
+        sync_test = test(&#39;b&#39;,1)()
+        ```
+        Output:
+        ```
+        a start
+        b start
+        b end
+        a end
+        ```
+
+
+        Input:
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            time.sleep(wait)
+            return f&#34;{name}: {wait}&#34;
+
+        async_test = p.asyncRun(test(&#39;a&#39;,2))
+        print(async_test.asyncWait()) #=&gt; a: 2
+        ```
+
+
+        Input:
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            time.sleep(wait)
+            return f&#34;{name}: {wait}&#34;
+
+        async_test = test(&#39;a&#39;,2).asyncRun()
+        print(async_test.asyncWait()) #=&gt; a: 2
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(fn, curry_fn):
+            self.exception(&#39;`fn` must be a thunk&#39;)
+        return fn.asyncRun()
+
+    def asyncWait(self, fn):
+        &#34;&#34;&#34;
+        Function:
+
+        - Waits for a supplied function (if needed) and returns the results
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method for which to wait
+            - Note: The supplied `fn` must have previously called `asyncRun`
+
+        Notes:
+
+        - A thunkified function that has called `asyncRun` can call `asyncWait` in place
+
+        Examples:
+
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            time.sleep(wait)
+            return f&#34;{name}: {wait}&#34;
+
+        async_test = p.asyncRun(test(&#39;a&#39;,2))
+        print(p.asyncWait(async_test)) #=&gt; a: 2
+        ```
+
+
+        ```
+        import time
+
+        @p.thunkify
+        def test(name, wait):
+            time.sleep(wait)
+            return f&#34;{name}: {wait}&#34;
+
+        async_test = p.asyncRun(test(&#39;a&#39;,2))
+        print(async_test.asyncWait()) #=&gt; a: 2
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(fn, curry_fn):
+            self.exception(&#39;`fn` must be a thunk&#39;)
+        return fn.asyncWait()
 
     def clamp(self, minimum, maximum, a):
         &#34;&#34;&#34;
@@ -1902,12 +2110,11 @@ class pamda_core(utils):
         &#34;&#34;&#34;
         if isinstance(path, str):
             path=[path]
-        if not self.hasPath(data, path):
+        if not self.hasPath(path=path, data=data):
             self.warn(message=&#34;Path does not exist&#34;)
-            return data
-        if len(path)==0:
-            return {}
-        return self.assocPath(data=data, path=path[:-1], value={key:value for key, value in self.path(data, path=path[:-1]).items() if key!=path[-1]})
+        else:
+            reduce(self.getForceDict, path[:-1], data).pop(path[-1])
+        return data
 
     def flatten(self, data):
         &#34;&#34;&#34;
@@ -2199,12 +2406,7 @@ class pamda_core(utils):
         &#34;&#34;&#34;
         if isinstance(path, str):
             path=[path]
-        if len(path) &gt; 0:
-            if path[0] in data:
-                return self.hasPath(data=data[path[0]], path=path[1:])
-            else:
-                return False
-        return True
+        return path[-1] in reduce(lambda x,y: x.get(y,{}), path[:-1], data)
 
     def hardRound(self, decimal_places, a):
         &#34;&#34;&#34;
@@ -2582,7 +2784,7 @@ class pamda_core(utils):
         &#34;&#34;&#34;
         Function:
 
-        - Returns the value of a path within a nested dictionary
+        - Returns the value of a path within a nested dictionary or None if the path does not exist
 
         Requires:
 
@@ -2601,11 +2803,7 @@ class pamda_core(utils):
         p.path(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; 1
         ```
         &#34;&#34;&#34;
-        if isinstance(path, str):
-            path=[path]
-        if len(path) &gt; 0:
-            return self.path(data=data[path[0]], path=path[1:])
-        return data
+        return self.pathOr(None, path, data)
 
     def pathOr(self, default, path, data):
         &#34;&#34;&#34;
@@ -2635,12 +2833,7 @@ class pamda_core(utils):
         &#34;&#34;&#34;
         if isinstance(path, str):
             path=[path]
-        if len(path) &gt; 0:
-            if path[0] in data:
-                return self.path(data=data[path[0]], path=path[1:])
-            else:
-                return default
-        return data
+        return reduce(lambda x, y: x.get(y, {}), path[:-1], data).get(path[-1], default)
 
     def pipe(self, fns, data):
         &#34;&#34;&#34;
@@ -3317,7 +3510,7 @@ p.adjust(
 </li>
 <li><code>data</code>:<ul>
 <li>Type: dict</li>
-<li>What: A dictionary to check if the path exists</li>
+<li>What: A dictionary in which to associate the given value to the given path</li>
 </ul>
 </li>
 </ul>
@@ -3346,7 +3539,7 @@ p.assocPath(path=['a','c'], value=3, data=data) #=&gt; {'a':{'b':1, 'c':3}}
         - What: The value to appropriate to the end of the path
     - `data`:
         - Type: dict
-        - What: A dictionary to check if the path exists
+        - What: A dictionary in which to associate the given value to the given path
 
     Example:
 
@@ -3357,14 +3550,8 @@ p.assocPath(path=['a','c'], value=3, data=data) #=&gt; {'a':{'b':1, 'c':3}}
     &#34;&#34;&#34;
     if isinstance(path, str):
         path=[path]
-    if len(path) &gt; 1:
-        if path[0] not in data:
-            data[path[0]] = {}
-        data[path[0]] = self.assocPath(data=data[path[0]], path=path[1:],value=value)
-        return data
-    else:
-        data[path[0]] = value
-        return data</code></pre>
+    reduce(self.getForceDict, path[:-1], data).__setitem__(path[-1],value)
+    return data</code></pre>
 </details>
 </dd>
 <dt id="pamda.pamda_core.pamda_core.assocPathComplex"><code class="name flex">
@@ -3436,18 +3623,251 @@ p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=
     p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=[&#39;a&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[2,1]}}
     ```
     &#34;&#34;&#34;
-    if len(path) &gt; 1:
-        if path[0] not in data:
-            data[path[0]] = {}
-        data[path[0]] = self.assocPathComplex(data=data[path[0]], path=path[1:], default=default, default_fn=default_fn)
-        return data
-    else:
-        if self.getArity(default_fn)!=1:
-            self.exception(&#39;`assocPathComplex` `default_fn` must be an unary (single input) function.&#39;)
-        if path[0] not in data:
-            data[path[0]] = default
-        data[path[0]] = default_fn(data[path[0]])
-        return data</code></pre>
+    if self.getArity(default_fn)!=1:
+        self.exception(&#39;`assocPathComplex` `default_fn` must be an unary (single input) function.&#39;)
+    if isinstance(path, str):
+        path=[path]
+    path_object = reduce(self.getForceDict, path[:-1], data)
+    path_object.__setitem__(path[-1], default_fn(path_object.get(path[-1],default)))
+    return data</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_core.pamda_core.asyncRun"><code class="name flex">
+<span>def <span class="ident">asyncRun</span></span>(<span>self, fn)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Runs the supplied function asychronously</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>fn</code>:<ul>
+<li>Type: function | method</li>
+<li>What: The function or method to run asychronously</li>
+<li>Note: The supplied <code>fn</code> must have an arity of 0</li>
+</ul>
+</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>To pass inputs to a function in asyncRun, first thunkify the function and pass all arguments before calling <code>asyncRun</code> on it</li>
+<li>To get the results of an <code>asyncRun</code> call <code>asyncWait</code></li>
+<li>A thunkified function with arity of 0 can call <code>asyncRun</code> in place</li>
+</ul>
+<p>Examples:</p>
+<p>Input:</p>
+<pre><code>import time
+
+@p.thunkify
+def test(name, wait):
+    print(f'{name} start')
+    time.sleep(wait)
+    print(f'{name} end')
+
+async_test = p.asyncRun(test('a',2))
+sync_test = test('b',1)()
+</code></pre>
+<p>Output:</p>
+<pre><code>a start
+b start
+b end
+a end
+</code></pre>
+<p>Input:</p>
+<pre><code>import time
+
+@p.thunkify
+def test(name, wait):
+    time.sleep(wait)
+    return f&quot;{name}: {wait}&quot;
+
+async_test = p.asyncRun(test('a',2))
+print(async_test.asyncWait()) #=&gt; a: 2
+</code></pre>
+<p>Input:</p>
+<pre><code>import time
+
+@p.thunkify
+def test(name, wait):
+    time.sleep(wait)
+    return f&quot;{name}: {wait}&quot;
+
+async_test = test('a',2).asyncRun()
+print(async_test.asyncWait()) #=&gt; a: 2
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def asyncRun(self, fn):
+    &#34;&#34;&#34;
+    Function:
+
+    - Runs the supplied function asychronously
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to run asychronously
+        - Note: The supplied `fn` must have an arity of 0
+
+    Notes:
+
+    - To pass inputs to a function in asyncRun, first thunkify the function and pass all arguments before calling `asyncRun` on it
+    - To get the results of an `asyncRun` call `asyncWait`
+    - A thunkified function with arity of 0 can call `asyncRun` in place
+
+    Examples:
+
+    Input:
+    ```
+    import time
+
+    @p.thunkify
+    def test(name, wait):
+        print(f&#39;{name} start&#39;)
+        time.sleep(wait)
+        print(f&#39;{name} end&#39;)
+
+    async_test = p.asyncRun(test(&#39;a&#39;,2))
+    sync_test = test(&#39;b&#39;,1)()
+    ```
+    Output:
+    ```
+    a start
+    b start
+    b end
+    a end
+    ```
+
+
+    Input:
+    ```
+    import time
+
+    @p.thunkify
+    def test(name, wait):
+        time.sleep(wait)
+        return f&#34;{name}: {wait}&#34;
+
+    async_test = p.asyncRun(test(&#39;a&#39;,2))
+    print(async_test.asyncWait()) #=&gt; a: 2
+    ```
+
+
+    Input:
+    ```
+    import time
+
+    @p.thunkify
+    def test(name, wait):
+        time.sleep(wait)
+        return f&#34;{name}: {wait}&#34;
+
+    async_test = test(&#39;a&#39;,2).asyncRun()
+    print(async_test.asyncWait()) #=&gt; a: 2
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(fn, curry_fn):
+        self.exception(&#39;`fn` must be a thunk&#39;)
+    return fn.asyncRun()</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_core.pamda_core.asyncWait"><code class="name flex">
+<span>def <span class="ident">asyncWait</span></span>(<span>self, fn)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Waits for a supplied function (if needed) and returns the results</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>fn</code>:<ul>
+<li>Type: function | method</li>
+<li>What: The function or method for which to wait</li>
+<li>Note: The supplied <code>fn</code> must have previously called <code>asyncRun</code></li>
+</ul>
+</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>A thunkified function that has called <code>asyncRun</code> can call <code>asyncWait</code> in place</li>
+</ul>
+<p>Examples:</p>
+<pre><code>import time
+
+@p.thunkify
+def test(name, wait):
+    time.sleep(wait)
+    return f&quot;{name}: {wait}&quot;
+
+async_test = p.asyncRun(test('a',2))
+print(p.asyncWait(async_test)) #=&gt; a: 2
+</code></pre>
+<pre><code>import time
+
+@p.thunkify
+def test(name, wait):
+    time.sleep(wait)
+    return f&quot;{name}: {wait}&quot;
+
+async_test = p.asyncRun(test('a',2))
+print(async_test.asyncWait()) #=&gt; a: 2
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def asyncWait(self, fn):
+    &#34;&#34;&#34;
+    Function:
+
+    - Waits for a supplied function (if needed) and returns the results
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method for which to wait
+        - Note: The supplied `fn` must have previously called `asyncRun`
+
+    Notes:
+
+    - A thunkified function that has called `asyncRun` can call `asyncWait` in place
+
+    Examples:
+
+    ```
+    import time
+
+    @p.thunkify
+    def test(name, wait):
+        time.sleep(wait)
+        return f&#34;{name}: {wait}&#34;
+
+    async_test = p.asyncRun(test(&#39;a&#39;,2))
+    print(p.asyncWait(async_test)) #=&gt; a: 2
+    ```
+
+
+    ```
+    import time
+
+    @p.thunkify
+    def test(name, wait):
+        time.sleep(wait)
+        return f&#34;{name}: {wait}&#34;
+
+    async_test = p.asyncRun(test(&#39;a&#39;,2))
+    print(async_test.asyncWait()) #=&gt; a: 2
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(fn, curry_fn):
+        self.exception(&#39;`fn` must be a thunk&#39;)
+    return fn.asyncWait()</code></pre>
 </details>
 </dd>
 <dt id="pamda.pamda_core.pamda_core.clamp"><code class="name flex">
@@ -3774,12 +4194,11 @@ p.dissocPath(path=['a','b','c'], data=data) #=&gt; {'a':{'b':{'d':1}}}
     &#34;&#34;&#34;
     if isinstance(path, str):
         path=[path]
-    if not self.hasPath(data, path):
+    if not self.hasPath(path=path, data=data):
         self.warn(message=&#34;Path does not exist&#34;)
-        return data
-    if len(path)==0:
-        return {}
-    return self.assocPath(data=data, path=path[:-1], value={key:value for key, value in self.path(data, path=path[:-1]).items() if key!=path[-1]})</code></pre>
+    else:
+        reduce(self.getForceDict, path[:-1], data).pop(path[-1])
+    return data</code></pre>
 </details>
 </dd>
 <dt id="pamda.pamda_core.pamda_core.flatten"><code class="name flex">
@@ -4422,12 +4841,7 @@ p.hasPath(path=['a','d'], data=data) #=&gt; False
     &#34;&#34;&#34;
     if isinstance(path, str):
         path=[path]
-    if len(path) &gt; 0:
-        if path[0] in data:
-            return self.hasPath(data=data[path[0]], path=path[1:])
-        else:
-            return False
-    return True</code></pre>
+    return path[-1] in reduce(lambda x,y: x.get(y,{}), path[:-1], data)</code></pre>
 </details>
 </dd>
 <dt id="pamda.pamda_core.pamda_core.head"><code class="name flex">
@@ -5091,7 +5505,7 @@ p.nest(
 <dd>
 <div class="desc"><p>Function:</p>
 <ul>
-<li>Returns the value of a path within a nested dictionary</li>
+<li>Returns the value of a path within a nested dictionary or None if the path does not exist</li>
 </ul>
 <p>Requires:</p>
 <ul>
@@ -5119,7 +5533,7 @@ p.path(path=['a','b'], data=data) #=&gt; 1
     &#34;&#34;&#34;
     Function:
 
-    - Returns the value of a path within a nested dictionary
+    - Returns the value of a path within a nested dictionary or None if the path does not exist
 
     Requires:
 
@@ -5138,11 +5552,7 @@ p.path(path=['a','b'], data=data) #=&gt; 1
     p.path(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; 1
     ```
     &#34;&#34;&#34;
-    if isinstance(path, str):
-        path=[path]
-    if len(path) &gt; 0:
-        return self.path(data=data[path[0]], path=path[1:])
-    return data</code></pre>
+    return self.pathOr(None, path, data)</code></pre>
 </details>
 </dd>
 <dt id="pamda.pamda_core.pamda_core.pathOr"><code class="name flex">
@@ -5208,12 +5618,7 @@ p.path(default=2, path=['a','c'], data=data) #=&gt; 2
     &#34;&#34;&#34;
     if isinstance(path, str):
         path=[path]
-    if len(path) &gt; 0:
-        if path[0] in data:
-            return self.path(data=data[path[0]], path=path[1:])
-        else:
-            return default
-    return data</code></pre>
+    return reduce(lambda x, y: x.get(y, {}), path[:-1], data).get(path[-1], default)</code></pre>
 </details>
 </dd>
 <dt id="pamda.pamda_core.pamda_core.pipe"><code class="name flex">
@@ -6063,6 +6468,7 @@ p.zipObj(a=a, b=b) #=&gt; {'a':1, 'b':2}
 <li><code><b><a title="pamda.utils.utils" href="utils.html#pamda.utils.utils">utils</a></b></code>:
 <ul class="hlist">
 <li><code><a title="pamda.utils.utils.exception" href="utils.html#pamda.utils.error.exception">exception</a></code></li>
+<li><code><a title="pamda.utils.utils.getForceDict" href="utils.html#pamda.utils.utils.getForceDict">getForceDict</a></code></li>
 <li><code><a title="pamda.utils.utils.getMethods" href="utils.html#pamda.utils.utils.getMethods">getMethods</a></code></li>
 <li><code><a title="pamda.utils.utils.read_csv" href="utils.html#pamda.utils.utils.read_csv">read_csv</a></code></li>
 <li><code><a title="pamda.utils.utils.read_json" href="utils.html#pamda.utils.utils.read_json">read_json</a></code></li>
@@ -6098,6 +6504,8 @@ p.zipObj(a=a, b=b) #=&gt; {'a':1, 'b':2}
 <li><code><a title="pamda.pamda_core.pamda_core.adjust" href="#pamda.pamda_core.pamda_core.adjust">adjust</a></code></li>
 <li><code><a title="pamda.pamda_core.pamda_core.assocPath" href="#pamda.pamda_core.pamda_core.assocPath">assocPath</a></code></li>
 <li><code><a title="pamda.pamda_core.pamda_core.assocPathComplex" href="#pamda.pamda_core.pamda_core.assocPathComplex">assocPathComplex</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.asyncRun" href="#pamda.pamda_core.pamda_core.asyncRun">asyncRun</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.asyncWait" href="#pamda.pamda_core.pamda_core.asyncWait">asyncWait</a></code></li>
 <li><code><a title="pamda.pamda_core.pamda_core.clamp" href="#pamda.pamda_core.pamda_core.clamp">clamp</a></code></li>
 <li><code><a title="pamda.pamda_core.pamda_core.curry" href="#pamda.pamda_core.pamda_core.curry">curry</a></code></li>
 <li><code><a title="pamda.pamda_core.pamda_core.dec" href="#pamda.pamda_core.pamda_core.dec">dec</a></code></li>
