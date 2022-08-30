@@ -28,9 +28,18 @@
 </summary>
 <pre><code class="python">from pamda.pamda_core import pamda_core
 
+
 class pamda_core_curried:
     def __init__(self, pamda, *args, **kwargs):
-        no_curry=[&#39;read_csv&#39;,&#39;read_json&#39;,&#39;write_csv&#39;,&#39;write_json&#39;, &#39;warn&#39;, &#39;vprint&#39;, &#39;exception&#39;]
+        no_curry = [
+            &#34;read_csv&#34;,
+            &#34;read_json&#34;,
+            &#34;write_csv&#34;,
+            &#34;write_json&#34;,
+            &#34;warn&#34;,
+            &#34;vprint&#34;,
+            &#34;exception&#34;,
+        ]
         for method in pamda.getMethods(pamda):
             if method in no_curry:
                 setattr(self, method, getattr(pamda, method))
@@ -38,8 +47,8 @@ class pamda_core_curried:
                 setattr(self, method, pamda.curry(getattr(pamda, method)))
 
 
-pamda_uncurried=pamda_core()
-pamda=pamda_core_curried(pamda=pamda_uncurried)</code></pre>
+pamda_uncurried = pamda_core()
+pamda = pamda_core_curried(pamda=pamda_uncurried)</code></pre>
 </details>
 </section>
 <section>
@@ -63,7 +72,15 @@ pamda=pamda_core_curried(pamda=pamda_uncurried)</code></pre>
 </summary>
 <pre><code class="python">class pamda_core_curried:
     def __init__(self, pamda, *args, **kwargs):
-        no_curry=[&#39;read_csv&#39;,&#39;read_json&#39;,&#39;write_csv&#39;,&#39;write_json&#39;, &#39;warn&#39;, &#39;vprint&#39;, &#39;exception&#39;]
+        no_curry = [
+            &#34;read_csv&#34;,
+            &#34;read_json&#34;,
+            &#34;write_csv&#34;,
+            &#34;write_json&#34;,
+            &#34;warn&#34;,
+            &#34;vprint&#34;,
+            &#34;exception&#34;,
+        ]
         for method in pamda.getMethods(pamda):
             if method in no_curry:
                 setattr(self, method, getattr(pamda, method))

@@ -1,5 +1,6 @@
 import sys, json, csv
 
+
 class error:
     def warn(self, message, depth=0):
         """
@@ -28,18 +29,20 @@ class error:
         - If `self.show_warnings=False`, supresses all warnings
 
         """
-        if self.__dict__.get('show_warnings',True):
-            kwargs={
-                'class_name':self.__class__.__name__,
-                'method_name':sys._getframe(depth).f_back.f_code.co_name
+        if self.__dict__.get("show_warnings", True):
+            kwargs = {
+                "class_name": self.__class__.__name__,
+                "method_name": sys._getframe(depth).f_back.f_code.co_name,
             }
-            pre_message="(Warning for `{class_name}.{method_name}`): ".format(**kwargs)
+            pre_message = "(Warning for `{class_name}.{method_name}`): ".format(
+                **kwargs
+            )
             # Attempt to format in kwargs where possible
             try:
-                message=pre_message+message.format(**kwargs)
+                message = pre_message + message.format(**kwargs)
             except:
-                message=pre_message+message
-            if self.__dict__.get('show_warning_stack',False):
+                message = pre_message + message
+            if self.__dict__.get("show_warning_stack", False):
                 traceback.print_stack(limit=10)
             print(message)
 
@@ -71,16 +74,16 @@ class error:
 
         """
         if self.verbose or force:
-            kwargs={
-                'class_name':self.__class__.__name__,
-                'method_name':sys._getframe(depth).f_back.f_code.co_name
+            kwargs = {
+                "class_name": self.__class__.__name__,
+                "method_name": sys._getframe(depth).f_back.f_code.co_name,
             }
-            pre_message="(`{class_name}.{method_name}`): ".format(**kwargs)
+            pre_message = "(`{class_name}.{method_name}`): ".format(**kwargs)
             # Attempt to format in kwargs where possible
             try:
-                message=pre_message+message.format(**kwargs)
+                message = pre_message + message.format(**kwargs)
             except:
-                message=pre_message+message
+                message = pre_message + message
             print(message)
 
     def exception(self, message, depth=0):
@@ -97,7 +100,7 @@ class error:
             - Note: Messages with `{{class_name}}` and `{{method_name}}` in them are formatted appropriately
 
         Optional:
-        
+
         - `depth`:
             - Type: int
             - What: The depth of the nth call below the top of the method stack
@@ -105,17 +108,20 @@ class error:
             - Default: 0
 
         """
-        kwargs={
-            'class_name':self.__class__.__name__,
-            'method_name':sys._getframe(depth).f_back.f_code.co_name
+        kwargs = {
+            "class_name": self.__class__.__name__,
+            "method_name": sys._getframe(depth).f_back.f_code.co_name,
         }
-        pre_message="(Exception for `{class_name}.{method_name}`): ".format(**kwargs)
+        pre_message = "(Exception for `{class_name}.{method_name}`): ".format(
+            **kwargs
+        )
         # Attempt to format in kwargs where possible
         try:
-            message=pre_message+message.format(**kwargs)
+            message = pre_message + message.format(**kwargs)
         except:
-            message=pre_message+message
+            message = pre_message + message
         raise Exception(message)
+
 
 class utils(error):
     ######################
@@ -153,7 +159,9 @@ class utils(error):
             if has_header and return_dict:
                 return [dict(zip(headers, i)) for i in file_data]
             elif not has_header and return_dict:
-                self.exception(message="If `return_dict` is True, `has_header` must also be True.")
+                self.exception(
+                    message="If `return_dict` is True, `has_header` must also be True."
+                )
             else:
                 return [i for i in file_data]
 
@@ -172,18 +180,20 @@ class utils(error):
             - Type: list of lists | list of dicts
             - What: The data to write
         """
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             if isinstance(data[0], dict):
-                writer=csv.DictWriter(f, fieldnames=data[0].keys())
+                writer = csv.DictWriter(f, fieldnames=data[0].keys())
                 writer.writeheader()
                 for row in data:
                     writer.writerow(row)
             elif isinstance(data[0], list):
-                writer=csv.writer(f)
+                writer = csv.writer(f)
                 for row in data:
                     writer.writerow(row)
             else:
-                self.exception("write_csv takes in list of lists or list of dicts only.")
+                self.exception(
+                    "write_csv takes in list of lists or list of dicts only."
+                )
 
     def read_json(self, filename):
         """
@@ -197,12 +207,12 @@ class utils(error):
             - What: The filepath of the json to read
         """
         const_map = {
-            '-Infinity': float('-Infinity'),
-            'Infinity': float('Infinity'),
-            'NaN': None,
+            "-Infinity": float("-Infinity"),
+            "Infinity": float("Infinity"),
+            "NaN": None,
         }
         with open(filename) as f:
-            return json.load(f, parse_constant=lambda x:const_map[x])
+            return json.load(f, parse_constant=lambda x: const_map[x])
 
     def write_json(self, filename, data, pretty=False):
         """
@@ -219,7 +229,7 @@ class utils(error):
             - Type: A json serializable python object
             - What: The data to write
         """
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             if pretty:
                 json.dump(data, f, indent=4)
             else:
@@ -254,4 +264,40 @@ class utils(error):
         p.getMethods(MyClass) #=> ['A', 'B']
         ```
         """
-        return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith("__")]
+        return [
+            fn
+            for fn in dir(object)
+            if callable(getattr(object, fn)) and not fn.startswith("__")
+        ]
+
+    def getForceDict(self, object, key):
+        """
+        Function:
+
+        - Returns a value from a dictionary given a key and forces that value to be a dictionary
+        - Note: This updates the object in place to force the value from the key to be a dictionary
+
+        Requires:
+
+        - `object`:
+            - Type: dict
+            - What: The object from which to look for a key
+        - `key`:
+            - Type: str
+            - What: The key to look up in the object
+
+        Example:
+
+        ```
+        data = {'a':{}, 'b':1}
+
+        p.getForceDict(data, 'a') #=> {}
+        p.getForceDict(data, 'b') #=> {}
+
+        # Note that the object has been updated in place
+        data #=> {'a':{}, 'b':{}}
+        ```
+        """
+        if not isinstance(object.get(key), dict):
+            object.__setitem__(key, {})
+        return object.get(key)
