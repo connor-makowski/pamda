@@ -28,6 +28,7 @@
 </summary>
 <pre><code class="python">import sys, json, csv
 
+
 class error:
     def warn(self, message, depth=0):
         &#34;&#34;&#34;
@@ -56,18 +57,20 @@ class error:
         - If `self.show_warnings=False`, supresses all warnings
 
         &#34;&#34;&#34;
-        if self.__dict__.get(&#39;show_warnings&#39;,True):
-            kwargs={
-                &#39;class_name&#39;:self.__class__.__name__,
-                &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+        if self.__dict__.get(&#34;show_warnings&#34;, True):
+            kwargs = {
+                &#34;class_name&#34;: self.__class__.__name__,
+                &#34;method_name&#34;: sys._getframe(depth).f_back.f_code.co_name,
             }
-            pre_message=&#34;(Warning for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+            pre_message = &#34;(Warning for `{class_name}.{method_name}`): &#34;.format(
+                **kwargs
+            )
             # Attempt to format in kwargs where possible
             try:
-                message=pre_message+message.format(**kwargs)
+                message = pre_message + message.format(**kwargs)
             except:
-                message=pre_message+message
-            if self.__dict__.get(&#39;show_warning_stack&#39;,False):
+                message = pre_message + message
+            if self.__dict__.get(&#34;show_warning_stack&#34;, False):
                 traceback.print_stack(limit=10)
             print(message)
 
@@ -99,16 +102,16 @@ class error:
 
         &#34;&#34;&#34;
         if self.verbose or force:
-            kwargs={
-                &#39;class_name&#39;:self.__class__.__name__,
-                &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+            kwargs = {
+                &#34;class_name&#34;: self.__class__.__name__,
+                &#34;method_name&#34;: sys._getframe(depth).f_back.f_code.co_name,
             }
-            pre_message=&#34;(`{class_name}.{method_name}`): &#34;.format(**kwargs)
+            pre_message = &#34;(`{class_name}.{method_name}`): &#34;.format(**kwargs)
             # Attempt to format in kwargs where possible
             try:
-                message=pre_message+message.format(**kwargs)
+                message = pre_message + message.format(**kwargs)
             except:
-                message=pre_message+message
+                message = pre_message + message
             print(message)
 
     def exception(self, message, depth=0):
@@ -133,17 +136,20 @@ class error:
             - Default: 0
 
         &#34;&#34;&#34;
-        kwargs={
-            &#39;class_name&#39;:self.__class__.__name__,
-            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+        kwargs = {
+            &#34;class_name&#34;: self.__class__.__name__,
+            &#34;method_name&#34;: sys._getframe(depth).f_back.f_code.co_name,
         }
-        pre_message=&#34;(Exception for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+        pre_message = &#34;(Exception for `{class_name}.{method_name}`): &#34;.format(
+            **kwargs
+        )
         # Attempt to format in kwargs where possible
         try:
-            message=pre_message+message.format(**kwargs)
+            message = pre_message + message.format(**kwargs)
         except:
-            message=pre_message+message
+            message = pre_message + message
         raise Exception(message)
+
 
 class utils(error):
     ######################
@@ -181,7 +187,9 @@ class utils(error):
             if has_header and return_dict:
                 return [dict(zip(headers, i)) for i in file_data]
             elif not has_header and return_dict:
-                self.exception(message=&#34;If `return_dict` is True, `has_header` must also be True.&#34;)
+                self.exception(
+                    message=&#34;If `return_dict` is True, `has_header` must also be True.&#34;
+                )
             else:
                 return [i for i in file_data]
 
@@ -200,18 +208,20 @@ class utils(error):
             - Type: list of lists | list of dicts
             - What: The data to write
         &#34;&#34;&#34;
-        with open(filename, &#39;w&#39;) as f:
+        with open(filename, &#34;w&#34;) as f:
             if isinstance(data[0], dict):
-                writer=csv.DictWriter(f, fieldnames=data[0].keys())
+                writer = csv.DictWriter(f, fieldnames=data[0].keys())
                 writer.writeheader()
                 for row in data:
                     writer.writerow(row)
             elif isinstance(data[0], list):
-                writer=csv.writer(f)
+                writer = csv.writer(f)
                 for row in data:
                     writer.writerow(row)
             else:
-                self.exception(&#34;write_csv takes in list of lists or list of dicts only.&#34;)
+                self.exception(
+                    &#34;write_csv takes in list of lists or list of dicts only.&#34;
+                )
 
     def read_json(self, filename):
         &#34;&#34;&#34;
@@ -225,12 +235,12 @@ class utils(error):
             - What: The filepath of the json to read
         &#34;&#34;&#34;
         const_map = {
-            &#39;-Infinity&#39;: float(&#39;-Infinity&#39;),
-            &#39;Infinity&#39;: float(&#39;Infinity&#39;),
-            &#39;NaN&#39;: None,
+            &#34;-Infinity&#34;: float(&#34;-Infinity&#34;),
+            &#34;Infinity&#34;: float(&#34;Infinity&#34;),
+            &#34;NaN&#34;: None,
         }
         with open(filename) as f:
-            return json.load(f, parse_constant=lambda x:const_map[x])
+            return json.load(f, parse_constant=lambda x: const_map[x])
 
     def write_json(self, filename, data, pretty=False):
         &#34;&#34;&#34;
@@ -247,7 +257,7 @@ class utils(error):
             - Type: A json serializable python object
             - What: The data to write
         &#34;&#34;&#34;
-        with open(filename, &#39;w&#39;) as f:
+        with open(filename, &#34;w&#34;) as f:
             if pretty:
                 json.dump(data, f, indent=4)
             else:
@@ -282,7 +292,11 @@ class utils(error):
         p.getMethods(MyClass) #=&gt; [&#39;A&#39;, &#39;B&#39;]
         ```
         &#34;&#34;&#34;
-        return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)]
+        return [
+            fn
+            for fn in dir(object)
+            if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)
+        ]
 
     def getForceDict(self, object, key):
         &#34;&#34;&#34;
@@ -363,18 +377,20 @@ class utils(error):
         - If `self.show_warnings=False`, supresses all warnings
 
         &#34;&#34;&#34;
-        if self.__dict__.get(&#39;show_warnings&#39;,True):
-            kwargs={
-                &#39;class_name&#39;:self.__class__.__name__,
-                &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+        if self.__dict__.get(&#34;show_warnings&#34;, True):
+            kwargs = {
+                &#34;class_name&#34;: self.__class__.__name__,
+                &#34;method_name&#34;: sys._getframe(depth).f_back.f_code.co_name,
             }
-            pre_message=&#34;(Warning for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+            pre_message = &#34;(Warning for `{class_name}.{method_name}`): &#34;.format(
+                **kwargs
+            )
             # Attempt to format in kwargs where possible
             try:
-                message=pre_message+message.format(**kwargs)
+                message = pre_message + message.format(**kwargs)
             except:
-                message=pre_message+message
-            if self.__dict__.get(&#39;show_warning_stack&#39;,False):
+                message = pre_message + message
+            if self.__dict__.get(&#34;show_warning_stack&#34;, False):
                 traceback.print_stack(limit=10)
             print(message)
 
@@ -406,16 +422,16 @@ class utils(error):
 
         &#34;&#34;&#34;
         if self.verbose or force:
-            kwargs={
-                &#39;class_name&#39;:self.__class__.__name__,
-                &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+            kwargs = {
+                &#34;class_name&#34;: self.__class__.__name__,
+                &#34;method_name&#34;: sys._getframe(depth).f_back.f_code.co_name,
             }
-            pre_message=&#34;(`{class_name}.{method_name}`): &#34;.format(**kwargs)
+            pre_message = &#34;(`{class_name}.{method_name}`): &#34;.format(**kwargs)
             # Attempt to format in kwargs where possible
             try:
-                message=pre_message+message.format(**kwargs)
+                message = pre_message + message.format(**kwargs)
             except:
-                message=pre_message+message
+                message = pre_message + message
             print(message)
 
     def exception(self, message, depth=0):
@@ -440,16 +456,18 @@ class utils(error):
             - Default: 0
 
         &#34;&#34;&#34;
-        kwargs={
-            &#39;class_name&#39;:self.__class__.__name__,
-            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+        kwargs = {
+            &#34;class_name&#34;: self.__class__.__name__,
+            &#34;method_name&#34;: sys._getframe(depth).f_back.f_code.co_name,
         }
-        pre_message=&#34;(Exception for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+        pre_message = &#34;(Exception for `{class_name}.{method_name}`): &#34;.format(
+            **kwargs
+        )
         # Attempt to format in kwargs where possible
         try:
-            message=pre_message+message.format(**kwargs)
+            message = pre_message + message.format(**kwargs)
         except:
-            message=pre_message+message
+            message = pre_message + message
         raise Exception(message)</code></pre>
 </details>
 <h3>Subclasses</h3>
@@ -511,16 +529,18 @@ class utils(error):
         - Default: 0
 
     &#34;&#34;&#34;
-    kwargs={
-        &#39;class_name&#39;:self.__class__.__name__,
-        &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+    kwargs = {
+        &#34;class_name&#34;: self.__class__.__name__,
+        &#34;method_name&#34;: sys._getframe(depth).f_back.f_code.co_name,
     }
-    pre_message=&#34;(Exception for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+    pre_message = &#34;(Exception for `{class_name}.{method_name}`): &#34;.format(
+        **kwargs
+    )
     # Attempt to format in kwargs where possible
     try:
-        message=pre_message+message.format(**kwargs)
+        message = pre_message + message.format(**kwargs)
     except:
-        message=pre_message+message
+        message = pre_message + message
     raise Exception(message)</code></pre>
 </details>
 </dd>
@@ -590,16 +610,16 @@ class utils(error):
 
     &#34;&#34;&#34;
     if self.verbose or force:
-        kwargs={
-            &#39;class_name&#39;:self.__class__.__name__,
-            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+        kwargs = {
+            &#34;class_name&#34;: self.__class__.__name__,
+            &#34;method_name&#34;: sys._getframe(depth).f_back.f_code.co_name,
         }
-        pre_message=&#34;(`{class_name}.{method_name}`): &#34;.format(**kwargs)
+        pre_message = &#34;(`{class_name}.{method_name}`): &#34;.format(**kwargs)
         # Attempt to format in kwargs where possible
         try:
-            message=pre_message+message.format(**kwargs)
+            message = pre_message + message.format(**kwargs)
         except:
-            message=pre_message+message
+            message = pre_message + message
         print(message)</code></pre>
 </details>
 </dd>
@@ -666,18 +686,20 @@ class utils(error):
     - If `self.show_warnings=False`, supresses all warnings
 
     &#34;&#34;&#34;
-    if self.__dict__.get(&#39;show_warnings&#39;,True):
-        kwargs={
-            &#39;class_name&#39;:self.__class__.__name__,
-            &#39;method_name&#39;:sys._getframe(depth).f_back.f_code.co_name
+    if self.__dict__.get(&#34;show_warnings&#34;, True):
+        kwargs = {
+            &#34;class_name&#34;: self.__class__.__name__,
+            &#34;method_name&#34;: sys._getframe(depth).f_back.f_code.co_name,
         }
-        pre_message=&#34;(Warning for `{class_name}.{method_name}`): &#34;.format(**kwargs)
+        pre_message = &#34;(Warning for `{class_name}.{method_name}`): &#34;.format(
+            **kwargs
+        )
         # Attempt to format in kwargs where possible
         try:
-            message=pre_message+message.format(**kwargs)
+            message = pre_message + message.format(**kwargs)
         except:
-            message=pre_message+message
-        if self.__dict__.get(&#39;show_warning_stack&#39;,False):
+            message = pre_message + message
+        if self.__dict__.get(&#34;show_warning_stack&#34;, False):
             traceback.print_stack(limit=10)
         print(message)</code></pre>
 </details>
@@ -729,7 +751,9 @@ class utils(error):
             if has_header and return_dict:
                 return [dict(zip(headers, i)) for i in file_data]
             elif not has_header and return_dict:
-                self.exception(message=&#34;If `return_dict` is True, `has_header` must also be True.&#34;)
+                self.exception(
+                    message=&#34;If `return_dict` is True, `has_header` must also be True.&#34;
+                )
             else:
                 return [i for i in file_data]
 
@@ -748,18 +772,20 @@ class utils(error):
             - Type: list of lists | list of dicts
             - What: The data to write
         &#34;&#34;&#34;
-        with open(filename, &#39;w&#39;) as f:
+        with open(filename, &#34;w&#34;) as f:
             if isinstance(data[0], dict):
-                writer=csv.DictWriter(f, fieldnames=data[0].keys())
+                writer = csv.DictWriter(f, fieldnames=data[0].keys())
                 writer.writeheader()
                 for row in data:
                     writer.writerow(row)
             elif isinstance(data[0], list):
-                writer=csv.writer(f)
+                writer = csv.writer(f)
                 for row in data:
                     writer.writerow(row)
             else:
-                self.exception(&#34;write_csv takes in list of lists or list of dicts only.&#34;)
+                self.exception(
+                    &#34;write_csv takes in list of lists or list of dicts only.&#34;
+                )
 
     def read_json(self, filename):
         &#34;&#34;&#34;
@@ -773,12 +799,12 @@ class utils(error):
             - What: The filepath of the json to read
         &#34;&#34;&#34;
         const_map = {
-            &#39;-Infinity&#39;: float(&#39;-Infinity&#39;),
-            &#39;Infinity&#39;: float(&#39;Infinity&#39;),
-            &#39;NaN&#39;: None,
+            &#34;-Infinity&#34;: float(&#34;-Infinity&#34;),
+            &#34;Infinity&#34;: float(&#34;Infinity&#34;),
+            &#34;NaN&#34;: None,
         }
         with open(filename) as f:
-            return json.load(f, parse_constant=lambda x:const_map[x])
+            return json.load(f, parse_constant=lambda x: const_map[x])
 
     def write_json(self, filename, data, pretty=False):
         &#34;&#34;&#34;
@@ -795,7 +821,7 @@ class utils(error):
             - Type: A json serializable python object
             - What: The data to write
         &#34;&#34;&#34;
-        with open(filename, &#39;w&#39;) as f:
+        with open(filename, &#34;w&#34;) as f:
             if pretty:
                 json.dump(data, f, indent=4)
             else:
@@ -830,7 +856,11 @@ class utils(error):
         p.getMethods(MyClass) #=&gt; [&#39;A&#39;, &#39;B&#39;]
         ```
         &#34;&#34;&#34;
-        return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)]
+        return [
+            fn
+            for fn in dir(object)
+            if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)
+        ]
 
     def getForceDict(self, object, key):
         &#34;&#34;&#34;
@@ -1001,7 +1031,11 @@ p.getMethods(MyClass) #=&gt; ['A', 'B']
     p.getMethods(MyClass) #=&gt; [&#39;A&#39;, &#39;B&#39;]
     ```
     &#34;&#34;&#34;
-    return [fn for fn in dir(object) if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)]</code></pre>
+    return [
+        fn
+        for fn in dir(object)
+        if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)
+    ]</code></pre>
 </details>
 </dd>
 <dt id="pamda.utils.utils.read_csv"><code class="name flex">
@@ -1077,7 +1111,9 @@ p.getMethods(MyClass) #=&gt; ['A', 'B']
         if has_header and return_dict:
             return [dict(zip(headers, i)) for i in file_data]
         elif not has_header and return_dict:
-            self.exception(message=&#34;If `return_dict` is True, `has_header` must also be True.&#34;)
+            self.exception(
+                message=&#34;If `return_dict` is True, `has_header` must also be True.&#34;
+            )
         else:
             return [i for i in file_data]</code></pre>
 </details>
@@ -1110,12 +1146,12 @@ p.getMethods(MyClass) #=&gt; ['A', 'B']
         - What: The filepath of the json to read
     &#34;&#34;&#34;
     const_map = {
-        &#39;-Infinity&#39;: float(&#39;-Infinity&#39;),
-        &#39;Infinity&#39;: float(&#39;Infinity&#39;),
-        &#39;NaN&#39;: None,
+        &#34;-Infinity&#34;: float(&#34;-Infinity&#34;),
+        &#34;Infinity&#34;: float(&#34;Infinity&#34;),
+        &#34;NaN&#34;: None,
     }
     with open(filename) as f:
-        return json.load(f, parse_constant=lambda x:const_map[x])</code></pre>
+        return json.load(f, parse_constant=lambda x: const_map[x])</code></pre>
 </details>
 </dd>
 <dt id="pamda.utils.utils.write_csv"><code class="name flex">
@@ -1158,18 +1194,20 @@ p.getMethods(MyClass) #=&gt; ['A', 'B']
         - Type: list of lists | list of dicts
         - What: The data to write
     &#34;&#34;&#34;
-    with open(filename, &#39;w&#39;) as f:
+    with open(filename, &#34;w&#34;) as f:
         if isinstance(data[0], dict):
-            writer=csv.DictWriter(f, fieldnames=data[0].keys())
+            writer = csv.DictWriter(f, fieldnames=data[0].keys())
             writer.writeheader()
             for row in data:
                 writer.writerow(row)
         elif isinstance(data[0], list):
-            writer=csv.writer(f)
+            writer = csv.writer(f)
             for row in data:
                 writer.writerow(row)
         else:
-            self.exception(&#34;write_csv takes in list of lists or list of dicts only.&#34;)</code></pre>
+            self.exception(
+                &#34;write_csv takes in list of lists or list of dicts only.&#34;
+            )</code></pre>
 </details>
 </dd>
 <dt id="pamda.utils.utils.write_json"><code class="name flex">
@@ -1212,7 +1250,7 @@ p.getMethods(MyClass) #=&gt; ['A', 'B']
         - Type: A json serializable python object
         - What: The data to write
     &#34;&#34;&#34;
-    with open(filename, &#39;w&#39;) as f:
+    with open(filename, &#34;w&#34;) as f:
         if pretty:
             json.dump(data, f, indent=4)
         else:
