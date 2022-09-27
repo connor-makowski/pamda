@@ -7,7 +7,7 @@ Inspired heavily by [Ramda](https://ramdajs.com/docs/).
 
 Documentation for Pamda Functions
 --------
-https://connor-makowski.github.io/pamda/pamda_core.html
+https://connor-makowski.github.io/pamda/pamda.html
 
 Key Features
 --------
@@ -35,11 +35,11 @@ pip install pamda
 
 ## Basic Usage
 ```py
-from pamda import pamda as p
+from pamda import pamda
 
 data={'a':{'b':1, 'c':2}}
 # Example: Select data given a path and a dictionary
-p.path(['a','b'])(data) #=> 1
+pamda.path(['a','b'])(data) #=> 1
 
 # See documentation for all core pamda functions at
 # https://connor-makowski.github.io/pamda/pamda_core.html
@@ -47,14 +47,14 @@ p.path(['a','b'])(data) #=> 1
 
 ## Curry Usage
 ```py
-from pamda import pamda as p
+from pamda import pamda
 
 # Define a function that you want to curry
 def myFunction(a,b,c):
     return [a,b,c]
 
 # You can call p.curry as a function to curry your functions
-curriedMyFn=p.curry(myFunction)
+curriedMyFn=pamda.curry(myFunction)
 
 # Inputs can now be passed in an async fashion
 # The function is evaluated when all inputs are added
@@ -71,7 +71,7 @@ curriedMyFn(1,2)(3) #=> [1,2,3]
 from pamda import pamda as p
 
 # You can use p.curry as a decorator too
-@p.curry
+@pamda.curry
 def myFunction(a,b,c):
     return [a,b,c]
 
@@ -156,4 +156,4 @@ addUp(1)(2) #=> 3
 
 - Pamda also ships with a few helpful utilities
 - Check out the documentation here:
-  - https://connor-makowski.github.io/pamda/utils.html
+  - https://connor-makowski.github.io/pamda/pamda_utils.html

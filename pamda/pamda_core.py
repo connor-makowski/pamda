@@ -1,10 +1,13 @@
 from functools import reduce
-from pamda.utils import utils
-from pamda.curry_fn import curry_fn
+from pamda.pamda_utils import pamda_utils
+from pamda.pamda_curry import curry_obj
+from pamda import pamda_wrappers
 
 
-class pamda_core(utils):
-    def accumulate(self, fn, initial_accumulator, data):
+@pamda_wrappers.curry_wrap
+@pamda_wrappers.classmethod_wrap
+class pamda_core:
+    def accumulate(self, fn, initial_accumulator, data: list):
         """
         Function:
 
@@ -29,8 +32,8 @@ class pamda_core(utils):
 
         ```
         data=[1,2,3,4]
-        p.accumulate(
-            fn=p.add,
+        pamda.accumulate(
+            fn=pamda.add,
             initial_accumulator=0,
             data=data
         )
@@ -38,17 +41,12 @@ class pamda_core(utils):
 
         ```
         """
-        if not isinstance(fn, curry_fn):
-            fn = curry_fn(fn)
+        fn = self.curry(fn)
         if fn.__arity__ != 2:
-            self.exception(
-                "`reduce` `fn` must have an arity of 2 (take two inputs)"
-            )
-        if not isinstance(data, (list)):
-            self.exception("`reduce` `data` must be a list")
+            raise Exception("`fn` must have an arity of 2 (take two inputs)")
         if not len(data) > 0:
-            self.exception(
-                "`reduce` `data` has a length of 0, however it must have a length of at least 1"
+            raise Exception(
+                "`data` has a length of 0, however it must have a length of at least 1"
             )
         acc = initial_accumulator
         out = []
@@ -57,7 +55,7 @@ class pamda_core(utils):
             out.append(acc)
         return out
 
-    def add(self, a, b):
+    def add(self, a: [int, float], b: [int, float]):
         """
         Function:
 
@@ -75,14 +73,12 @@ class pamda_core(utils):
         Example:
 
         ```
-        p.add(1, 2) #=> 3
+        pamda.add(1, 2) #=> 3
         ```
         """
-        if not all([isinstance(item, (int, float)) for item in [a, b]]):
-            self.exception("`a` and `b` both have to be `int`s or `float`s")
         return a + b
 
-    def adjust(self, index, fn, data):
+    def adjust(self, index: int, fn, data: list):
         """
         Function:
 
@@ -107,24 +103,19 @@ class pamda_core(utils):
 
         ```
         data=[1,5,9]
-        p.adjust(
+        pamda.adjust(
             index=1,
-            fn=p.inc,
+            fn=pamda.inc,
             data=data
         ) #=> [1,6,9]
         ```
         """
-        if not isinstance(index, int):
-            self.exception("`index` must be an int")
-        if not isinstance(data, list):
-            self.exception("`data` must be a list")
-        if not isinstance(fn, curry_fn):
-            fn = curry_fn(fn)
+        fn = self.curry(fn)
         index = self.clamp(-len(data), len(data) - 1, index)
         data[index] = fn(data[index])
         return data
 
-    def assocPath(self, path, value, data):
+    def assocPath(self, path: [list, str], value, data: dict):
         """
         Function:
 
@@ -147,15 +138,17 @@ class pamda_core(utils):
 
         ```
         data={'a':{'b':1}}
-        p.assocPath(path=['a','c'], value=3, data=data) #=> {'a':{'b':1, 'c':3}}
+        pamda.assocPath(path=['a','c'], value=3, data=data) #=> {'a':{'b':1, 'c':3}}
         ```
         """
         if isinstance(path, str):
             path = [path]
-        reduce(self.getForceDict, path[:-1], data).__setitem__(path[-1], value)
+        reduce(pamda_utils.getForceDict, path[:-1], data).__setitem__(
+            path[-1], value
+        )
         return data
 
-    def assocPathComplex(self, default, default_fn, path, data):
+    def assocPathComplex(self, default, default_fn, path: str, data: dict):
         """
         Function:
 
@@ -181,22 +174,22 @@ class pamda_core(utils):
 
         ```
         data={'a':{'b':1}}
-        p.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=data) #=> {'a':{'b':1,'c':[2,1]}}
+        pamda.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=data) #=> {'a':{'b':1,'c':[2,1]}}
         ```
         """
         if self.getArity(default_fn) != 1:
-            self.exception(
+            raise Exception(
                 "`assocPathComplex` `default_fn` must be an unary (single input) function."
             )
         if isinstance(path, str):
             path = [path]
-        path_object = reduce(self.getForceDict, path[:-1], data)
+        path_object = reduce(pamda_utils.getForceDict, path[:-1], data)
         path_object.__setitem__(
             path[-1], default_fn(path_object.get(path[-1], default))
         )
         return data
 
-    def asyncRun(self, fn):
+    def asyncRun(self, fn: curry_obj):
         """
         Function:
 
@@ -221,13 +214,13 @@ class pamda_core(utils):
         ```
         import time
 
-        @p.thunkify
+        @pamda.thunkify
         def test(name, wait):
             print(f'{name} start')
             time.sleep(wait)
             print(f'{name} end')
 
-        async_test = p.asyncRun(test('a',2))
+        async_test = pamda.asyncRun(test('a',2))
         sync_test = test('b',1)()
         ```
         Output:
@@ -243,12 +236,12 @@ class pamda_core(utils):
         ```
         import time
 
-        @p.thunkify
+        @pamda.thunkify
         def test(name, wait):
             time.sleep(wait)
             return f"{name}: {wait}"
 
-        async_test = p.asyncRun(test('a',2))
+        async_test = pamda.asyncRun(test('a',2))
         print(async_test.asyncWait()) #=> a: 2
         ```
 
@@ -257,7 +250,7 @@ class pamda_core(utils):
         ```
         import time
 
-        @p.thunkify
+        @pamda.thunkify
         def test(name, wait):
             time.sleep(wait)
             return f"{name}: {wait}"
@@ -266,11 +259,9 @@ class pamda_core(utils):
         print(async_test.asyncWait()) #=> a: 2
         ```
         """
-        if not isinstance(fn, curry_fn):
-            self.exception("`fn` must be a thunk")
         return fn.asyncRun()
 
-    def asyncWait(self, fn):
+    def asyncWait(self, fn: curry_obj):
         """
         Function:
 
@@ -292,33 +283,33 @@ class pamda_core(utils):
         ```
         import time
 
-        @p.thunkify
+        @pamda.thunkify
         def test(name, wait):
             time.sleep(wait)
             return f"{name}: {wait}"
 
-        async_test = p.asyncRun(test('a',2))
-        print(p.asyncWait(async_test)) #=> a: 2
+        async_test = pamda.asyncRun(test('a',2))
+        print(pamda.asyncWait(async_test)) #=> a: 2
         ```
 
 
         ```
         import time
 
-        @p.thunkify
+        @pamda.thunkify
         def test(name, wait):
             time.sleep(wait)
             return f"{name}: {wait}"
 
-        async_test = p.asyncRun(test('a',2))
+        async_test = pamda.asyncRun(test('a',2))
         print(async_test.asyncWait()) #=> a: 2
         ```
         """
-        if not isinstance(fn, curry_fn):
-            self.exception("`fn` must be a thunk")
         return fn.asyncWait()
 
-    def clamp(self, minimum, maximum, a):
+    def clamp(
+        self, minimum: [int, float], maximum: [int, float], a: [int, float]
+    ):
         """
         Function:
 
@@ -339,16 +330,10 @@ class pamda_core(utils):
         Example:
 
         ```
-        p.clamp(1, 3, 2) #=> 2
-        p.clamp(1, 3, 5) #=> 3
+        pamda.clamp(1, 3, 2) #=> 2
+        pamda.clamp(1, 3, 5) #=> 3
         ```
         """
-        if not all(
-            [isinstance(item, (int, float)) for item in [minimum, maximum, a]]
-        ):
-            self.exception(
-                "`minimum`,`maximum` and `a` all have to be `int`s or `float`s"
-            )
         return min(max(a, minimum), maximum)
 
     def curry(self, fn):
@@ -373,7 +358,7 @@ class pamda_core(utils):
         Examples:
 
         ```
-        curriedZip=p.curry(p.zip)
+        curriedZip=pamda.curry(pamda.zip)
         curriedZip(['a','b'])([1,2]) #=> [['a',1],['b',2]]
 
         # Curried functions can be thunkified at any time
@@ -386,7 +371,7 @@ class pamda_core(utils):
         def myFunction(a,b,c):
             return [a,b,c]
 
-        curriedMyFn=p.curry(myFunction)
+        curriedMyFn=pamda.curry(myFunction)
 
         curriedMyFn(1,2,3) #=> [1,2,3]
         curriedMyFn(1)(2,3) #=> [1,2,3]
@@ -398,11 +383,11 @@ class pamda_core(utils):
 
         ```
         """
-        if not isinstance(fn, curry_fn):
-            return curry_fn(fn)
-        return fn
+        if fn.__dict__.get("__isCurried__"):
+            return fn()
+        return curry_obj(fn)
 
-    def dec(self, a):
+    def dec(self, a: [int, float]):
         """
         Function:
 
@@ -417,14 +402,14 @@ class pamda_core(utils):
         Example:
 
         ```
-        p.dec(42) #=> 41
+        pamda.dec(42) #=> 41
         ```
         """
         if not isinstance(a, (int, float)):
-            self.exception("`a` must be an `int` or a `float`")
+            raise Exception("`a` must be an `int` or a `float`")
         return a - 1
 
-    def difference(self, a, b):
+    def difference(self, a: list, b: list):
         """
         Function:
 
@@ -444,13 +429,13 @@ class pamda_core(utils):
         ```
         a=['a','b']
         b=['b','c']
-        p.difference(a=a, b=b) #=> ['a']
-        p.difference(a=b, b=a) #=> ['c']
+        pamda.difference(a=a, b=b) #=> ['a']
+        pamda.difference(a=b, b=a) #=> ['c']
         ```
         """
         return list(set(a).difference(set(b)))
 
-    def dissocPath(self, path, data):
+    def dissocPath(self, path: [str, list], data: dict):
         """
         Function:
 
@@ -470,18 +455,18 @@ class pamda_core(utils):
 
         ```
         data={'a':{'b':{'c':0,'d':1}}}
-        p.dissocPath(path=['a','b','c'], data=data) #=> {'a':{'b':{'d':1}}}
+        pamda.dissocPath(path=['a','b','c'], data=data) #=> {'a':{'b':{'d':1}}}
         ```
         """
         if isinstance(path, str):
             path = [path]
         if not self.hasPath(path=path, data=data):
-            self.warn(message="Path does not exist")
+            raise Exception("Path does not exist")
         else:
-            reduce(self.getForceDict, path[:-1], data).pop(path[-1])
+            reduce(pamda_utils.getForceDict, path[:-1], data).pop(path[-1])
         return data
 
-    def flatten(self, data):
+    def flatten(self, data: list):
         """
         Function:
 
@@ -496,7 +481,7 @@ class pamda_core(utils):
 
         ```
         data=[['a','b'],[1,2]]
-        p.flatten(data=data) #=> ['a','b',1,2]
+        pamda.flatten(data=data) #=> ['a','b',1,2]
         ```
         """
         return [i for sub_list in data for i in sub_list]
@@ -530,14 +515,14 @@ class pamda_core(utils):
         def concat(a,b,c,d):
             return str(a)+str(b)+str(c)+str(d)
 
-        flip_concat=p.flip(concat)
+        flip_concat=pamda.flip(concat)
 
         concat('fe-','fi-','fo-','fum') #=> 'fe-fi-fo-fum'
         flip_concat('fe-','fi-','fo-','fum') #=> 'fi-fe-fo-fum'
         ```
 
         ```
-        @p.curry
+        @pamda.curry
         def concat(a,b,c,d):
             return str(a)+str(b)+str(c)+str(d)
 
@@ -549,13 +534,13 @@ class pamda_core(utils):
         ```
 
         ```
-        @p.curry
+        @pamda.curry
         def concat(a,b,c,d):
             return str(a)+str(b)+str(c)+str(d)
 
-        a=p.flip(concat)('fi-')
-        b=p.flip(a)('fo-')
-        c=p.flip(b)('fum')
+        a=pamda.flip(concat)('fi-')
+        b=pamda.flip(a)('fo-')
+        c=pamda.flip(b)('fum')
         c('fe-') #=> 'fe-fi-fo-fum'
         ```
 
@@ -563,14 +548,11 @@ class pamda_core(utils):
         def concat(a,b,c,d):
             return str(a)+str(b)+str(c)+str(d)
 
-        a=p.flip(concat)('fi-').flip()('fo-').flip()('fum')
+        a=pamda.flip(concat)('fi-').flip()('fo-').flip()('fum')
         a('fe-') #=> 'fe-fi-fo-fum'
         ```
         """
-        if not isinstance(fn, curry_fn):
-            fn = curry_fn(fn)
-        else:
-            fn = fn()
+        fn = self.curry(fn)
         return fn.flip()
 
     def getArity(self, fn):
@@ -589,17 +571,16 @@ class pamda_core(utils):
         Examples:
 
         ```
-        p.getArity(p.zip) #=> 2
-        curriedZip=p.curry(p.zip)
+        pamda.getArity(pamda.zip) #=> 2
+        curriedZip=pamda.curry(pamda.zip)
         ABCuriedZip=curriedZip(['a','b'])
-        p.getArity(ABCuriedZip) #=> 1
+        pamda.getArity(ABCuriedZip) #=> 1
         ```
         """
-        if isinstance(fn, curry_fn):
-            return fn.__arity__
-        return curry_fn(fn).__arity__
+        fn = self.curry(fn)
+        return fn.__arity__
 
-    def groupBy(self, fn, data):
+    def groupBy(self, fn, data: list):
         """
         Function:
 
@@ -638,24 +619,23 @@ class pamda_core(utils):
             {'name':'Fred', 'score':79},
             {'name':'Joe', 'score':84},
         ]
-        p.groupBy(getGrade,data)
+        pamda.groupBy(getGrade,data)
         #=>{
         #=>    'B':[{'name':'Joe', 'score':84}]
         #=>    'C':[{'name':'Connor', 'score':75},{'name':'Fred', 'score':79}]
         #=>}
         ```
         """
-        if not isinstance(fn, curry_fn):
-            fn = self.curry(fn)
+        fn = self.curry(fn)
         if fn.__arity__ != 1:
-            self.exception(
+            raise Exception(
                 "groupBy `fn` must only take one parameter as its input"
             )
         output = {}
         for i in data:
             path = fn(i)
             if not isinstance(path, str):
-                self.exception(
+                raise Exception(
                     "groupBy `fn` must return a str but instead returned {}".format(
                         path
                     )
@@ -668,7 +648,7 @@ class pamda_core(utils):
             )
         return output
 
-    def groupKeys(self, keys, data):
+    def groupKeys(self, keys: list, data: list):
         """
         Function:
 
@@ -692,7 +672,7 @@ class pamda_core(utils):
             {'color':'green', 'size':11, 'shape':'ball'},
             {'color':'green', 'size':12, 'shape':'square'}
         ]
-        p.groupKeys(['color','shape'],data)
+        pamda.groupKeys(['color','shape'],data)
         #=> [
         #=>     [{'color': 'red', 'size': 9, 'shape': 'ball'}, {'color': 'red', 'size': 10, 'shape': 'ball'}],
         #=>     [{'color': 'green', 'size': 11, 'shape': 'ball'}],
@@ -700,18 +680,16 @@ class pamda_core(utils):
         #=> ]
         ```
         """
-        if not isinstance(keys, list):
-            self.exception("groupKeys `keys` must be a list")
         if len(keys) == 0:
-            self.exception(
-                "groupKeys `keys` list must have at least one string in it"
+            raise Exception(
+                "groupKeys `keys` list must have at least one item in it"
             )
         output = list(self.nestItem(keys, data).values())
         for i in range(len(keys) - 1):
             output = self.unnest([list(i.values()) for i in output])
         return output
 
-    def groupWith(self, fn, data):
+    def groupWith(self, fn, data: list):
         """
         Function:
 
@@ -736,13 +714,12 @@ class pamda_core(utils):
             return a==b
 
         data=[1,2,3,1,1,2,2,3,3,3]
-        p.groupWith(areEqual,data) #=> [[1], [2], [3], [1, 1], [2, 2], [3, 3, 3]]
+        pamda.groupWith(areEqual,data) #=> [[1], [2], [3], [1, 1], [2, 2], [3, 3, 3]]
         ```
         """
-        if not isinstance(fn, curry_fn):
-            fn = self.curry(fn)
+        fn = self.curry(fn)
         if fn.__arity__ != 2:
-            self.exception("groupWith `fn` must take exactly two parameters")
+            raise Exception("groupWith `fn` must take exactly two parameters")
         output = []
         start = True
         for i in data:
@@ -758,7 +735,7 @@ class pamda_core(utils):
         output.append(sublist)
         return output
 
-    def hasPath(self, path, data):
+    def hasPath(self, path: [list, str], data: dict):
         """
         Function:
 
@@ -778,15 +755,15 @@ class pamda_core(utils):
 
         ```
         data={'a':{'b':1}}
-        p.hasPath(path=['a','b'], data=data) #=> True
-        p.hasPath(path=['a','d'], data=data) #=> False
+        pamda.hasPath(path=['a','b'], data=data) #=> True
+        pamda.hasPath(path=['a','d'], data=data) #=> False
         ```
         """
         if isinstance(path, str):
             path = [path]
         return path[-1] in reduce(lambda x, y: x.get(y, {}), path[:-1], data)
 
-    def hardRound(self, decimal_places, a):
+    def hardRound(self, decimal_places: int, a: [int, float]):
         """
         Function:
 
@@ -794,33 +771,26 @@ class pamda_core(utils):
 
         Requires:
 
-        - `a`:
-            - Type: int | float
-            - What: The number to round
-
-        Optional:
-
         - `decimal_places`:
             - Type: int
             - What: The number of decimal places to round to
             - Default: 0
             - Notes: Negative numbers accepted (EG -1 rounds to the nearest 10)
+        - `a`:
+            - Type: int | float
+            - What: The number to round
 
         Example:
 
         ```
         a=12.345
-        p.hardRound(1,a) #=> 12.3
-        p.hardRound(-1,a) #=> 10
+        pamda.hardRound(1,a) #=> 12.3
+        pamda.hardRound(-1,a) #=> 10
         ```
         """
-        if not isinstance(a, (float, int)):
-            self.exception(
-                "`hardRound` can only be called on `float` or `int` objects"
-            )
         return int(a * (10**decimal_places) + 0.5) / (10**decimal_places)
 
-    def head(self, data):
+    def head(self, data: [list, str]):
         """
         Function:
 
@@ -836,18 +806,18 @@ class pamda_core(utils):
 
         ```
         data=['fe','fi','fo','fum']
-        p.first(
+        pamda.first(
             data=data
         ) #=> fe
         ```
         """
         if not isinstance(data, (list, str)):
-            self.exception("`head` can only be called on a `str` or a `list`")
+            raise Exception("`head` can only be called on a `str` or a `list`")
         if not len(data) > 0:
-            self.exception("Attempting to call `head` on an empty list or str")
+            raise Exception("Attempting to call `head` on an empty list or str")
         return data[0]
 
-    def inc(self, a):
+    def inc(self, a: [int, float]):
         """
         Function:
 
@@ -862,14 +832,14 @@ class pamda_core(utils):
         Example:
 
         ```
-        p.inc(42) #=> 43
+        pamda.inc(42) #=> 43
         ```
         """
         if not isinstance(a, (int, float)):
-            self.exception("`a` must be an `int` or a `float`")
+            raise Exception("`a` must be an `int` or a `float`")
         return a + 1
 
-    def intersection(self, a, b):
+    def intersection(self, a: list, b: list):
         """
         Function:
 
@@ -889,12 +859,12 @@ class pamda_core(utils):
         ```
         a=['a','b']
         b=['b','c']
-        p.intersection(a=a, b=b) #=> ['b']
+        pamda.intersection(a=a, b=b) #=> ['b']
         ```
         """
         return list(set(a).intersection(set(b)))
 
-    def map(self, fn, data):
+    def map(self, fn, data: [list, dict]):
         """
         Function:
 
@@ -914,8 +884,8 @@ class pamda_core(utils):
 
         ```
         data=[1,2,3]
-        p.map(
-            fn=p.inc,
+        pamda.map(
+            fn=pamda.inc,
             data=data
         )
         #=> [2,3,4]
@@ -923,22 +893,19 @@ class pamda_core(utils):
 
         ```
         data={'a':1,'b':2,'c':3}
-        p.map(
-            fn=p.inc,
+        pamda.map(
+            fn=pamda.inc,
             data=data
         )
         #=> {'a':2,'b':3,'c':4}
         ```
 
         """
-        if not isinstance(fn, curry_fn):
-            fn = curry_fn(fn)
+        fn = self.curry(fn)
         if fn.__arity__ != 1:
-            self.exception("`map` `fn` must be unary (take one input)")
-        if not isinstance(data, (list, dict)):
-            self.exception("`map` `data` must be a list or a dict")
+            raise Exception("`map` `fn` must be unary (take one input)")
         if not len(data) > 0:
-            self.exception(
+            raise Exception(
                 "`map` `data` has a length of 0 or is an empty dictionary, however it must have at least one element in it"
             )
         if isinstance(data, dict):
@@ -946,7 +913,7 @@ class pamda_core(utils):
         else:
             return [fn(i) for i in data]
 
-    def mean(self, data):
+    def mean(self, data: list):
         """
         Function:
 
@@ -963,23 +930,21 @@ class pamda_core(utils):
 
         ```
         data=[1,2,3]
-        p.mean(data=data)
+        pamda.mean(data=data)
         #=> 2
         ```
 
         ```
         data=[]
-        p.mean(data=data)
+        pamda.mean(data=data)
         #=> None
         ```
         """
-        if not isinstance(data, (list)):
-            self.exception("`mean` `data` must be a list")
         if len(data) == 0:
             return None
         return sum(data) / len(data)
 
-    def median(self, data):
+    def median(self, data: list):
         """
         Function:
 
@@ -997,24 +962,24 @@ class pamda_core(utils):
 
         ```
         data=[7,2,8,9]
-        p.median(data=data)
+        pamda.median(data=data)
         #=> 7.5
         ```
 
         ```
         data=[7,8,9]
-        p.median(data=data)
+        pamda.median(data=data)
         #=> 8
         ```
 
         ```
         data=[]
-        p.median(data=data)
+        pamda.median(data=data)
         #=> None
         ```
         """
         if not isinstance(data, (list)):
-            self.exception("`median` `data` must be a list")
+            raise Exception("`median` `data` must be a list")
         length = len(data)
         if length == 0:
             return None
@@ -1023,7 +988,7 @@ class pamda_core(utils):
             return (data[int(length / 2)] + data[int(length / 2) - 1]) / 2
         return data[int(length / 2)]
 
-    def mergeDeep(self, update_data, data):
+    def mergeDeep(self, update_data: dict, data: dict):
         """
         Function:
 
@@ -1044,7 +1009,7 @@ class pamda_core(utils):
         ```
         data={'a':{'b':{'c':'d'},'e':'f'}}
         update_data={'a':{'b':{'h':'i'},'e':'g'}}
-        p.mergeDeep(
+        pamda.mergeDeep(
             update_data=update_data,
             data=data
         ) #=> {'a':{'b':{'c':'d','h':'i'},'e':'g'}}
@@ -1066,7 +1031,7 @@ class pamda_core(utils):
         output.update(new_dict)
         return output
 
-    def nest(self, path_keys, value_key, data):
+    def nest(self, path_keys: list, value_key: str, data: list):
         """
         Function:
 
@@ -1095,7 +1060,7 @@ class pamda_core(utils):
             {'x_1':'a','x_2':'b', 'output':'d'},
             {'x_1':'a','x_2':'e', 'output':'f'}
         ]
-        p.nest(
+        pamda.nest(
             path_keys=['x_1','x_2'],
             value_key='output',
             data=data
@@ -1103,9 +1068,9 @@ class pamda_core(utils):
         ```
         """
         if not isinstance(data, list):
-            self.exception("Attempting to `nest` an object that is not a list")
+            raise Exception("Attempting to `nest` an object that is not a list")
         if len(data) == 0:
-            self.exception("Attempting to `nest` from an empty list")
+            raise Exception("Attempting to `nest` from an empty list")
         nested_output = {}
         for item in data:
             nested_output = self.assocPathComplex(
@@ -1116,7 +1081,7 @@ class pamda_core(utils):
             )
         return nested_output
 
-    def nestItem(self, path_keys, data):
+    def nestItem(self, path_keys: list, data: list):
         """
         Function:
 
@@ -1143,7 +1108,7 @@ class pamda_core(utils):
             {'x_1':'a','x_2':'b'},
             {'x_1':'a','x_2':'e'}
         ]
-        p.nest(
+        pamda.nest(
             path_keys=['x_1','x_2'],
             data=data
         )
@@ -1151,12 +1116,8 @@ class pamda_core(utils):
 
         ```
         """
-        if not isinstance(data, list):
-            self.exception(
-                "Attempting to `nestItem` an object that is not a list"
-            )
         if len(data) == 0:
-            self.exception("Attempting to `nestItem` from an empty list")
+            raise Exception("Attempting to `nestItem` from an empty list")
         nested_output = {}
         for item in data:
             nested_output = self.assocPathComplex(
@@ -1167,7 +1128,7 @@ class pamda_core(utils):
             )
         return nested_output
 
-    def path(self, path, data):
+    def path(self, path: [list, str], data: dict):
         """
         Function:
 
@@ -1187,12 +1148,12 @@ class pamda_core(utils):
 
         ```
         data={'a':{'b':1}}
-        p.path(path=['a','b'], data=data) #=> 1
+        pamda.path(path=['a','b'], data=data) #=> 1
         ```
         """
         return self.pathOr(None, path, data)
 
-    def pathOr(self, default, path, data):
+    def pathOr(self, default, path: [list, str], data: dict):
         """
         Function:
 
@@ -1215,7 +1176,7 @@ class pamda_core(utils):
 
         ```
         data={'a':{'b':1}}
-        p.path(default=2, path=['a','c'], data=data) #=> 2
+        pamda.path(default=2, path=['a','c'], data=data) #=> 2
         ```
         """
         if isinstance(path, str):
@@ -1224,7 +1185,7 @@ class pamda_core(utils):
             path[-1], default
         )
 
-    def pipe(self, fns, data):
+    def pipe(self, fns: list, data):
         """
         Function:
 
@@ -1247,32 +1208,30 @@ class pamda_core(utils):
 
         ```
         data=['abc','def']
-        p.pipe(fns=[p.head, p.tail], data=data) #=> 'c'
+        pamda.pipe(fns=[pamda.head, pamda.tail], data=data) #=> 'c'
         ```
 
         ```
         data={'a':{'b':'c'}}
-        curriedPath=p.curry(p.path)
-        p.pipe(fns=[curriedPath('a'), curriedPath('b')], data=data) #=> 'c'
+        curriedPath=pamda.curry(pamda.path)
+        pamda.pipe(fns=[curriedPath('a'), curriedPath('b')], data=data) #=> 'c'
         ```
         """
-        if not isinstance(fns, list):
-            self.exception("`fns` must be a list")
         if len(fns) == 0:
-            self.exception("`fns` must be a list with at least one function")
+            raise Exception("`fns` must be a list with at least one function")
         if self.getArity(fns[0]) == 0:
-            self.exception(
+            raise Exception(
                 "The first function in `fns` can have n arity (accepting n args), but this must be greater than 0."
             )
         if not all([(self.getArity(fn) == 1) for fn in fns[1:]]):
-            self.exception(
+            raise Exception(
                 "Only the first function in `fns` can have n arity (accept n args). All other functions must have an arity of one (accepting one argument)."
             )
         for fn in fns:
             data = fn(data)
         return data
 
-    def pluck(self, path, data):
+    def pluck(self, path: [list, str], data: list):
         """
         Function:
 
@@ -1292,18 +1251,16 @@ class pamda_core(utils):
 
         ```
         data=[{'a':{'b':1, 'c':'d'}},{'a':{'b':2, 'c':'e'}}]
-        p.pluck(path=['a','b'], data=data) #=> [1,2]
+        pamda.pluck(path=['a','b'], data=data) #=> [1,2]
         ```
         """
-        if not isinstance(data, list):
-            self.exception(
-                "Attempting to pluck from an object that is not a list"
-            )
         if len(data) == 0:
-            self.exception("Attempting to pluck from an empty list")
+            raise Exception("Attempting to pluck from an empty list")
         return [self.path(data=i, path=path) for i in data]
 
-    def pluckIf(self, if_path, if_vals, path, data):
+    def pluckIf(
+        self, if_path: list, if_vals: list, path: [list, str], data: list
+    ):
         """
         Function:
 
@@ -1330,24 +1287,18 @@ class pamda_core(utils):
 
         ```
         data=[{'a':{'b':1, 'c':'d'}},{'a':{'b':2, 'c':'e'}}]
-        p.pluck(if_path=['a','c'], if_vals=['d'], path=['a','b'], data=data) #=> [1]
+        pamda.pluck(if_path=['a','c'], if_vals=['d'], path=['a','b'], data=data) #=> [1]
         ```
         """
-        if not isinstance(if_vals, list):
-            self.exception("`if_vals` must be a list")
-        if not isinstance(data, list):
-            self.exception(
-                "Attempting to pluck from an object that is not a list"
-            )
         if len(data) == 0:
-            self.exception("Attempting to pluck from an empty list")
+            raise Exception("Attempting to pluck from an empty list")
         return [
             self.path(data=i, path=path)
             for i in data
             if self.path(data=i, path=if_path) in if_vals
         ]
 
-    def reduce(self, fn, initial_accumulator, data):
+    def reduce(self, fn, initial_accumulator, data: list):
         """
         Function:
 
@@ -1372,8 +1323,8 @@ class pamda_core(utils):
 
         ```
         data=[1,2,3,4]
-        p.reduce(
-            fn=p.add,
+        pamda.reduce(
+            fn=pamda.add,
             initial_accumulator=0,
             data=data
         )
@@ -1381,16 +1332,15 @@ class pamda_core(utils):
 
         ```
         """
-        if not isinstance(fn, curry_fn):
-            fn = curry_fn(fn)
+        fn = self.curry(fn)
         if fn.__arity__ != 2:
-            self.exception(
+            raise Exception(
                 "`reduce` `fn` must have an arity of 2 (take two inputs)"
             )
         if not isinstance(data, (list)):
-            self.exception("`reduce` `data` must be a list")
+            raise Exception("`reduce` `data` must be a list")
         if not len(data) > 0:
-            self.exception(
+            raise Exception(
                 "`reduce` `data` has a length of 0, however it must have a length of at least 1"
             )
         acc = initial_accumulator
@@ -1398,7 +1348,7 @@ class pamda_core(utils):
             acc = fn(acc, i)
         return acc
 
-    def safeDivide(self, denominator, a):
+    def safeDivide(self, denominator: [int, float], a: [int, float]):
         """
         Function:
 
@@ -1417,19 +1367,18 @@ class pamda_core(utils):
         Example:
 
         ```
-        p.safeDivide(2,10) #=> 5
-        p.safeDivide(0,10) #=> 10
+        pamda.safeDivide(2,10) #=> 5
+        pamda.safeDivide(0,10) #=> 10
         ```
         """
-        if not isinstance(a, (float, int)) or not isinstance(
-            denominator, (float, int)
-        ):
-            self.exception(
-                "`safeDivide` can only be called on `float` or `int` objects"
-            )
         return a / denominator if denominator != 0 else a
 
-    def safeDivideDefault(self, default_denominator, denominator, a):
+    def safeDivideDefault(
+        self,
+        default_denominator: [int, float],
+        denominator: [int, float],
+        a: [int, float],
+    ):
         """
         Function:
 
@@ -1451,25 +1400,17 @@ class pamda_core(utils):
         Example:
 
         ```
-        p.safeDivideDefault(2,5,10) #=> 2
-        p.safeDivideDefault(2,0,10) #=> 5
+        pamda.safeDivideDefault(2,5,10) #=> 2
+        pamda.safeDivideDefault(2,0,10) #=> 5
         ```
         """
-        if (
-            not isinstance(a, (float, int))
-            or not isinstance(denominator, (float, int))
-            or not isinstance(default_denominator, (float, int))
-        ):
-            self.exception(
-                "`safeDivideDefault` can only be called on `float` or `int` objects"
-            )
         if default_denominator == 0:
-            self.exception(
+            raise Exception(
                 "`safeDivideDefault` `default_denominator` can not be 0"
             )
         return a / denominator if denominator != 0 else a / default_denominator
 
-    def symmetricDifference(self, a, b):
+    def symmetricDifference(self, a: list, b: list):
         """
         Function:
 
@@ -1489,12 +1430,12 @@ class pamda_core(utils):
         ```
         a=['a','b']
         b=['b','c']
-        p.symmetricDifference(a=a, b=b) #=> ['a','c']
+        pamda.symmetricDifference(a=a, b=b) #=> ['a','c']
         ```
         """
         return list(set(a).difference(set(b))) + list(set(b).difference(set(a)))
 
-    def tail(self, data):
+    def tail(self, data: [str, list]):
         """
         Function:
 
@@ -1510,15 +1451,13 @@ class pamda_core(utils):
 
         ```
         data=['fe','fi','fo','fum']
-        p.tail(
+        pamda.tail(
             data=data
         ) #=> fum
         ```
         """
-        if not isinstance(data, (list, str)):
-            self.exception("`tail` can only be called on a `str` or a `list`")
         if not len(data) > 0:
-            self.exception("Attempting to call `tail` on an empty list or str")
+            raise Exception("Attempting to call `tail` on an empty list or str")
         return data[-1]
 
     def thunkify(self, fn):
@@ -1548,7 +1487,7 @@ class pamda_core(utils):
         def add(a,b):
             return a+b
 
-        addThunk=p.thunkify(add)
+        addThunk=pamda.thunkify(add)
 
         add(1,2) #=> 3
         addThunk(1,2)
@@ -1559,7 +1498,7 @@ class pamda_core(utils):
         ```
 
         ```
-        @p.curry
+        @pamda.curry
         def add(a,b):
             return a+b
 
@@ -1571,13 +1510,10 @@ class pamda_core(utils):
         add(1,2)() #=> 3
         ```
         """
-        if not isinstance(fn, curry_fn):
-            fn = curry_fn(fn)
-        else:
-            fn = fn()
+        fn = self.curry(fn)
         return fn.thunkify()
 
-    def unnest(self, data):
+    def unnest(self, data: list):
         """
         Function:
 
@@ -1593,15 +1529,13 @@ class pamda_core(utils):
 
         ```
         data=['fe','fi',['fo',['fum']]]
-        p.unnest(
+        pamda.unnest(
             data=data
         ) #=> =['fe','fi','fo',['fum']]
         ```
         """
-        if not isinstance(data, (list)):
-            self.exception("`unnest` can only be called on a `list`")
         if not len(data) > 0:
-            self.exception("Attempting to call `unnest` on an empty list")
+            raise Exception("Attempting to call `unnest` on an empty list")
         output = []
         for i in data:
             if isinstance(i, list):
@@ -1610,7 +1544,7 @@ class pamda_core(utils):
                 output.append(i)
         return output
 
-    def zip(self, a, b):
+    def zip(self, a: list, b: list):
         """
         Function:
 
@@ -1630,12 +1564,12 @@ class pamda_core(utils):
         ```
         a=['a','b']
         b=[1,2]
-        p.zip(a=a, b=b) #=> [['a',1],['b',2]]
+        pamda.zip(a=a, b=b) #=> [['a',1],['b',2]]
         ```
         """
         return [list(item) for item in zip(a, b)]
 
-    def zipObj(self, a, b):
+    def zipObj(self, a: list, b: list):
         """
         Function:
 
@@ -1656,7 +1590,7 @@ class pamda_core(utils):
         ```
         a=['a','b']
         b=[1,2]
-        p.zipObj(a=a, b=b) #=> {'a':1, 'b':2}
+        pamda.zipObj(a=a, b=b) #=> {'a':1, 'b':2}
         ```
         """
         return dict(zip(a, b))

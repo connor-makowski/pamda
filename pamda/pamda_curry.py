@@ -1,15 +1,16 @@
 import types, threading
 
 
-class curry_fn:
+class curry_obj:
     def __init__(
         self, __fn__, *__args__, __flips__=[], __isThunk__=False, **__kwargs__
     ):
-        self.__doc__ = __fn__.__doc__
-        self.__name__ = __fn__.__name__ + "_curried"
         self.__fn__ = __fn__
+        self.__name__ = self.__fn__.__name__
+        self.__doc__ = self.__fn__.__doc__
         self.__args__ = __args__
         self.__kwargs__ = __kwargs__
+        self.__isCurried__ = True
         self.__isThunk__ = __isThunk__
         self.__flips__ = __flips__
         self.__fnArity__ = self.__getFnArity__()
@@ -31,7 +32,7 @@ class curry_fn:
                 if self.__thread__ != None:
                     self.__thread_results__ = results
                 return results
-        return curry_fn(
+        return curry_obj(
             self.__fn__,
             *new_args,
             __flips__=self.__flips__,
@@ -51,7 +52,7 @@ class curry_fn:
                 "A non function was passed as a function and does not have any arity. See the stack trace above for more information."
             )
         extra_method_input_count = (
-            1 if isinstance(self.__fn__, types.MethodType) else 0
+            1 if isinstance(self.__fn__, (types.MethodType)) else 0
         )
         return self.__fn__.__code__.co_argcount - extra_method_input_count
 

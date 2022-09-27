@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>pamda.pamda_utils API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>pamda.pamda_utils</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import csv
+import json
+from pamda import pamda_wrappers
+
+
+@pamda_wrappers.staticmethod_wrap
+class pamda_utils:
+    ######################
+    # Data Handling
+    def read_csv(
+        filename: str, has_header: bool = True, return_dict: bool = True
+    ):
+        &#34;&#34;&#34;
+        Function:
+
+        - Reads the contents of a csv and converts it to list of dicts or list of lists
+
+        Requires:
+
+        - `filename`:
+            - Type: str
+            - What: The filepath of the csv to read
+
+        Optional:
+
+        - `has_header`:
+            - Type: bool
+            - What: Flag to indicate if the csv has an initial row that identifies columns
+            - Default: True
+            - Note: Returns a list of lists
+        - `return_dict`:
+            - Type: bool
+            - What: Flag to indicate if the csv should be converted to:
+                - True: list of dicts
+                - False: list of lists
+            - Note: If True, requires `has_header` to be True as the header determines the keys of the dicts
+        &#34;&#34;&#34;
+        with open(filename) as f:
+            file_data = csv.reader(f, delimiter=&#34;,&#34;, quotechar=&#39;&#34;&#39;)
+            if has_header:
+                headers = next(file_data)
+            if has_header and return_dict:
+                return [dict(zip(headers, i)) for i in file_data]
+            elif not has_header and return_dict:
+                raise Exception(
+                    &#34;If `return_dict` is True, `has_header` must also be True.&#34;
+                )
+            else:
+                return [i for i in file_data]
+
+    def write_csv(filename: str, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Writes the contents of a list of list or list of dicts to a csv
+
+        Requires:
+
+        - `filename`:
+            - Type: str
+            - What: The filepath of the csv to read
+        - `data`:
+            - Type: list of lists | list of dicts
+            - What: The data to write
+        &#34;&#34;&#34;
+        with open(filename, &#34;w&#34;) as f:
+            if isinstance(data[0], dict):
+                writer = csv.DictWriter(f, fieldnames=data[0].keys())
+                writer.writeheader()
+                for row in data:
+                    writer.writerow(row)
+            elif isinstance(data[0], list):
+                writer = csv.writer(f)
+                for row in data:
+                    writer.writerow(row)
+            else:
+                raise Exception(
+                    &#34;`write_csv` takes in list of lists or list of dicts only.&#34;
+                )
+
+    def read_json(filename: str):
+        &#34;&#34;&#34;
+        Function:
+
+        - Reads the contents of a json
+
+        Requires:
+        - `filename`:
+            - Type: str
+            - What: The filepath of the json to read
+        &#34;&#34;&#34;
+        const_map = {
+            &#34;-Infinity&#34;: float(&#34;-Infinity&#34;),
+            &#34;Infinity&#34;: float(&#34;Infinity&#34;),
+            &#34;NaN&#34;: None,
+        }
+        with open(filename) as f:
+            return json.load(f, parse_constant=lambda x: const_map[x])
+
+    def write_json(filename: str, data, pretty: bool = False):
+        &#34;&#34;&#34;
+        Function:
+
+        - Writes the contents of a list of list or list of dicts to a json
+
+        Requires:
+
+        - `filename`:
+            - Type: str
+            - What: The filepath of the json to write
+        - `data`:
+            - Type: A json serializable python object
+            - What: The data to write
+        &#34;&#34;&#34;
+        with open(filename, &#34;w&#34;) as f:
+            if pretty:
+                json.dump(data, f, indent=4)
+            else:
+                json.dump(data, f)
+
+    ######################
+    # Helpful Functions
+    @pamda_wrappers.curry_wrap
+    def getMethods(object):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the callable methods of a class (dunder-excluded) as a list of strs
+
+        Requires:
+
+        - `object`:
+            - Type: any
+            - What: Any python object
+            - Default: 1
+
+        Example:
+
+        ```
+        class MyClass:
+            def A(self):
+                pass
+
+            def B(self):
+                pass
+
+
+        pamda.getMethods(MyClass) #=&gt; [&#39;A&#39;, &#39;B&#39;]
+        ```
+        &#34;&#34;&#34;
+        return [
+            fn
+            for fn in dir(object)
+            if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)
+        ]
+
+    @pamda_wrappers.curry_wrap
+    def getForceDict(object: dict, key: str):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns a value from a dictionary given a key and forces that value to be a dictionary
+        - Note: This updates the object in place to force the value from the key to be a dictionary
+
+        Requires:
+
+        - `object`:
+            - Type: dict
+            - What: The object from which to look for a key
+        - `key`:
+            - Type: str
+            - What: The key to look up in the object
+
+        Example:
+
+        ```
+        data = {&#39;a&#39;:{}, &#39;b&#39;:1}
+
+        pamda.getForceDict(data, &#39;a&#39;) #=&gt; {}
+        pamda.getForceDict(data, &#39;b&#39;) #=&gt; {}
+
+        # Note that the object has been updated in place
+        data #=&gt; {&#39;a&#39;:{}, &#39;b&#39;:{}}
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(object.get(key), dict):
+            object.__setitem__(key, {})
+        return object.get(key)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="pamda.pamda_utils.pamda_utils"><code class="flex name class">
+<span>class <span class="ident">pamda_utils</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pamda_wrappers.staticmethod_wrap
+class pamda_utils:
+    ######################
+    # Data Handling
+    def read_csv(
+        filename: str, has_header: bool = True, return_dict: bool = True
+    ):
+        &#34;&#34;&#34;
+        Function:
+
+        - Reads the contents of a csv and converts it to list of dicts or list of lists
+
+        Requires:
+
+        - `filename`:
+            - Type: str
+            - What: The filepath of the csv to read
+
+        Optional:
+
+        - `has_header`:
+            - Type: bool
+            - What: Flag to indicate if the csv has an initial row that identifies columns
+            - Default: True
+            - Note: Returns a list of lists
+        - `return_dict`:
+            - Type: bool
+            - What: Flag to indicate if the csv should be converted to:
+                - True: list of dicts
+                - False: list of lists
+            - Note: If True, requires `has_header` to be True as the header determines the keys of the dicts
+        &#34;&#34;&#34;
+        with open(filename) as f:
+            file_data = csv.reader(f, delimiter=&#34;,&#34;, quotechar=&#39;&#34;&#39;)
+            if has_header:
+                headers = next(file_data)
+            if has_header and return_dict:
+                return [dict(zip(headers, i)) for i in file_data]
+            elif not has_header and return_dict:
+                raise Exception(
+                    &#34;If `return_dict` is True, `has_header` must also be True.&#34;
+                )
+            else:
+                return [i for i in file_data]
+
+    def write_csv(filename: str, data):
+        &#34;&#34;&#34;
+        Function:
+
+        - Writes the contents of a list of list or list of dicts to a csv
+
+        Requires:
+
+        - `filename`:
+            - Type: str
+            - What: The filepath of the csv to read
+        - `data`:
+            - Type: list of lists | list of dicts
+            - What: The data to write
+        &#34;&#34;&#34;
+        with open(filename, &#34;w&#34;) as f:
+            if isinstance(data[0], dict):
+                writer = csv.DictWriter(f, fieldnames=data[0].keys())
+                writer.writeheader()
+                for row in data:
+                    writer.writerow(row)
+            elif isinstance(data[0], list):
+                writer = csv.writer(f)
+                for row in data:
+                    writer.writerow(row)
+            else:
+                raise Exception(
+                    &#34;`write_csv` takes in list of lists or list of dicts only.&#34;
+                )
+
+    def read_json(filename: str):
+        &#34;&#34;&#34;
+        Function:
+
+        - Reads the contents of a json
+
+        Requires:
+        - `filename`:
+            - Type: str
+            - What: The filepath of the json to read
+        &#34;&#34;&#34;
+        const_map = {
+            &#34;-Infinity&#34;: float(&#34;-Infinity&#34;),
+            &#34;Infinity&#34;: float(&#34;Infinity&#34;),
+            &#34;NaN&#34;: None,
+        }
+        with open(filename) as f:
+            return json.load(f, parse_constant=lambda x: const_map[x])
+
+    def write_json(filename: str, data, pretty: bool = False):
+        &#34;&#34;&#34;
+        Function:
+
+        - Writes the contents of a list of list or list of dicts to a json
+
+        Requires:
+
+        - `filename`:
+            - Type: str
+            - What: The filepath of the json to write
+        - `data`:
+            - Type: A json serializable python object
+            - What: The data to write
+        &#34;&#34;&#34;
+        with open(filename, &#34;w&#34;) as f:
+            if pretty:
+                json.dump(data, f, indent=4)
+            else:
+                json.dump(data, f)
+
+    ######################
+    # Helpful Functions
+    @pamda_wrappers.curry_wrap
+    def getMethods(object):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns the callable methods of a class (dunder-excluded) as a list of strs
+
+        Requires:
+
+        - `object`:
+            - Type: any
+            - What: Any python object
+            - Default: 1
+
+        Example:
+
+        ```
+        class MyClass:
+            def A(self):
+                pass
+
+            def B(self):
+                pass
+
+
+        pamda.getMethods(MyClass) #=&gt; [&#39;A&#39;, &#39;B&#39;]
+        ```
+        &#34;&#34;&#34;
+        return [
+            fn
+            for fn in dir(object)
+            if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)
+        ]
+
+    @pamda_wrappers.curry_wrap
+    def getForceDict(object: dict, key: str):
+        &#34;&#34;&#34;
+        Function:
+
+        - Returns a value from a dictionary given a key and forces that value to be a dictionary
+        - Note: This updates the object in place to force the value from the key to be a dictionary
+
+        Requires:
+
+        - `object`:
+            - Type: dict
+            - What: The object from which to look for a key
+        - `key`:
+            - Type: str
+            - What: The key to look up in the object
+
+        Example:
+
+        ```
+        data = {&#39;a&#39;:{}, &#39;b&#39;:1}
+
+        pamda.getForceDict(data, &#39;a&#39;) #=&gt; {}
+        pamda.getForceDict(data, &#39;b&#39;) #=&gt; {}
+
+        # Note that the object has been updated in place
+        data #=&gt; {&#39;a&#39;:{}, &#39;b&#39;:{}}
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(object.get(key), dict):
+            object.__setitem__(key, {})
+        return object.get(key)</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="pamda.pamda.pamda" href="pamda.html#pamda.pamda.pamda">pamda</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="pamda.pamda_utils.pamda_utils.getForceDict"><code class="name">var <span class="ident">getForceDict</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pamda.pamda_utils.pamda_utils.getMethods"><code class="name">var <span class="ident">getMethods</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="pamda.pamda_utils.pamda_utils.read_csv"><code class="name flex">
+<span>def <span class="ident">read_csv</span></span>(<span>filename: str, has_header: bool = True, return_dict: bool = True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Reads the contents of a csv and converts it to list of dicts or list of lists</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>filename</code>:<ul>
+<li>Type: str</li>
+<li>What: The filepath of the csv to read</li>
+</ul>
+</li>
+</ul>
+<p>Optional:</p>
+<ul>
+<li><code>has_header</code>:<ul>
+<li>Type: bool</li>
+<li>What: Flag to indicate if the csv has an initial row that identifies columns</li>
+<li>Default: True</li>
+<li>Note: Returns a list of lists</li>
+</ul>
+</li>
+<li><code>return_dict</code>:<ul>
+<li>Type: bool</li>
+<li>What: Flag to indicate if the csv should be converted to:<ul>
+<li>True: list of dicts</li>
+<li>False: list of lists</li>
+</ul>
+</li>
+<li>Note: If True, requires <code>has_header</code> to be True as the header determines the keys of the dicts</li>
+</ul>
+</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def read_csv(
+    filename: str, has_header: bool = True, return_dict: bool = True
+):
+    &#34;&#34;&#34;
+    Function:
+
+    - Reads the contents of a csv and converts it to list of dicts or list of lists
+
+    Requires:
+
+    - `filename`:
+        - Type: str
+        - What: The filepath of the csv to read
+
+    Optional:
+
+    - `has_header`:
+        - Type: bool
+        - What: Flag to indicate if the csv has an initial row that identifies columns
+        - Default: True
+        - Note: Returns a list of lists
+    - `return_dict`:
+        - Type: bool
+        - What: Flag to indicate if the csv should be converted to:
+            - True: list of dicts
+            - False: list of lists
+        - Note: If True, requires `has_header` to be True as the header determines the keys of the dicts
+    &#34;&#34;&#34;
+    with open(filename) as f:
+        file_data = csv.reader(f, delimiter=&#34;,&#34;, quotechar=&#39;&#34;&#39;)
+        if has_header:
+            headers = next(file_data)
+        if has_header and return_dict:
+            return [dict(zip(headers, i)) for i in file_data]
+        elif not has_header and return_dict:
+            raise Exception(
+                &#34;If `return_dict` is True, `has_header` must also be True.&#34;
+            )
+        else:
+            return [i for i in file_data]</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_utils.pamda_utils.read_json"><code class="name flex">
+<span>def <span class="ident">read_json</span></span>(<span>filename: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Reads the contents of a json</li>
+</ul>
+<p>Requires:
+- <code>filename</code>:
+- Type: str
+- What: The filepath of the json to read</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def read_json(filename: str):
+    &#34;&#34;&#34;
+    Function:
+
+    - Reads the contents of a json
+
+    Requires:
+    - `filename`:
+        - Type: str
+        - What: The filepath of the json to read
+    &#34;&#34;&#34;
+    const_map = {
+        &#34;-Infinity&#34;: float(&#34;-Infinity&#34;),
+        &#34;Infinity&#34;: float(&#34;Infinity&#34;),
+        &#34;NaN&#34;: None,
+    }
+    with open(filename) as f:
+        return json.load(f, parse_constant=lambda x: const_map[x])</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_utils.pamda_utils.write_csv"><code class="name flex">
+<span>def <span class="ident">write_csv</span></span>(<span>filename: str, data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Writes the contents of a list of list or list of dicts to a csv</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>filename</code>:<ul>
+<li>Type: str</li>
+<li>What: The filepath of the csv to read</li>
+</ul>
+</li>
+<li><code>data</code>:<ul>
+<li>Type: list of lists | list of dicts</li>
+<li>What: The data to write</li>
+</ul>
+</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write_csv(filename: str, data):
+    &#34;&#34;&#34;
+    Function:
+
+    - Writes the contents of a list of list or list of dicts to a csv
+
+    Requires:
+
+    - `filename`:
+        - Type: str
+        - What: The filepath of the csv to read
+    - `data`:
+        - Type: list of lists | list of dicts
+        - What: The data to write
+    &#34;&#34;&#34;
+    with open(filename, &#34;w&#34;) as f:
+        if isinstance(data[0], dict):
+            writer = csv.DictWriter(f, fieldnames=data[0].keys())
+            writer.writeheader()
+            for row in data:
+                writer.writerow(row)
+        elif isinstance(data[0], list):
+            writer = csv.writer(f)
+            for row in data:
+                writer.writerow(row)
+        else:
+            raise Exception(
+                &#34;`write_csv` takes in list of lists or list of dicts only.&#34;
+            )</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_utils.pamda_utils.write_json"><code class="name flex">
+<span>def <span class="ident">write_json</span></span>(<span>filename: str, data, pretty: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Writes the contents of a list of list or list of dicts to a json</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>filename</code>:<ul>
+<li>Type: str</li>
+<li>What: The filepath of the json to write</li>
+</ul>
+</li>
+<li><code>data</code>:<ul>
+<li>Type: A json serializable python object</li>
+<li>What: The data to write</li>
+</ul>
+</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write_json(filename: str, data, pretty: bool = False):
+    &#34;&#34;&#34;
+    Function:
+
+    - Writes the contents of a list of list or list of dicts to a json
+
+    Requires:
+
+    - `filename`:
+        - Type: str
+        - What: The filepath of the json to write
+    - `data`:
+        - Type: A json serializable python object
+        - What: The data to write
+    &#34;&#34;&#34;
+    with open(filename, &#34;w&#34;) as f:
+        if pretty:
+            json.dump(data, f, indent=4)
+        else:
+            json.dump(data, f)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="pamda" href="index.html">pamda</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="pamda.pamda_utils.pamda_utils" href="#pamda.pamda_utils.pamda_utils">pamda_utils</a></code></h4>
+<ul class="two-column">
+<li><code><a title="pamda.pamda_utils.pamda_utils.getForceDict" href="#pamda.pamda_utils.pamda_utils.getForceDict">getForceDict</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.getMethods" href="#pamda.pamda_utils.pamda_utils.getMethods">getMethods</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.read_csv" href="#pamda.pamda_utils.pamda_utils.read_csv">read_csv</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.read_json" href="#pamda.pamda_utils.pamda_utils.read_json">read_json</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.write_csv" href="#pamda.pamda_utils.pamda_utils.write_csv">write_csv</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.write_json" href="#pamda.pamda_utils.pamda_utils.write_json">write_json</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

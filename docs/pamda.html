@@ -26,29 +26,14 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from pamda.pamda_core import pamda_core
+<pre><code class="python">from pamda.pamda_utils import pamda_utils
+from pamda.pamda_core import pamda_core
+import type_enforced
 
 
-class pamda_core_curried:
-    def __init__(self, pamda, *args, **kwargs):
-        no_curry = [
-            &#34;read_csv&#34;,
-            &#34;read_json&#34;,
-            &#34;write_csv&#34;,
-            &#34;write_json&#34;,
-            &#34;warn&#34;,
-            &#34;vprint&#34;,
-            &#34;exception&#34;,
-        ]
-        for method in pamda.getMethods(pamda):
-            if method in no_curry:
-                setattr(self, method, getattr(pamda, method))
-            else:
-                setattr(self, method, pamda.curry(getattr(pamda, method)))
-
-
-pamda_uncurried = pamda_core()
-pamda = pamda_core_curried(pamda=pamda_uncurried)</code></pre>
+@type_enforced.Enforcer
+class pamda(pamda_core, pamda_utils):
+    pass</code></pre>
 </details>
 </section>
 <section>
@@ -60,9 +45,8 @@ pamda = pamda_core_curried(pamda=pamda_uncurried)</code></pre>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="pamda.pamda.pamda_core_curried"><code class="flex name class">
-<span>class <span class="ident">pamda_core_curried</span></span>
-<span>(</span><span>pamda, *args, **kwargs)</span>
+<dt id="pamda.pamda.pamda"><code class="flex name class">
+<span>class <span class="ident">pamda</span></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -70,23 +54,73 @@ pamda = pamda_core_curried(pamda=pamda_uncurried)</code></pre>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class pamda_core_curried:
-    def __init__(self, pamda, *args, **kwargs):
-        no_curry = [
-            &#34;read_csv&#34;,
-            &#34;read_json&#34;,
-            &#34;write_csv&#34;,
-            &#34;write_json&#34;,
-            &#34;warn&#34;,
-            &#34;vprint&#34;,
-            &#34;exception&#34;,
-        ]
-        for method in pamda.getMethods(pamda):
-            if method in no_curry:
-                setattr(self, method, getattr(pamda, method))
-            else:
-                setattr(self, method, pamda.curry(getattr(pamda, method)))</code></pre>
+<pre><code class="python">@type_enforced.Enforcer
+class pamda(pamda_core, pamda_utils):
+    pass</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pamda.pamda_core.pamda_core" href="pamda_core.html#pamda.pamda_core.pamda_core">pamda_core</a></li>
+<li><a title="pamda.pamda_utils.pamda_utils" href="pamda_utils.html#pamda.pamda_utils.pamda_utils">pamda_utils</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pamda.pamda_core.pamda_core" href="pamda_core.html#pamda.pamda_core.pamda_core">pamda_core</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pamda.pamda_core.pamda_core.accumulate" href="pamda_core.html#pamda.pamda_core.pamda_core.accumulate">accumulate</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.add" href="pamda_core.html#pamda.pamda_core.pamda_core.add">add</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.adjust" href="pamda_core.html#pamda.pamda_core.pamda_core.adjust">adjust</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.assocPath" href="pamda_core.html#pamda.pamda_core.pamda_core.assocPath">assocPath</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.assocPathComplex" href="pamda_core.html#pamda.pamda_core.pamda_core.assocPathComplex">assocPathComplex</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.asyncRun" href="pamda_core.html#pamda.pamda_core.pamda_core.asyncRun">asyncRun</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.asyncWait" href="pamda_core.html#pamda.pamda_core.pamda_core.asyncWait">asyncWait</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.clamp" href="pamda_core.html#pamda.pamda_core.pamda_core.clamp">clamp</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.curry" href="pamda_core.html#pamda.pamda_core.pamda_core.curry">curry</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.dec" href="pamda_core.html#pamda.pamda_core.pamda_core.dec">dec</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.difference" href="pamda_core.html#pamda.pamda_core.pamda_core.difference">difference</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.dissocPath" href="pamda_core.html#pamda.pamda_core.pamda_core.dissocPath">dissocPath</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.flatten" href="pamda_core.html#pamda.pamda_core.pamda_core.flatten">flatten</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.flip" href="pamda_core.html#pamda.pamda_core.pamda_core.flip">flip</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.getArity" href="pamda_core.html#pamda.pamda_core.pamda_core.getArity">getArity</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.groupBy" href="pamda_core.html#pamda.pamda_core.pamda_core.groupBy">groupBy</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.groupKeys" href="pamda_core.html#pamda.pamda_core.pamda_core.groupKeys">groupKeys</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.groupWith" href="pamda_core.html#pamda.pamda_core.pamda_core.groupWith">groupWith</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.hardRound" href="pamda_core.html#pamda.pamda_core.pamda_core.hardRound">hardRound</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.hasPath" href="pamda_core.html#pamda.pamda_core.pamda_core.hasPath">hasPath</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.head" href="pamda_core.html#pamda.pamda_core.pamda_core.head">head</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.inc" href="pamda_core.html#pamda.pamda_core.pamda_core.inc">inc</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.intersection" href="pamda_core.html#pamda.pamda_core.pamda_core.intersection">intersection</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.map" href="pamda_core.html#pamda.pamda_core.pamda_core.map">map</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.mean" href="pamda_core.html#pamda.pamda_core.pamda_core.mean">mean</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.median" href="pamda_core.html#pamda.pamda_core.pamda_core.median">median</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.mergeDeep" href="pamda_core.html#pamda.pamda_core.pamda_core.mergeDeep">mergeDeep</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.nest" href="pamda_core.html#pamda.pamda_core.pamda_core.nest">nest</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.nestItem" href="pamda_core.html#pamda.pamda_core.pamda_core.nestItem">nestItem</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.path" href="pamda_core.html#pamda.pamda_core.pamda_core.path">path</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.pathOr" href="pamda_core.html#pamda.pamda_core.pamda_core.pathOr">pathOr</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.pipe" href="pamda_core.html#pamda.pamda_core.pamda_core.pipe">pipe</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.pluck" href="pamda_core.html#pamda.pamda_core.pamda_core.pluck">pluck</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.pluckIf" href="pamda_core.html#pamda.pamda_core.pamda_core.pluckIf">pluckIf</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.reduce" href="pamda_core.html#pamda.pamda_core.pamda_core.reduce">reduce</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.safeDivide" href="pamda_core.html#pamda.pamda_core.pamda_core.safeDivide">safeDivide</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.safeDivideDefault" href="pamda_core.html#pamda.pamda_core.pamda_core.safeDivideDefault">safeDivideDefault</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.symmetricDifference" href="pamda_core.html#pamda.pamda_core.pamda_core.symmetricDifference">symmetricDifference</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.tail" href="pamda_core.html#pamda.pamda_core.pamda_core.tail">tail</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.thunkify" href="pamda_core.html#pamda.pamda_core.pamda_core.thunkify">thunkify</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.unnest" href="pamda_core.html#pamda.pamda_core.pamda_core.unnest">unnest</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.zip" href="pamda_core.html#pamda.pamda_core.pamda_core.zip">zip</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda_core.zipObj" href="pamda_core.html#pamda.pamda_core.pamda_core.zipObj">zipObj</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="pamda.pamda_utils.pamda_utils" href="pamda_utils.html#pamda.pamda_utils.pamda_utils">pamda_utils</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pamda.pamda_utils.pamda_utils.read_csv" href="pamda_utils.html#pamda.pamda_utils.pamda_utils.read_csv">read_csv</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.read_json" href="pamda_utils.html#pamda.pamda_utils.pamda_utils.read_json">read_json</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.write_csv" href="pamda_utils.html#pamda.pamda_utils.pamda_utils.write_csv">write_csv</a></code></li>
+<li><code><a title="pamda.pamda_utils.pamda_utils.write_json" href="pamda_utils.html#pamda.pamda_utils.pamda_utils.write_json">write_json</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -105,7 +139,7 @@ pamda = pamda_core_curried(pamda=pamda_uncurried)</code></pre>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="pamda.pamda.pamda_core_curried" href="#pamda.pamda.pamda_core_curried">pamda_core_curried</a></code></h4>
+<h4><code><a title="pamda.pamda.pamda" href="#pamda.pamda.pamda">pamda</a></code></h4>
 </li>
 </ul>
 </li>
