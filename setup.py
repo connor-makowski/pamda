@@ -18,7 +18,7 @@ setup(
   download_url = 'https://github.com/connor-makowski/pamda/dist/pamda-1.0.0.tar.gz',
   keywords = ['data', 'ramda', 'pamda','functional'],
   install_requires=[
-        "type_enforced==0.0.8"
+        "type_enforced==0.0.11"
   ],
   classifiers=[
     'Development Status :: 3 - Alpha',

@@ -32,9 +32,9 @@ from pamda.pamda_curry import curry_obj
 from pamda import pamda_wrappers
 
 
-@pamda_wrappers.curry_wrap
+@pamda_wrappers.typed_curry_wrap
 @pamda_wrappers.classmethod_wrap
-class pamda_core:
+class pamda:
     def accumulate(self, fn, initial_accumulator, data: list):
         &#34;&#34;&#34;
         Function:
@@ -176,7 +176,9 @@ class pamda_core:
         )
         return data
 
-    def assocPathComplex(self, default, default_fn, path: str, data: dict):
+    def assocPathComplex(
+        self, default, default_fn, path: [str, list], data: dict
+    ):
         &#34;&#34;&#34;
         Function:
 
@@ -379,7 +381,7 @@ class pamda_core:
 
         Notes:
 
-        - Once curried, the function | method becomes a curry_fn object
+        - Once curried, the function | method becomes a curry_obj object
         - The initial function is only called once all inputs are passed
 
 
@@ -414,6 +416,40 @@ class pamda_core:
         if fn.__dict__.get(&#34;__isCurried__&#34;):
             return fn()
         return curry_obj(fn)
+
+    def curryTyped(self, fn):
+        &#34;&#34;&#34;
+        Function:
+
+        - Curries a function such that inputs can be added interatively and function annotations are type checked at runtime
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to curry
+            - Note: Class methods auto apply self during curry
+
+        Notes:
+
+        - Once curried, the function | method becomes a curry_obj object
+        - The initial function is only called once all inputs are passed
+
+
+        Examples:
+
+        ```
+        @pamda.curryTyped
+        def add(a:int,b:int):
+            return a+b
+
+        add(1)(1) #=&gt; 2
+        add(1)(1.5) #=&gt; Raises type exception
+        ```
+        &#34;&#34;&#34;
+        if fn.__dict__.get(&#34;__isCurried__&#34;):
+            return fn().typeEnforce()
+        return curry_obj(fn).typeEnforce()
 
     def dec(self, a: [int, float]):
         &#34;&#34;&#34;
@@ -1633,8 +1669,8 @@ class pamda_core:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="pamda.pamda_core.pamda_core"><code class="flex name class">
-<span>class <span class="ident">pamda_core</span></span>
+<dt id="pamda.pamda_core.pamda"><code class="flex name class">
+<span>class <span class="ident">pamda</span></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1642,9 +1678,9 @@ class pamda_core:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@pamda_wrappers.curry_wrap
+<pre><code class="python">@pamda_wrappers.typed_curry_wrap
 @pamda_wrappers.classmethod_wrap
-class pamda_core:
+class pamda:
     def accumulate(self, fn, initial_accumulator, data: list):
         &#34;&#34;&#34;
         Function:
@@ -1786,7 +1822,9 @@ class pamda_core:
         )
         return data
 
-    def assocPathComplex(self, default, default_fn, path: str, data: dict):
+    def assocPathComplex(
+        self, default, default_fn, path: [str, list], data: dict
+    ):
         &#34;&#34;&#34;
         Function:
 
@@ -1989,7 +2027,7 @@ class pamda_core:
 
         Notes:
 
-        - Once curried, the function | method becomes a curry_fn object
+        - Once curried, the function | method becomes a curry_obj object
         - The initial function is only called once all inputs are passed
 
 
@@ -2024,6 +2062,40 @@ class pamda_core:
         if fn.__dict__.get(&#34;__isCurried__&#34;):
             return fn()
         return curry_obj(fn)
+
+    def curryTyped(self, fn):
+        &#34;&#34;&#34;
+        Function:
+
+        - Curries a function such that inputs can be added interatively and function annotations are type checked at runtime
+
+        Requires:
+
+        - `fn`:
+            - Type: function | method
+            - What: The function or method to curry
+            - Note: Class methods auto apply self during curry
+
+        Notes:
+
+        - Once curried, the function | method becomes a curry_obj object
+        - The initial function is only called once all inputs are passed
+
+
+        Examples:
+
+        ```
+        @pamda.curryTyped
+        def add(a:int,b:int):
+            return a+b
+
+        add(1)(1) #=&gt; 2
+        add(1)(1.5) #=&gt; Raises type exception
+        ```
+        &#34;&#34;&#34;
+        if fn.__dict__.get(&#34;__isCurried__&#34;):
+            return fn().typeEnforce()
+        return curry_obj(fn).typeEnforce()
 
     def dec(self, a: [int, float]):
         &#34;&#34;&#34;
@@ -3239,8 +3311,8 @@ class pamda_core:
 </ul>
 <h3>Static methods</h3>
 <dl>
-<dt id="pamda.pamda_core.pamda_core.accumulate"><code class="name flex">
-<span>def <span class="ident">accumulate</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.accumulate"><code class="name flex">
+<span>def <span class="ident">accumulate</span></span>(<span>self, fn, initial_accumulator, data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3276,9 +3348,61 @@ pamda.accumulate(
 #=&gt; [1,3,6,10]
 
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def accumulate(self, fn, initial_accumulator, data: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns an accumulated list of items by iterating a function starting with an accumulator over a list
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to reduce
+        - Note: This function should have an arity of 2 (take two inputs)
+        - Note: The first input should take the accumulator value
+        - Note: The second input should take the data value
+    -`initial_accumulator`:
+        - Type: any
+        - What: The initial item to pass into the function when starting the accumulation process
+    - `data`:
+        - Type: list
+        - What: The list of items to iterate over
+
+    Example:
+
+    ```
+    data=[1,2,3,4]
+    pamda.accumulate(
+        fn=pamda.add,
+        initial_accumulator=0,
+        data=data
+    )
+    #=&gt; [1,3,6,10]
+
+    ```
+    &#34;&#34;&#34;
+    fn = self.curry(fn)
+    if fn.__arity__ != 2:
+        raise Exception(&#34;`fn` must have an arity of 2 (take two inputs)&#34;)
+    if not len(data) &gt; 0:
+        raise Exception(
+            &#34;`data` has a length of 0, however it must have a length of at least 1&#34;
+        )
+    acc = initial_accumulator
+    out = []
+    for i in data:
+        acc = fn(acc, i)
+        out.append(acc)
+    return out</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.add"><code class="name flex">
-<span>def <span class="ident">add</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.add"><code class="name flex">
+<span>def <span class="ident">add</span></span>(<span>self, a: [<class 'int'>, <class 'float'>], b: [<class 'int'>, <class 'float'>])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3301,9 +3425,36 @@ pamda.accumulate(
 <p>Example:</p>
 <pre><code>pamda.add(1, 2) #=&gt; 3
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add(self, a: [int, float], b: [int, float]):
+    &#34;&#34;&#34;
+    Function:
+
+    - Adds two numbers
+
+    Requires:
+
+    - `a`:
+        - Type: int | float
+        - What: The first number to add
+    - `b`:
+        - Type: int | float
+        - What: The second number to add
+
+    Example:
+
+    ```
+    pamda.add(1, 2) #=&gt; 3
+    ```
+    &#34;&#34;&#34;
+    return a + b</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.adjust"><code class="name flex">
-<span>def <span class="ident">adjust</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.adjust"><code class="name flex">
+<span>def <span class="ident">adjust</span></span>(<span>self, index: int, fn, data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3339,9 +3490,50 @@ pamda.adjust(
     data=data
 ) #=&gt; [1,6,9]
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def adjust(self, index: int, fn, data: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Adjusts an item in a list by applying a function to it
+
+    Requires:
+
+    - `index`:
+        - Type: int
+        - What: The 0 based index of the item in the list to adjust
+        - Note: Indicies are accepted
+        - Note: If the index is out of range, picks the (-)first / (+)last item
+    - `fn`:
+        - Type: function | method
+        - What: The function to apply the index item to
+        - Note: This is automatically curried
+    - `data`:
+        - Type: list
+        - What: The list to adjust
+
+    Example:
+
+    ```
+    data=[1,5,9]
+    pamda.adjust(
+        index=1,
+        fn=pamda.inc,
+        data=data
+    ) #=&gt; [1,6,9]
+    ```
+    &#34;&#34;&#34;
+    fn = self.curry(fn)
+    index = self.clamp(-len(data), len(data) - 1, index)
+    data[index] = fn(data[index])
+    return data</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.assocPath"><code class="name flex">
-<span>def <span class="ident">assocPath</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.assocPath"><code class="name flex">
+<span>def <span class="ident">assocPath</span></span>(<span>self, path: [<class 'list'>, <class 'str'>], value, data: dict)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3371,9 +3563,46 @@ pamda.adjust(
 <pre><code>data={'a':{'b':1}}
 pamda.assocPath(path=['a','c'], value=3, data=data) #=&gt; {'a':{'b':1, 'c':3}}
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def assocPath(self, path: [list, str], value, data: dict):
+    &#34;&#34;&#34;
+    Function:
+
+    - Ensures a path exists within a nested dictionary
+
+    Requires:
+
+    - `path`:
+        - Type: list of strs | str
+        - What: The path to check
+        - Note: If a string is passed, assumes a single item path list with that string
+    - `value`:
+        - Type: any
+        - What: The value to appropriate to the end of the path
+    - `data`:
+        - Type: dict
+        - What: A dictionary in which to associate the given value to the given path
+
+    Example:
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:1}}
+    pamda.assocPath(path=[&#39;a&#39;,&#39;c&#39;], value=3, data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:3}}
+    ```
+    &#34;&#34;&#34;
+    if isinstance(path, str):
+        path = [path]
+    reduce(pamda_utils.getForceDict, path[:-1], data).__setitem__(
+        path[-1], value
+    )
+    return data</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.assocPathComplex"><code class="name flex">
-<span>def <span class="ident">assocPathComplex</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.assocPathComplex"><code class="name flex">
+<span>def <span class="ident">assocPathComplex</span></span>(<span>self, default, default_fn, path: [<class 'str'>, <class 'list'>], data: dict)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3408,9 +3637,56 @@ pamda.assocPath(path=['a','c'], value=3, data=data) #=&gt; {'a':{'b':1, 'c':3}}
 <pre><code>data={'a':{'b':1}}
 pamda.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=data) #=&gt; {'a':{'b':1,'c':[2,1]}}
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def assocPathComplex(
+    self, default, default_fn, path: [str, list], data: dict
+):
+    &#34;&#34;&#34;
+    Function:
+
+    - Ensures a path exists within a nested dictionary
+
+    Requires:
+
+    - `default`:
+        - Type: any
+        - What: The default item to add to a path that does not yet exist
+    - `default_fn`:
+        - Type: function | method
+        - What: A unary (single input) function that takes in the current path item (or default) and adjusts it
+        - Example: `lambda x: x` # Returns the value in the dict or the default value if none was present
+    - `path`:
+        - Type: list of strs
+        - What: The path to check
+    - `data`:
+        - Type: dict
+        - What: A dictionary to check if the path exists
+
+    Example:
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:1}}
+    pamda.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=[&#39;a&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1,&#39;c&#39;:[2,1]}}
+    ```
+    &#34;&#34;&#34;
+    if self.getArity(default_fn) != 1:
+        raise Exception(
+            &#34;`assocPathComplex` `default_fn` must be an unary (single input) function.&#34;
+        )
+    if isinstance(path, str):
+        path = [path]
+    path_object = reduce(pamda_utils.getForceDict, path[:-1], data)
+    path_object.__setitem__(
+        path[-1], default_fn(path_object.get(path[-1], default))
+    )
+    return data</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.asyncRun"><code class="name flex">
-<span>def <span class="ident">asyncRun</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.asyncRun"><code class="name flex">
+<span>def <span class="ident">asyncRun</span></span>(<span>self, fn: <a title="pamda.pamda_curry.curry_obj" href="pamda_curry.html#pamda.pamda_curry.curry_obj">curry_obj</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3473,9 +3749,85 @@ def test(name, wait):
 async_test = test('a',2).asyncRun()
 print(async_test.asyncWait()) #=&gt; a: 2
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def asyncRun(self, fn: curry_obj):
+    &#34;&#34;&#34;
+    Function:
+
+    - Runs the supplied function asychronously
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to run asychronously
+        - Note: The supplied `fn` must have an arity of 0
+
+    Notes:
+
+    - To pass inputs to a function in asyncRun, first thunkify the function and pass all arguments before calling `asyncRun` on it
+    - To get the results of an `asyncRun` call `asyncWait`
+    - A thunkified function with arity of 0 can call `asyncRun` on itself
+
+    Examples:
+
+    Input:
+    ```
+    import time
+
+    @pamda.thunkify
+    def test(name, wait):
+        print(f&#39;{name} start&#39;)
+        time.sleep(wait)
+        print(f&#39;{name} end&#39;)
+
+    async_test = pamda.asyncRun(test(&#39;a&#39;,2))
+    sync_test = test(&#39;b&#39;,1)()
+    ```
+    Output:
+    ```
+    a start
+    b start
+    b end
+    a end
+    ```
+
+
+    Input:
+    ```
+    import time
+
+    @pamda.thunkify
+    def test(name, wait):
+        time.sleep(wait)
+        return f&#34;{name}: {wait}&#34;
+
+    async_test = pamda.asyncRun(test(&#39;a&#39;,2))
+    print(async_test.asyncWait()) #=&gt; a: 2
+    ```
+
+
+    Input:
+    ```
+    import time
+
+    @pamda.thunkify
+    def test(name, wait):
+        time.sleep(wait)
+        return f&#34;{name}: {wait}&#34;
+
+    async_test = test(&#39;a&#39;,2).asyncRun()
+    print(async_test.asyncWait()) #=&gt; a: 2
+    ```
+    &#34;&#34;&#34;
+    return fn.asyncRun()</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.asyncWait"><code class="name flex">
-<span>def <span class="ident">asyncWait</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.asyncWait"><code class="name flex">
+<span>def <span class="ident">asyncWait</span></span>(<span>self, fn: <a title="pamda.pamda_curry.curry_obj" href="pamda_curry.html#pamda.pamda_curry.curry_obj">curry_obj</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3516,9 +3868,59 @@ def test(name, wait):
 async_test = pamda.asyncRun(test('a',2))
 print(async_test.asyncWait()) #=&gt; a: 2
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def asyncWait(self, fn: curry_obj):
+    &#34;&#34;&#34;
+    Function:
+
+    - Waits for a supplied function (if needed) and returns the results
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method for which to wait
+        - Note: The supplied `fn` must have previously called `asyncRun`
+
+    Notes:
+
+    - A thunkified function that has called `asyncRun` can call `asyncWait` on itself
+
+    Examples:
+
+    ```
+    import time
+
+    @pamda.thunkify
+    def test(name, wait):
+        time.sleep(wait)
+        return f&#34;{name}: {wait}&#34;
+
+    async_test = pamda.asyncRun(test(&#39;a&#39;,2))
+    print(pamda.asyncWait(async_test)) #=&gt; a: 2
+    ```
+
+
+    ```
+    import time
+
+    @pamda.thunkify
+    def test(name, wait):
+        time.sleep(wait)
+        return f&#34;{name}: {wait}&#34;
+
+    async_test = pamda.asyncRun(test(&#39;a&#39;,2))
+    print(async_test.asyncWait()) #=&gt; a: 2
+    ```
+    &#34;&#34;&#34;
+    return fn.asyncWait()</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.clamp"><code class="name flex">
-<span>def <span class="ident">clamp</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.clamp"><code class="name flex">
+<span>def <span class="ident">clamp</span></span>(<span>self, minimum: [<class 'int'>, <class 'float'>], maximum: [<class 'int'>, <class 'float'>], a: [<class 'int'>, <class 'float'>])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3547,9 +3949,42 @@ print(async_test.asyncWait()) #=&gt; a: 2
 <pre><code>pamda.clamp(1, 3, 2) #=&gt; 2
 pamda.clamp(1, 3, 5) #=&gt; 3
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def clamp(
+    self, minimum: [int, float], maximum: [int, float], a: [int, float]
+):
+    &#34;&#34;&#34;
+    Function:
+
+    - Forces data to be within minimum and maximum
+
+    Requires:
+
+    - `minimum`:
+        - Type: int | float
+        - What: The minimum number
+    - `maximum`:
+        - Type: int | float
+        - What: The maximum number
+    - `a`:
+        - Type: int | float
+        - What: The number to clamp
+
+    Example:
+
+    ```
+    pamda.clamp(1, 3, 2) #=&gt; 2
+    pamda.clamp(1, 3, 5) #=&gt; 3
+    ```
+    &#34;&#34;&#34;
+    return min(max(a, minimum), maximum)</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.curry"><code class="name flex">
-<span>def <span class="ident">curry</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.curry"><code class="name flex">
+<span>def <span class="ident">curry</span></span>(<span>self, fn)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3567,7 +4002,7 @@ pamda.clamp(1, 3, 5) #=&gt; 3
 </ul>
 <p>Notes:</p>
 <ul>
-<li>Once curried, the function | method becomes a curry_fn object</li>
+<li>Once curried, the function | method becomes a curry_obj object</li>
 <li>The initial function is only called once all inputs are passed</li>
 </ul>
 <p>Examples:</p>
@@ -3593,9 +4028,133 @@ x(4) #=&gt; [1,2,4]
 
 
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def curry(self, fn):
+    &#34;&#34;&#34;
+    Function:
+
+    - Curries a function such that inputs can be added interatively
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to curry
+        - Note: Class methods auto apply self during curry
+
+    Notes:
+
+    - Once curried, the function | method becomes a curry_obj object
+    - The initial function is only called once all inputs are passed
+
+
+    Examples:
+
+    ```
+    curriedZip=pamda.curry(pamda.zip)
+    curriedZip([&#39;a&#39;,&#39;b&#39;])([1,2]) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+
+    # Curried functions can be thunkified at any time
+    # See also thunkify
+    zipThunk=curriedZip.thunkify()([&#39;a&#39;,&#39;b&#39;])([1,2])
+    zipThunk() #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+    ```
+
+    ```
+    def myFunction(a,b,c):
+        return [a,b,c]
+
+    curriedMyFn=pamda.curry(myFunction)
+
+    curriedMyFn(1,2,3) #=&gt; [1,2,3]
+    curriedMyFn(1)(2,3) #=&gt; [1,2,3]
+
+    x=curriedMyFn(1)(2)
+    x(3) #=&gt; [1,2,3]
+    x(4) #=&gt; [1,2,4]
+
+
+    ```
+    &#34;&#34;&#34;
+    if fn.__dict__.get(&#34;__isCurried__&#34;):
+        return fn()
+    return curry_obj(fn)</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.dec"><code class="name flex">
-<span>def <span class="ident">dec</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.curryTyped"><code class="name flex">
+<span>def <span class="ident">curryTyped</span></span>(<span>self, fn)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Curries a function such that inputs can be added interatively and function annotations are type checked at runtime</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>fn</code>:<ul>
+<li>Type: function | method</li>
+<li>What: The function or method to curry</li>
+<li>Note: Class methods auto apply self during curry</li>
+</ul>
+</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>Once curried, the function | method becomes a curry_obj object</li>
+<li>The initial function is only called once all inputs are passed</li>
+</ul>
+<p>Examples:</p>
+<pre><code>@pamda.curryTyped
+def add(a:int,b:int):
+    return a+b
+
+add(1)(1) #=&gt; 2
+add(1)(1.5) #=&gt; Raises type exception
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def curryTyped(self, fn):
+    &#34;&#34;&#34;
+    Function:
+
+    - Curries a function such that inputs can be added interatively and function annotations are type checked at runtime
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to curry
+        - Note: Class methods auto apply self during curry
+
+    Notes:
+
+    - Once curried, the function | method becomes a curry_obj object
+    - The initial function is only called once all inputs are passed
+
+
+    Examples:
+
+    ```
+    @pamda.curryTyped
+    def add(a:int,b:int):
+        return a+b
+
+    add(1)(1) #=&gt; 2
+    add(1)(1.5) #=&gt; Raises type exception
+    ```
+    &#34;&#34;&#34;
+    if fn.__dict__.get(&#34;__isCurried__&#34;):
+        return fn().typeEnforce()
+    return curry_obj(fn).typeEnforce()</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_core.pamda.dec"><code class="name flex">
+<span>def <span class="ident">dec</span></span>(<span>self, a: [<class 'int'>, <class 'float'>])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3613,9 +4172,35 @@ x(4) #=&gt; [1,2,4]
 <p>Example:</p>
 <pre><code>pamda.dec(42) #=&gt; 41
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dec(self, a: [int, float]):
+    &#34;&#34;&#34;
+    Function:
+
+    - Decrements a number by one
+
+    Requires:
+
+    - `a`:
+        - Type: int | float
+        - What: The number to decrement
+
+    Example:
+
+    ```
+    pamda.dec(42) #=&gt; 41
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(a, (int, float)):
+        raise Exception(&#34;`a` must be an `int` or a `float`&#34;)
+    return a - 1</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.difference"><code class="name flex">
-<span>def <span class="ident">difference</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.difference"><code class="name flex">
+<span>def <span class="ident">difference</span></span>(<span>self, a: list, b: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3641,9 +4226,39 @@ b=['b','c']
 pamda.difference(a=a, b=b) #=&gt; ['a']
 pamda.difference(a=b, b=a) #=&gt; ['c']
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def difference(self, a: list, b: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Combines two lists into a list of no duplicates items present in the first list but not the second
+
+    Requires:
+
+    - `a`:
+        - Type: list
+        - What: List of items in which to look for a difference
+    - `b`:
+        - Type: list
+        - What: List of items in which to compare when looking for the difference
+
+    Example:
+
+    ```
+    a=[&#39;a&#39;,&#39;b&#39;]
+    b=[&#39;b&#39;,&#39;c&#39;]
+    pamda.difference(a=a, b=b) #=&gt; [&#39;a&#39;]
+    pamda.difference(a=b, b=a) #=&gt; [&#39;c&#39;]
+    ```
+    &#34;&#34;&#34;
+    return list(set(a).difference(set(b)))</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.dissocPath"><code class="name flex">
-<span>def <span class="ident">dissocPath</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.dissocPath"><code class="name flex">
+<span>def <span class="ident">dissocPath</span></span>(<span>self, path: [<class 'str'>, <class 'list'>], data: dict)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3668,9 +4283,44 @@ pamda.difference(a=b, b=a) #=&gt; ['c']
 <pre><code>data={'a':{'b':{'c':0,'d':1}}}
 pamda.dissocPath(path=['a','b','c'], data=data) #=&gt; {'a':{'b':{'d':1}}}
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dissocPath(self, path: [str, list], data: dict):
+    &#34;&#34;&#34;
+    Function:
+
+    - Removes the value at the end of a path within a nested dictionary
+
+    Requires:
+
+    - `path`:
+        - Type: list of strs | str
+        - What: The path to remove from the dictionary
+        - Note: If a string is passed, assumes a single item path list with that string
+    - `data`:
+        - Type: dict
+        - What: A dictionary with a path to be removed
+
+    Example:
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:0,&#39;d&#39;:1}}}
+    pamda.dissocPath(path=[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;d&#39;:1}}}
+    ```
+    &#34;&#34;&#34;
+    if isinstance(path, str):
+        path = [path]
+    if not self.hasPath(path=path, data=data):
+        raise Exception(&#34;Path does not exist&#34;)
+    else:
+        reduce(pamda_utils.getForceDict, path[:-1], data).pop(path[-1])
+    return data</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.flatten"><code class="name flex">
-<span>def <span class="ident">flatten</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.flatten"><code class="name flex">
+<span>def <span class="ident">flatten</span></span>(<span>self, data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3689,9 +4339,33 @@ Example:</li>
 <pre><code>data=[['a','b'],[1,2]]
 pamda.flatten(data=data) #=&gt; ['a','b',1,2]
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def flatten(self, data: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Flattens a list of lists to a single list
+
+    Requires:
+
+    - `data`:
+        - Type: list of lists
+        - What: The list of lists to reduce to a single list
+    Example:
+
+    ```
+    data=[[&#39;a&#39;,&#39;b&#39;],[1,2]]
+    pamda.flatten(data=data) #=&gt; [&#39;a&#39;,&#39;b&#39;,1,2]
+    ```
+    &#34;&#34;&#34;
+    return [i for sub_list in data for i in sub_list]</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.flip"><code class="name flex">
-<span>def <span class="ident">flip</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.flip"><code class="name flex">
+<span>def <span class="ident">flip</span></span>(<span>self, fn)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3753,9 +4427,82 @@ c('fe-') #=&gt; 'fe-fi-fo-fum'
 a=pamda.flip(concat)('fi-').flip()('fo-').flip()('fum')
 a('fe-') #=&gt; 'fe-fi-fo-fum'
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def flip(self, fn):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns a new function equivalent to the supplied function except that the first two inputs are flipped
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to flip
+        - Note: This function must have an arity of at least 2 (take two inputs)
+        - Note: Only args are flipped, kwargs are passed as normal
+
+    Notes:
+
+    - Input functions are not flipped in place
+    - The returned function is a flipped version of the input function
+    - A curried function can be flipped in place by calling fn.flip()
+    - A function can be flipped multiple times:
+        - At each flip, the first and second inputs for the function as it is currently curried are switched
+        - Flipping a function two times before adding an input will return the initial value
+
+    Examples:
+
+    ```
+    def concat(a,b,c,d):
+        return str(a)+str(b)+str(c)+str(d)
+
+    flip_concat=pamda.flip(concat)
+
+    concat(&#39;fe-&#39;,&#39;fi-&#39;,&#39;fo-&#39;,&#39;fum&#39;) #=&gt; &#39;fe-fi-fo-fum&#39;
+    flip_concat(&#39;fe-&#39;,&#39;fi-&#39;,&#39;fo-&#39;,&#39;fum&#39;) #=&gt; &#39;fi-fe-fo-fum&#39;
+    ```
+
+    ```
+    @pamda.curry
+    def concat(a,b,c,d):
+        return str(a)+str(b)+str(c)+str(d)
+
+    concat(&#39;fe-&#39;,&#39;fi-&#39;,&#39;fo-&#39;,&#39;fum&#39;) #=&gt; &#39;fe-fi-fo-fum&#39;
+
+    concat.flip()
+
+    concat(&#39;fe-&#39;,&#39;fi-&#39;,&#39;fo-&#39;,&#39;fum&#39;) #=&gt; &#39;fi-fe-fo-fum&#39;
+    ```
+
+    ```
+    @pamda.curry
+    def concat(a,b,c,d):
+        return str(a)+str(b)+str(c)+str(d)
+
+    a=pamda.flip(concat)(&#39;fi-&#39;)
+    b=pamda.flip(a)(&#39;fo-&#39;)
+    c=pamda.flip(b)(&#39;fum&#39;)
+    c(&#39;fe-&#39;) #=&gt; &#39;fe-fi-fo-fum&#39;
+    ```
+
+    ```
+    def concat(a,b,c,d):
+        return str(a)+str(b)+str(c)+str(d)
+
+    a=pamda.flip(concat)(&#39;fi-&#39;).flip()(&#39;fo-&#39;).flip()(&#39;fum&#39;)
+    a(&#39;fe-&#39;) #=&gt; &#39;fe-fi-fo-fum&#39;
+    ```
+    &#34;&#34;&#34;
+    fn = self.curry(fn)
+    return fn.flip()</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.getArity"><code class="name flex">
-<span>def <span class="ident">getArity</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.getArity"><code class="name flex">
+<span>def <span class="ident">getArity</span></span>(<span>self, fn)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3777,9 +4524,38 @@ curriedZip=pamda.curry(pamda.zip)
 ABCuriedZip=curriedZip(['a','b'])
 pamda.getArity(ABCuriedZip) #=&gt; 1
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getArity(self, fn):
+    &#34;&#34;&#34;
+    Function:
+
+    - Gets the arity (number of inputs left to be specified) of a function or method (curried or uncurried)
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to get the arity of
+        - Note: Class methods remove one arity to account for self
+
+    Examples:
+
+    ```
+    pamda.getArity(pamda.zip) #=&gt; 2
+    curriedZip=pamda.curry(pamda.zip)
+    ABCuriedZip=curriedZip([&#39;a&#39;,&#39;b&#39;])
+    pamda.getArity(ABCuriedZip) #=&gt; 1
+    ```
+    &#34;&#34;&#34;
+    fn = self.curry(fn)
+    return fn.__arity__</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.groupBy"><code class="name flex">
-<span>def <span class="ident">groupBy</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.groupBy"><code class="name flex">
+<span>def <span class="ident">groupBy</span></span>(<span>self, fn, data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3827,9 +4603,81 @@ pamda.groupBy(getGrade,data)
 #=&gt;    'C':[{'name':'Connor', 'score':75},{'name':'Fred', 'score':79}]
 #=&gt;}
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def groupBy(self, fn, data: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Splits a list into a dictionary of sublists keyed by the return string of a provided function
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to group by
+        - Note: Must return a string
+        - Note: This function must be unary (take one input)
+        - Note: This function is applied to each item in the list recursively
+    - `data`:
+        - Type: list
+        - What: List of items to apply the function to and then group by the results
+
+    Examples:
+
+    ```
+    def getGrade(item):
+        score=item[&#39;score&#39;]
+        if score&gt;90:
+            return &#39;A&#39;
+        elif score&gt;80:
+            return &#39;B&#39;
+        elif score&gt;70:
+            return &#39;C&#39;
+        elif score&gt;60:
+            return &#39;D&#39;
+        else:
+            return &#39;F&#39;
+
+    data=[
+        {&#39;name&#39;:&#39;Connor&#39;, &#39;score&#39;:75},
+        {&#39;name&#39;:&#39;Fred&#39;, &#39;score&#39;:79},
+        {&#39;name&#39;:&#39;Joe&#39;, &#39;score&#39;:84},
+    ]
+    pamda.groupBy(getGrade,data)
+    #=&gt;{
+    #=&gt;    &#39;B&#39;:[{&#39;name&#39;:&#39;Joe&#39;, &#39;score&#39;:84}]
+    #=&gt;    &#39;C&#39;:[{&#39;name&#39;:&#39;Connor&#39;, &#39;score&#39;:75},{&#39;name&#39;:&#39;Fred&#39;, &#39;score&#39;:79}]
+    #=&gt;}
+    ```
+    &#34;&#34;&#34;
+    fn = self.curry(fn)
+    if fn.__arity__ != 1:
+        raise Exception(
+            &#34;groupBy `fn` must only take one parameter as its input&#34;
+        )
+    output = {}
+    for i in data:
+        path = fn(i)
+        if not isinstance(path, str):
+            raise Exception(
+                &#34;groupBy `fn` must return a str but instead returned {}&#34;.format(
+                    path
+                )
+            )
+        output = self.assocPathComplex(
+            default=[],
+            default_fn=lambda x: x + [i],
+            path=[fn(i)],
+            data=output,
+        )
+    return output</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.groupKeys"><code class="name flex">
-<span>def <span class="ident">groupKeys</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.groupKeys"><code class="name flex">
+<span>def <span class="ident">groupKeys</span></span>(<span>self, keys: list, data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3863,9 +4711,54 @@ pamda.groupKeys(['color','shape'],data)
 #=&gt;     [{'color': 'green', 'size': 12, 'shape': 'square'}]
 #=&gt; ]
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def groupKeys(self, keys: list, data: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Splits a list of dicts into a list of sublists of dicts separated by values with equal keys
+
+    Requires:
+
+    - `keys`:
+        - Type: list of strs
+        - What: The keys to group by
+    - `data`:
+        - Type: list of dicts
+        - What: List of dictionaries with which to match keys
+
+    Examples:
+
+    ```
+    data=[
+        {&#39;color&#39;:&#39;red&#39;, &#39;size&#39;:9, &#39;shape&#39;:&#39;ball&#39;},
+        {&#39;color&#39;:&#39;red&#39;, &#39;size&#39;:10, &#39;shape&#39;:&#39;ball&#39;},
+        {&#39;color&#39;:&#39;green&#39;, &#39;size&#39;:11, &#39;shape&#39;:&#39;ball&#39;},
+        {&#39;color&#39;:&#39;green&#39;, &#39;size&#39;:12, &#39;shape&#39;:&#39;square&#39;}
+    ]
+    pamda.groupKeys([&#39;color&#39;,&#39;shape&#39;],data)
+    #=&gt; [
+    #=&gt;     [{&#39;color&#39;: &#39;red&#39;, &#39;size&#39;: 9, &#39;shape&#39;: &#39;ball&#39;}, {&#39;color&#39;: &#39;red&#39;, &#39;size&#39;: 10, &#39;shape&#39;: &#39;ball&#39;}],
+    #=&gt;     [{&#39;color&#39;: &#39;green&#39;, &#39;size&#39;: 11, &#39;shape&#39;: &#39;ball&#39;}],
+    #=&gt;     [{&#39;color&#39;: &#39;green&#39;, &#39;size&#39;: 12, &#39;shape&#39;: &#39;square&#39;}]
+    #=&gt; ]
+    ```
+    &#34;&#34;&#34;
+    if len(keys) == 0:
+        raise Exception(
+            &#34;groupKeys `keys` list must have at least one item in it&#34;
+        )
+    output = list(self.nestItem(keys, data).values())
+    for i in range(len(keys) - 1):
+        output = self.unnest([list(i.values()) for i in output])
+    return output</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.groupWith"><code class="name flex">
-<span>def <span class="ident">groupWith</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.groupWith"><code class="name flex">
+<span>def <span class="ident">groupWith</span></span>(<span>self, fn, data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3895,9 +4788,59 @@ pamda.groupKeys(['color','shape'],data)
 data=[1,2,3,1,1,2,2,3,3,3]
 pamda.groupWith(areEqual,data) #=&gt; [[1], [2], [3], [1, 1], [2, 2], [3, 3, 3]]
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def groupWith(self, fn, data: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Splits a list into a list of sublists where each sublist is determined by adjacent pairwise comparisons from a provided function
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to groub with
+        - Note: Must return a boolean value
+        - Note: This function must have an arity of two (take two inputs)
+        - Note: This function is applied to each item plus the next adjacent item in the list recursively
+    - `data`:
+        - Type: list
+        - What: List of items to apply the function to and then group the results
+
+    Examples:
+
+    ```
+    def areEqual(a,b):
+        return a==b
+
+    data=[1,2,3,1,1,2,2,3,3,3]
+    pamda.groupWith(areEqual,data) #=&gt; [[1], [2], [3], [1, 1], [2, 2], [3, 3, 3]]
+    ```
+    &#34;&#34;&#34;
+    fn = self.curry(fn)
+    if fn.__arity__ != 2:
+        raise Exception(&#34;groupWith `fn` must take exactly two parameters&#34;)
+    output = []
+    start = True
+    for i in data:
+        if start:
+            sublist = [i]
+            start = False
+        elif fn(i, previous):
+            sublist.append(i)
+        else:
+            output.append(sublist)
+            sublist = [i]
+        previous = i
+    output.append(sublist)
+    return output</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.hardRound"><code class="name flex">
-<span>def <span class="ident">hardRound</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.hardRound"><code class="name flex">
+<span>def <span class="ident">hardRound</span></span>(<span>self, decimal_places: int, a: [<class 'int'>, <class 'float'>])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3924,9 +4867,40 @@ pamda.groupWith(areEqual,data) #=&gt; [[1], [2], [3], [1, 1], [2, 2], [3, 3, 3]]
 pamda.hardRound(1,a) #=&gt; 12.3
 pamda.hardRound(-1,a) #=&gt; 10
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hardRound(self, decimal_places: int, a: [int, float]):
+    &#34;&#34;&#34;
+    Function:
+
+    - Rounds to a set number of decimal places regardless of floating point math in python
+
+    Requires:
+
+    - `decimal_places`:
+        - Type: int
+        - What: The number of decimal places to round to
+        - Default: 0
+        - Notes: Negative numbers accepted (EG -1 rounds to the nearest 10)
+    - `a`:
+        - Type: int | float
+        - What: The number to round
+
+    Example:
+
+    ```
+    a=12.345
+    pamda.hardRound(1,a) #=&gt; 12.3
+    pamda.hardRound(-1,a) #=&gt; 10
+    ```
+    &#34;&#34;&#34;
+    return int(a * (10**decimal_places) + 0.5) / (10**decimal_places)</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.hasPath"><code class="name flex">
-<span>def <span class="ident">hasPath</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.hasPath"><code class="name flex">
+<span>def <span class="ident">hasPath</span></span>(<span>self, path: [<class 'list'>, <class 'str'>], data: dict)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3952,9 +4926,41 @@ pamda.hardRound(-1,a) #=&gt; 10
 pamda.hasPath(path=['a','b'], data=data) #=&gt; True
 pamda.hasPath(path=['a','d'], data=data) #=&gt; False
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hasPath(self, path: [list, str], data: dict):
+    &#34;&#34;&#34;
+    Function:
+
+    - Checks if a path exists within a nested dictionary
+
+    Requires:
+
+    - `path`:
+        - Type: list of strs | str
+        - What: The path to check
+        - Note: If a string is passed, assumes a single item path list with that string
+    - `data`:
+        - Type: dict
+        - What: A dictionary to check if the path exists
+
+    Example:
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:1}}
+    pamda.hasPath(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; True
+    pamda.hasPath(path=[&#39;a&#39;,&#39;d&#39;], data=data) #=&gt; False
+    ```
+    &#34;&#34;&#34;
+    if isinstance(path, str):
+        path = [path]
+    return path[-1] in reduce(lambda x, y: x.get(y, {}), path[:-1], data)</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.head"><code class="name flex">
-<span>def <span class="ident">head</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.head"><code class="name flex">
+<span>def <span class="ident">head</span></span>(<span>self, data: [<class 'list'>, <class 'str'>])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3975,9 +4981,40 @@ pamda.first(
     data=data
 ) #=&gt; fe
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def head(self, data: [list, str]):
+    &#34;&#34;&#34;
+    Function:
+
+    - Picks the first item out of a list or string
+
+    Requires:
+
+    - `data`:
+        - Type: list | str
+        - What: A list or string
+
+    Example:
+
+    ```
+    data=[&#39;fe&#39;,&#39;fi&#39;,&#39;fo&#39;,&#39;fum&#39;]
+    pamda.first(
+        data=data
+    ) #=&gt; fe
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(data, (list, str)):
+        raise Exception(&#34;`head` can only be called on a `str` or a `list`&#34;)
+    if not len(data) &gt; 0:
+        raise Exception(&#34;Attempting to call `head` on an empty list or str&#34;)
+    return data[0]</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.inc"><code class="name flex">
-<span>def <span class="ident">inc</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.inc"><code class="name flex">
+<span>def <span class="ident">inc</span></span>(<span>self, a: [<class 'int'>, <class 'float'>])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -3995,9 +5032,35 @@ pamda.first(
 <p>Example:</p>
 <pre><code>pamda.inc(42) #=&gt; 43
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def inc(self, a: [int, float]):
+    &#34;&#34;&#34;
+    Function:
+
+    - Increments a number by one
+
+    Requires:
+
+    - `a`:
+        - Type: int | float
+        - What: The number to increment
+
+    Example:
+
+    ```
+    pamda.inc(42) #=&gt; 43
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(a, (int, float)):
+        raise Exception(&#34;`a` must be an `int` or a `float`&#34;)
+    return a + 1</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.intersection"><code class="name flex">
-<span>def <span class="ident">intersection</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.intersection"><code class="name flex">
+<span>def <span class="ident">intersection</span></span>(<span>self, a: list, b: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4022,9 +5085,38 @@ pamda.first(
 b=['b','c']
 pamda.intersection(a=a, b=b) #=&gt; ['b']
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def intersection(self, a: list, b: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Combines two lists into a list of no duplicates composed of those elements common to both lists
+
+    Requires:
+
+    - `a`:
+        - Type: list
+        - What: List of items in which to look for an intersection
+    - `b`:
+        - Type: list
+        - What: List of items in which to look for an intersection
+
+    Example:
+
+    ```
+    a=[&#39;a&#39;,&#39;b&#39;]
+    b=[&#39;b&#39;,&#39;c&#39;]
+    pamda.intersection(a=a, b=b) #=&gt; [&#39;b&#39;]
+    ```
+    &#34;&#34;&#34;
+    return list(set(a).intersection(set(b)))</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.map"><code class="name flex">
-<span>def <span class="ident">map</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.map"><code class="name flex">
+<span>def <span class="ident">map</span></span>(<span>self, fn, data: [<class 'list'>, <class 'dict'>])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4060,9 +5152,62 @@ pamda.map(
 )
 #=&gt; {'a':2,'b':3,'c':4}
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def map(self, fn, data: [list, dict]):
+    &#34;&#34;&#34;
+    Function:
+
+    - Maps a function over a list or a dictionary
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to map over the list or dictionary
+        - Note: This function should have an arity of 1
+    - `data`:
+        - Type: list | dict
+        - What: The list or dict of items to map the function over
+
+    Examples:
+
+    ```
+    data=[1,2,3]
+    pamda.map(
+        fn=pamda.inc,
+        data=data
+    )
+    #=&gt; [2,3,4]
+    ```
+
+    ```
+    data={&#39;a&#39;:1,&#39;b&#39;:2,&#39;c&#39;:3}
+    pamda.map(
+        fn=pamda.inc,
+        data=data
+    )
+    #=&gt; {&#39;a&#39;:2,&#39;b&#39;:3,&#39;c&#39;:4}
+    ```
+
+    &#34;&#34;&#34;
+    fn = self.curry(fn)
+    if fn.__arity__ != 1:
+        raise Exception(&#34;`map` `fn` must be unary (take one input)&#34;)
+    if not len(data) &gt; 0:
+        raise Exception(
+            &#34;`map` `data` has a length of 0 or is an empty dictionary, however it must have at least one element in it&#34;
+        )
+    if isinstance(data, dict):
+        return {key: fn(value) for key, value in data.items()}
+    else:
+        return [fn(i) for i in data]</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.mean"><code class="name flex">
-<span>def <span class="ident">mean</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.mean"><code class="name flex">
+<span>def <span class="ident">mean</span></span>(<span>self, data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4087,9 +5232,44 @@ pamda.mean(data=data)
 pamda.mean(data=data)
 #=&gt; None
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mean(self, data: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Calculates the mean of a given list
+
+    Requires:
+
+    - `data`:
+        - Type: list of (floats | ints)
+        - What: The list with wich to calculate the mean
+        - Note: If the length of this list is 0, returns None
+
+    Example:
+
+    ```
+    data=[1,2,3]
+    pamda.mean(data=data)
+    #=&gt; 2
+    ```
+
+    ```
+    data=[]
+    pamda.mean(data=data)
+    #=&gt; None
+    ```
+    &#34;&#34;&#34;
+    if len(data) == 0:
+        return None
+    return sum(data) / len(data)</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.median"><code class="name flex">
-<span>def <span class="ident">median</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.median"><code class="name flex">
+<span>def <span class="ident">median</span></span>(<span>self, data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4119,9 +5299,57 @@ pamda.median(data=data)
 pamda.median(data=data)
 #=&gt; None
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def median(self, data: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Calculates the median of a given list
+    - If the length of the list is even, calculates the mean of the two central values
+
+    Requires:
+
+    - `data`:
+        - Type: list of (floats | ints)
+        - What: The list with wich to calculate the mean
+        - Note: If the length of this list is 0, returns None
+
+    Examples:
+
+    ```
+    data=[7,2,8,9]
+    pamda.median(data=data)
+    #=&gt; 7.5
+    ```
+
+    ```
+    data=[7,8,9]
+    pamda.median(data=data)
+    #=&gt; 8
+    ```
+
+    ```
+    data=[]
+    pamda.median(data=data)
+    #=&gt; None
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(data, (list)):
+        raise Exception(&#34;`median` `data` must be a list&#34;)
+    length = len(data)
+    if length == 0:
+        return None
+    data = sorted(data)
+    if length % 2 == 0:
+        return (data[int(length / 2)] + data[int(length / 2) - 1]) / 2
+    return data[int(length / 2)]</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.mergeDeep"><code class="name flex">
-<span>def <span class="ident">mergeDeep</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.mergeDeep"><code class="name flex">
+<span>def <span class="ident">mergeDeep</span></span>(<span>self, update_data: dict, data: dict)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4150,9 +5378,56 @@ pamda.mergeDeep(
     data=data
 ) #=&gt; {'a':{'b':{'c':'d','h':'i'},'e':'g'}}
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mergeDeep(self, update_data: dict, data: dict):
+    &#34;&#34;&#34;
+    Function:
+
+    - Recursively merges two nested dictionaries keeping all keys at each layer
+    - Values from `update_data` are used when keys are present in both dictionaries
+
+    Requires:
+
+    - `update_data`:
+        - Type: dict
+        - What: The new data that will take precedence during merging
+    - `data`:
+        - Type: dict
+        - What: The original data that will be merged into
+
+    Example:
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:&#39;d&#39;},&#39;e&#39;:&#39;f&#39;}}
+    update_data={&#39;a&#39;:{&#39;b&#39;:{&#39;h&#39;:&#39;i&#39;},&#39;e&#39;:&#39;g&#39;}}
+    pamda.mergeDeep(
+        update_data=update_data,
+        data=data
+    ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;c&#39;:&#39;d&#39;,&#39;h&#39;:&#39;i&#39;},&#39;e&#39;:&#39;g&#39;}}
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(data, dict) or not isinstance(update_data, dict):
+        return update_data
+    output = dict(data)
+    keys_original = set(data.keys())
+    keys_update = set(update_data.keys())
+    similar_keys = keys_original.intersection(keys_update)
+    similar_dict = {
+        key: self.mergeDeep(update_data[key], data[key])
+        for key in similar_keys
+    }
+    new_keys = keys_update.difference(keys_original)
+    new_dict = {key: update_data[key] for key in new_keys}
+    output.update(similar_dict)
+    output.update(new_dict)
+    return output</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.nest"><code class="name flex">
-<span>def <span class="ident">nest</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.nest"><code class="name flex">
+<span>def <span class="ident">nest</span></span>(<span>self, path_keys: list, value_key: str, data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4192,9 +5467,63 @@ pamda.nest(
     data=data
 ) #=&gt; {'a':{'b':['c','d'], 'e':['f']}}
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def nest(self, path_keys: list, value_key: str, data: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Nests a list of dictionaries into a nested dictionary
+    - Similar items are appended to a list in the end of the nested dictionary
+
+    Requires:
+
+    - `path_keys`:
+        - Type: list of strs
+        - What: The variables to pull from each item in data
+        - Note: Used to build out the nested dicitonary
+        - Note: Order matters as the nesting occurs in order of variable
+    - `value_key`:
+        - Type: str
+        - What: The variable to add to the list at the end of the nested dictionary path
+    - `data`:
+        - Type: list of dicts
+        - What: A list of dictionaries to use for nesting purposes
+
+    Example:
+
+    ```
+    data=[
+        {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;c&#39;},
+        {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;, &#39;output&#39;:&#39;d&#39;},
+        {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;e&#39;, &#39;output&#39;:&#39;f&#39;}
+    ]
+    pamda.nest(
+        path_keys=[&#39;x_1&#39;,&#39;x_2&#39;],
+        value_key=&#39;output&#39;,
+        data=data
+    ) #=&gt; {&#39;a&#39;:{&#39;b&#39;:[&#39;c&#39;,&#39;d&#39;], &#39;e&#39;:[&#39;f&#39;]}}
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(data, list):
+        raise Exception(&#34;Attempting to `nest` an object that is not a list&#34;)
+    if len(data) == 0:
+        raise Exception(&#34;Attempting to `nest` from an empty list&#34;)
+    nested_output = {}
+    for item in data:
+        nested_output = self.assocPathComplex(
+            data=nested_output,
+            path=[item[key] for key in path_keys],
+            default=[],
+            default_fn=lambda x: x + [item[value_key]],
+        )
+    return nested_output</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.nestItem"><code class="name flex">
-<span>def <span class="ident">nestItem</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.nestItem"><code class="name flex">
+<span>def <span class="ident">nestItem</span></span>(<span>self, path_keys: list, data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4231,9 +5560,60 @@ pamda.nest(
 #=&gt; {'a': {'b': [{'x_1': 'a', 'x_2': 'b'}, {'x_1': 'a', 'x_2': 'b'}], 'e': [{'x_1': 'a', 'x_2': 'e'}]}}
 
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def nestItem(self, path_keys: list, data: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Nests a list of dictionaries into a nested dictionary
+    - Similar items are appended to a list in the end of the nested dictionary
+    - Similar to `nest`, except no values are plucked for the aggregated list
+
+    Requires:
+
+    - `path_keys`:
+        - Type: list of strs
+        - What: The variables to pull from each item in data
+        - Note: Used to build out the nested dicitonary
+        - Note: Order matters as the nesting occurs in order of variable
+    - `data`:
+        - Type: list of dicts
+        - What: A list of dictionaries to use for nesting purposes
+
+    Example:
+
+    ```
+    data=[
+        {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;},
+        {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;b&#39;},
+        {&#39;x_1&#39;:&#39;a&#39;,&#39;x_2&#39;:&#39;e&#39;}
+    ]
+    pamda.nest(
+        path_keys=[&#39;x_1&#39;,&#39;x_2&#39;],
+        data=data
+    )
+    #=&gt; {&#39;a&#39;: {&#39;b&#39;: [{&#39;x_1&#39;: &#39;a&#39;, &#39;x_2&#39;: &#39;b&#39;}, {&#39;x_1&#39;: &#39;a&#39;, &#39;x_2&#39;: &#39;b&#39;}], &#39;e&#39;: [{&#39;x_1&#39;: &#39;a&#39;, &#39;x_2&#39;: &#39;e&#39;}]}}
+
+    ```
+    &#34;&#34;&#34;
+    if len(data) == 0:
+        raise Exception(&#34;Attempting to `nestItem` from an empty list&#34;)
+    nested_output = {}
+    for item in data:
+        nested_output = self.assocPathComplex(
+            data=nested_output,
+            path=[item[key] for key in path_keys],
+            default=[],
+            default_fn=lambda x: x + [item],
+        )
+    return nested_output</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.path"><code class="name flex">
-<span>def <span class="ident">path</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.path"><code class="name flex">
+<span>def <span class="ident">path</span></span>(<span>self, path: [<class 'list'>, <class 'str'>], data: dict)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4258,9 +5638,38 @@ pamda.nest(
 <pre><code>data={'a':{'b':1}}
 pamda.path(path=['a','b'], data=data) #=&gt; 1
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def path(self, path: [list, str], data: dict):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns the value of a path within a nested dictionary or None if the path does not exist
+
+    Requires:
+
+    - `path`:
+        - Type: list of strs | str
+        - What: The path to pull given the data
+        - Note: If a string is passed, assumes a single item path list with that string
+    - `data`:
+        - Type: dict
+        - What: A dictionary to get the path from
+
+    Example:
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:1}}
+    pamda.path(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; 1
+    ```
+    &#34;&#34;&#34;
+    return self.pathOr(None, path, data)</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.pathOr"><code class="name flex">
-<span>def <span class="ident">pathOr</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.pathOr"><code class="name flex">
+<span>def <span class="ident">pathOr</span></span>(<span>self, default, path: [<class 'list'>, <class 'str'>], data: dict)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4290,9 +5699,45 @@ pamda.path(path=['a','b'], data=data) #=&gt; 1
 <pre><code>data={'a':{'b':1}}
 pamda.path(default=2, path=['a','c'], data=data) #=&gt; 2
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pathOr(self, default, path: [list, str], data: dict):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns the value of a path within a nested dictionary or a default value if that path does not exist
+
+    Requires:
+
+    - `default`:
+        - Type: any
+        - What: The object to return if the path does not exist
+    - `path`:
+        - Type: list of strs | str
+        - What: The path to pull given the data
+        - Note: If a string is passed, assumes a single item path list with that string
+    - `data`:
+        - Type: dict
+        - What: A dictionary to get the path from
+
+    Example:
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:1}}
+    pamda.path(default=2, path=[&#39;a&#39;,&#39;c&#39;], data=data) #=&gt; 2
+    ```
+    &#34;&#34;&#34;
+    if isinstance(path, str):
+        path = [path]
+    return reduce(lambda x, y: x.get(y, {}), path[:-1], data).get(
+        path[-1], default
+    )</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.pipe"><code class="name flex">
-<span>def <span class="ident">pipe</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.pipe"><code class="name flex">
+<span>def <span class="ident">pipe</span></span>(<span>self, fns: list, data)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4324,9 +5769,59 @@ pamda.pipe(fns=[pamda.head, pamda.tail], data=data) #=&gt; 'c'
 curriedPath=pamda.curry(pamda.path)
 pamda.pipe(fns=[curriedPath('a'), curriedPath('b')], data=data) #=&gt; 'c'
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pipe(self, fns: list, data):
+    &#34;&#34;&#34;
+    Function:
+
+    - Pipes data through n functions in order (left to right composition) and returns the output
+
+    Requires:
+
+    - `fns`:
+        - Type: list of (functions | methods)
+        - What: The list of functions and methods to pipe the data through
+        - Notes: The first function in the list can be any arity (accepting any number of inputs)
+        - Notes: Any further function in the list can only be unary (single input)
+        - Notes: A function can be curried, but is not required to be
+        - Notes: You may opt to curry functions and add inputs to make them unary
+    - `data`:
+        - Type: any
+        - What: The data to be piped through the specified `fns`
+
+    Examples:
+
+    ```
+    data=[&#39;abc&#39;,&#39;def&#39;]
+    pamda.pipe(fns=[pamda.head, pamda.tail], data=data) #=&gt; &#39;c&#39;
+    ```
+
+    ```
+    data={&#39;a&#39;:{&#39;b&#39;:&#39;c&#39;}}
+    curriedPath=pamda.curry(pamda.path)
+    pamda.pipe(fns=[curriedPath(&#39;a&#39;), curriedPath(&#39;b&#39;)], data=data) #=&gt; &#39;c&#39;
+    ```
+    &#34;&#34;&#34;
+    if len(fns) == 0:
+        raise Exception(&#34;`fns` must be a list with at least one function&#34;)
+    if self.getArity(fns[0]) == 0:
+        raise Exception(
+            &#34;The first function in `fns` can have n arity (accepting n args), but this must be greater than 0.&#34;
+        )
+    if not all([(self.getArity(fn) == 1) for fn in fns[1:]]):
+        raise Exception(
+            &#34;Only the first function in `fns` can have n arity (accept n args). All other functions must have an arity of one (accepting one argument).&#34;
+        )
+    for fn in fns:
+        data = fn(data)
+    return data</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.pluck"><code class="name flex">
-<span>def <span class="ident">pluck</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.pluck"><code class="name flex">
+<span>def <span class="ident">pluck</span></span>(<span>self, path: [<class 'list'>, <class 'str'>], data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4351,9 +5846,40 @@ pamda.pipe(fns=[curriedPath('a'), curriedPath('b')], data=data) #=&gt; 'c'
 <pre><code>data=[{'a':{'b':1, 'c':'d'}},{'a':{'b':2, 'c':'e'}}]
 pamda.pluck(path=['a','b'], data=data) #=&gt; [1,2]
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pluck(self, path: [list, str], data: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns the values of a path within a list of nested dictionaries
+
+    Requires:
+
+    - `path`:
+        - Type: list of strs
+        - What: The path to pull given the data
+        - Note: If a string is passed, assumes a single item path list with that string
+    - `data`:
+        - Type: list of dicts
+        - What: A list of dictionaries to get the path from
+
+    Example:
+
+    ```
+    data=[{&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:&#39;d&#39;}},{&#39;a&#39;:{&#39;b&#39;:2, &#39;c&#39;:&#39;e&#39;}}]
+    pamda.pluck(path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; [1,2]
+    ```
+    &#34;&#34;&#34;
+    if len(data) == 0:
+        raise Exception(&#34;Attempting to pluck from an empty list&#34;)
+    return [self.path(data=i, path=path) for i in data]</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.pluckIf"><code class="name flex">
-<span>def <span class="ident">pluckIf</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.pluckIf"><code class="name flex">
+<span>def <span class="ident">pluckIf</span></span>(<span>self, if_path: list, if_vals: list, path: [<class 'list'>, <class 'str'>], data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4389,9 +5915,53 @@ pamda.pluck(path=['a','b'], data=data) #=&gt; [1,2]
 <pre><code>data=[{'a':{'b':1, 'c':'d'}},{'a':{'b':2, 'c':'e'}}]
 pamda.pluck(if_path=['a','c'], if_vals=['d'], path=['a','b'], data=data) #=&gt; [1]
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pluckIf(
+    self, if_path: list, if_vals: list, path: [list, str], data: list
+):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns the values of a path within a list of nested dictionaries if a path in those same dictionaries matches a value
+
+    Requires:
+
+    - `if_path`:
+        - Type: list of strs
+        - What: Path to check if the `if_val` matches
+    - `if_vals`:
+        - Type: list of any types
+        - What: If the `if_path`s value is in this list, this item is returned
+        - Note: Items should be the same type as objects at end of `if_path`
+    - `path`:
+        - Type: list of strs
+        - What: The path to pull given the data
+        - Note: If a string is passed, assumes a single item path list with that string
+    - `data`:
+        - Type: list of dicts
+        - What: A list of dictionary to get the path from
+
+    Example:
+
+    ```
+    data=[{&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:&#39;d&#39;}},{&#39;a&#39;:{&#39;b&#39;:2, &#39;c&#39;:&#39;e&#39;}}]
+    pamda.pluck(if_path=[&#39;a&#39;,&#39;c&#39;], if_vals=[&#39;d&#39;], path=[&#39;a&#39;,&#39;b&#39;], data=data) #=&gt; [1]
+    ```
+    &#34;&#34;&#34;
+    if len(data) == 0:
+        raise Exception(&#34;Attempting to pluck from an empty list&#34;)
+    return [
+        self.path(data=i, path=path)
+        for i in data
+        if self.path(data=i, path=if_path) in if_vals
+    ]</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.reduce"><code class="name flex">
-<span>def <span class="ident">reduce</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.reduce"><code class="name flex">
+<span>def <span class="ident">reduce</span></span>(<span>self, fn, initial_accumulator, data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4427,9 +5997,63 @@ pamda.reduce(
 #=&gt; 10
 
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reduce(self, fn, initial_accumulator, data: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns a single item by iterating a function starting with an accumulator over a list
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to reduce
+        - Note: This function should have an arity of 2 (take two inputs)
+        - Note: The first input should take the accumulator value
+        - Note: The second input should take the data value
+    -`initial_accumulator`:
+        - Type: any
+        - What: The initial item to pass into the function when starting the accumulation process
+    - `data`:
+        - Type: list
+        - What: The list of items to iterate over
+
+    Example:
+
+    ```
+    data=[1,2,3,4]
+    pamda.reduce(
+        fn=pamda.add,
+        initial_accumulator=0,
+        data=data
+    )
+    #=&gt; 10
+
+    ```
+    &#34;&#34;&#34;
+    fn = self.curry(fn)
+    if fn.__arity__ != 2:
+        raise Exception(
+            &#34;`reduce` `fn` must have an arity of 2 (take two inputs)&#34;
+        )
+    if not isinstance(data, (list)):
+        raise Exception(&#34;`reduce` `data` must be a list&#34;)
+    if not len(data) &gt; 0:
+        raise Exception(
+            &#34;`reduce` `data` has a length of 0, however it must have a length of at least 1&#34;
+        )
+    acc = initial_accumulator
+    for i in data:
+        acc = fn(acc, i)
+    return acc</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.safeDivide"><code class="name flex">
-<span>def <span class="ident">safeDivide</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.safeDivide"><code class="name flex">
+<span>def <span class="ident">safeDivide</span></span>(<span>self, denominator: [<class 'int'>, <class 'float'>], a: [<class 'int'>, <class 'float'>])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4457,9 +6081,38 @@ pamda.reduce(
 <pre><code>pamda.safeDivide(2,10) #=&gt; 5
 pamda.safeDivide(0,10) #=&gt; 10
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def safeDivide(self, denominator: [int, float], a: [int, float]):
+    &#34;&#34;&#34;
+    Function:
+
+    - Forces division to work by enforcing a denominator of 1 if the provided denominator is zero
+
+    Requires:
+
+    - `denominator`:
+        - Type: int | float
+        - What: The denominator
+
+    - `a`:
+        - Type: int | float
+        - What: The numerator
+
+    Example:
+
+    ```
+    pamda.safeDivide(2,10) #=&gt; 5
+    pamda.safeDivide(0,10) #=&gt; 10
+    ```
+    &#34;&#34;&#34;
+    return a / denominator if denominator != 0 else a</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.safeDivideDefault"><code class="name flex">
-<span>def <span class="ident">safeDivideDefault</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.safeDivideDefault"><code class="name flex">
+<span>def <span class="ident">safeDivideDefault</span></span>(<span>self, default_denominator: [<class 'int'>, <class 'float'>], denominator: [<class 'int'>, <class 'float'>], a: [<class 'int'>, <class 'float'>])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4489,9 +6142,50 @@ pamda.safeDivide(0,10) #=&gt; 10
 <pre><code>pamda.safeDivideDefault(2,5,10) #=&gt; 2
 pamda.safeDivideDefault(2,0,10) #=&gt; 5
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def safeDivideDefault(
+    self,
+    default_denominator: [int, float],
+    denominator: [int, float],
+    a: [int, float],
+):
+    &#34;&#34;&#34;
+    Function:
+
+    - Forces division to work by enforcing a non zero default denominator if the provided denominator is zero
+
+    Requires:
+
+    - `default_denominator`:
+        - Type: int | float
+        - What: A non zero denominator to use if denominator is zero
+        - Default: 1
+    - `denominator`:
+        - Type: int | float
+        - What: The denominator
+    - `a`:
+        - Type: int | float
+        - What: The numerator
+
+    Example:
+
+    ```
+    pamda.safeDivideDefault(2,5,10) #=&gt; 2
+    pamda.safeDivideDefault(2,0,10) #=&gt; 5
+    ```
+    &#34;&#34;&#34;
+    if default_denominator == 0:
+        raise Exception(
+            &#34;`safeDivideDefault` `default_denominator` can not be 0&#34;
+        )
+    return a / denominator if denominator != 0 else a / default_denominator</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.symmetricDifference"><code class="name flex">
-<span>def <span class="ident">symmetricDifference</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.symmetricDifference"><code class="name flex">
+<span>def <span class="ident">symmetricDifference</span></span>(<span>self, a: list, b: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4516,9 +6210,38 @@ pamda.safeDivideDefault(2,0,10) #=&gt; 5
 b=['b','c']
 pamda.symmetricDifference(a=a, b=b) #=&gt; ['a','c']
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def symmetricDifference(self, a: list, b: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Combines two lists into a list of no duplicates items present in one list but not the other
+
+    Requires:
+
+    - `a`:
+        - Type: list
+        - What: List of items in which to look for a difference
+    - `b`:
+        - Type: list
+        - What: List of items in which to look for a difference
+
+    Example:
+
+    ```
+    a=[&#39;a&#39;,&#39;b&#39;]
+    b=[&#39;b&#39;,&#39;c&#39;]
+    pamda.symmetricDifference(a=a, b=b) #=&gt; [&#39;a&#39;,&#39;c&#39;]
+    ```
+    &#34;&#34;&#34;
+    return list(set(a).difference(set(b))) + list(set(b).difference(set(a)))</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.tail"><code class="name flex">
-<span>def <span class="ident">tail</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.tail"><code class="name flex">
+<span>def <span class="ident">tail</span></span>(<span>self, data: [<class 'str'>, <class 'list'>])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4539,9 +6262,38 @@ pamda.tail(
     data=data
 ) #=&gt; fum
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tail(self, data: [str, list]):
+    &#34;&#34;&#34;
+    Function:
+
+    - Picks the last item out of a list or string
+
+    Requires:
+
+    - `data`:
+        - Type: list | str
+        - What: A list or string
+
+    Example:
+
+    ```
+    data=[&#39;fe&#39;,&#39;fi&#39;,&#39;fo&#39;,&#39;fum&#39;]
+    pamda.tail(
+        data=data
+    ) #=&gt; fum
+    ```
+    &#34;&#34;&#34;
+    if not len(data) &gt; 0:
+        raise Exception(&#34;Attempting to call `tail` on an empty list or str&#34;)
+    return data[-1]</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.thunkify"><code class="name flex">
-<span>def <span class="ident">thunkify</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.thunkify"><code class="name flex">
+<span>def <span class="ident">thunkify</span></span>(<span>self, fn)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4589,9 +6341,66 @@ add.thunkify()
 add(1,2)
 add(1,2)() #=&gt; 3
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def thunkify(self, fn):
+    &#34;&#34;&#34;
+    Function:
+
+    - Creates a curried thunk out of a function
+    - Evaluation of the thunk lazy and is delayed until called
+
+    Requires:
+
+    - `fn`:
+        - Type: function | method
+        - What: The function or method to thunkify
+        - Note: Thunkified functions are automatically curried
+        - Note: Class methods auto apply self during thunkify
+
+    Notes:
+
+    - Input functions are not thunkified in place
+    - The returned function is a thunkified version of the input function
+    - A curried function can be thunkified in place by calling fn.thunkify()
+
+    Examples:
+
+    ```
+    def add(a,b):
+        return a+b
+
+    addThunk=pamda.thunkify(add)
+
+    add(1,2) #=&gt; 3
+    addThunk(1,2)
+    addThunk(1,2)() #=&gt; 3
+
+    x=addThunk(1,2)
+    x() #=&gt; 3
+    ```
+
+    ```
+    @pamda.curry
+    def add(a,b):
+        return a+b
+
+    add(1,2) #=&gt; 3
+
+    add.thunkify()
+
+    add(1,2)
+    add(1,2)() #=&gt; 3
+    ```
+    &#34;&#34;&#34;
+    fn = self.curry(fn)
+    return fn.thunkify()</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.unnest"><code class="name flex">
-<span>def <span class="ident">unnest</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.unnest"><code class="name flex">
+<span>def <span class="ident">unnest</span></span>(<span>self, data: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4612,9 +6421,44 @@ pamda.unnest(
     data=data
 ) #=&gt; =['fe','fi','fo',['fum']]
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def unnest(self, data: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Removes one level of depth for all items in a list
+
+    Requires:
+
+    - `data`:
+        - Type: list
+        - What: A list of items to unnest by one level
+
+    Examples:
+
+    ```
+    data=[&#39;fe&#39;,&#39;fi&#39;,[&#39;fo&#39;,[&#39;fum&#39;]]]
+    pamda.unnest(
+        data=data
+    ) #=&gt; =[&#39;fe&#39;,&#39;fi&#39;,&#39;fo&#39;,[&#39;fum&#39;]]
+    ```
+    &#34;&#34;&#34;
+    if not len(data) &gt; 0:
+        raise Exception(&#34;Attempting to call `unnest` on an empty list&#34;)
+    output = []
+    for i in data:
+        if isinstance(i, list):
+            output += i
+        else:
+            output.append(i)
+    return output</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.zip"><code class="name flex">
-<span>def <span class="ident">zip</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.zip"><code class="name flex">
+<span>def <span class="ident">zip</span></span>(<span>self, a: list, b: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4639,9 +6483,38 @@ pamda.unnest(
 b=[1,2]
 pamda.zip(a=a, b=b) #=&gt; [['a',1],['b',2]]
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def zip(self, a: list, b: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Creates a new list out of the two supplied by pairing up equally-positioned items from both lists
+
+    Requires:
+
+    - `a`:
+        - Type: list
+        - What: List of items to appear in new list first
+    - `b`:
+        - Type: list
+        - What: List of items to appear in new list second
+
+    Example:
+
+    ```
+    a=[&#39;a&#39;,&#39;b&#39;]
+    b=[1,2]
+    pamda.zip(a=a, b=b) #=&gt; [[&#39;a&#39;,1],[&#39;b&#39;,2]]
+    ```
+    &#34;&#34;&#34;
+    return [list(item) for item in zip(a, b)]</code></pre>
+</details>
 </dd>
-<dt id="pamda.pamda_core.pamda_core.zipObj"><code class="name flex">
-<span>def <span class="ident">zipObj</span></span>(<span>*args, **kwargs)</span>
+<dt id="pamda.pamda_core.pamda.zipObj"><code class="name flex">
+<span>def <span class="ident">zipObj</span></span>(<span>self, a: list, b: list)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function:</p>
@@ -4667,6 +6540,36 @@ pamda.zip(a=a, b=b) #=&gt; [['a',1],['b',2]]
 b=[1,2]
 pamda.zipObj(a=a, b=b) #=&gt; {'a':1, 'b':2}
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def zipObj(self, a: list, b: list):
+    &#34;&#34;&#34;
+    Function:
+
+    - Creates a new dict out of two supplied lists by pairing up equally-positioned items from both lists
+    - The first list represents keys and the second values
+
+    Requires:
+
+    - `a`:
+        - Type: list
+        - What: List of items to appear in new list first
+    - `b`:
+        - Type: list
+        - What: List of items to appear in new list second
+
+    Example:
+
+    ```
+    a=[&#39;a&#39;,&#39;b&#39;]
+    b=[1,2]
+    pamda.zipObj(a=a, b=b) #=&gt; {&#39;a&#39;:1, &#39;b&#39;:2}
+    ```
+    &#34;&#34;&#34;
+    return dict(zip(a, b))</code></pre>
+</details>
 </dd>
 </dl>
 </dd>
@@ -4687,51 +6590,52 @@ pamda.zipObj(a=a, b=b) #=&gt; {'a':1, 'b':2}
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="pamda.pamda_core.pamda_core" href="#pamda.pamda_core.pamda_core">pamda_core</a></code></h4>
+<h4><code><a title="pamda.pamda_core.pamda" href="#pamda.pamda_core.pamda">pamda</a></code></h4>
 <ul class="two-column">
-<li><code><a title="pamda.pamda_core.pamda_core.accumulate" href="#pamda.pamda_core.pamda_core.accumulate">accumulate</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.add" href="#pamda.pamda_core.pamda_core.add">add</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.adjust" href="#pamda.pamda_core.pamda_core.adjust">adjust</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.assocPath" href="#pamda.pamda_core.pamda_core.assocPath">assocPath</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.assocPathComplex" href="#pamda.pamda_core.pamda_core.assocPathComplex">assocPathComplex</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.asyncRun" href="#pamda.pamda_core.pamda_core.asyncRun">asyncRun</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.asyncWait" href="#pamda.pamda_core.pamda_core.asyncWait">asyncWait</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.clamp" href="#pamda.pamda_core.pamda_core.clamp">clamp</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.curry" href="#pamda.pamda_core.pamda_core.curry">curry</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.dec" href="#pamda.pamda_core.pamda_core.dec">dec</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.difference" href="#pamda.pamda_core.pamda_core.difference">difference</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.dissocPath" href="#pamda.pamda_core.pamda_core.dissocPath">dissocPath</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.flatten" href="#pamda.pamda_core.pamda_core.flatten">flatten</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.flip" href="#pamda.pamda_core.pamda_core.flip">flip</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.getArity" href="#pamda.pamda_core.pamda_core.getArity">getArity</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.groupBy" href="#pamda.pamda_core.pamda_core.groupBy">groupBy</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.groupKeys" href="#pamda.pamda_core.pamda_core.groupKeys">groupKeys</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.groupWith" href="#pamda.pamda_core.pamda_core.groupWith">groupWith</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.hardRound" href="#pamda.pamda_core.pamda_core.hardRound">hardRound</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.hasPath" href="#pamda.pamda_core.pamda_core.hasPath">hasPath</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.head" href="#pamda.pamda_core.pamda_core.head">head</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.inc" href="#pamda.pamda_core.pamda_core.inc">inc</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.intersection" href="#pamda.pamda_core.pamda_core.intersection">intersection</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.map" href="#pamda.pamda_core.pamda_core.map">map</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.mean" href="#pamda.pamda_core.pamda_core.mean">mean</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.median" href="#pamda.pamda_core.pamda_core.median">median</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.mergeDeep" href="#pamda.pamda_core.pamda_core.mergeDeep">mergeDeep</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.nest" href="#pamda.pamda_core.pamda_core.nest">nest</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.nestItem" href="#pamda.pamda_core.pamda_core.nestItem">nestItem</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.path" href="#pamda.pamda_core.pamda_core.path">path</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.pathOr" href="#pamda.pamda_core.pamda_core.pathOr">pathOr</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.pipe" href="#pamda.pamda_core.pamda_core.pipe">pipe</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.pluck" href="#pamda.pamda_core.pamda_core.pluck">pluck</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.pluckIf" href="#pamda.pamda_core.pamda_core.pluckIf">pluckIf</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.reduce" href="#pamda.pamda_core.pamda_core.reduce">reduce</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.safeDivide" href="#pamda.pamda_core.pamda_core.safeDivide">safeDivide</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.safeDivideDefault" href="#pamda.pamda_core.pamda_core.safeDivideDefault">safeDivideDefault</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.symmetricDifference" href="#pamda.pamda_core.pamda_core.symmetricDifference">symmetricDifference</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.tail" href="#pamda.pamda_core.pamda_core.tail">tail</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.thunkify" href="#pamda.pamda_core.pamda_core.thunkify">thunkify</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.unnest" href="#pamda.pamda_core.pamda_core.unnest">unnest</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.zip" href="#pamda.pamda_core.pamda_core.zip">zip</a></code></li>
-<li><code><a title="pamda.pamda_core.pamda_core.zipObj" href="#pamda.pamda_core.pamda_core.zipObj">zipObj</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.accumulate" href="#pamda.pamda_core.pamda.accumulate">accumulate</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.add" href="#pamda.pamda_core.pamda.add">add</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.adjust" href="#pamda.pamda_core.pamda.adjust">adjust</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.assocPath" href="#pamda.pamda_core.pamda.assocPath">assocPath</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.assocPathComplex" href="#pamda.pamda_core.pamda.assocPathComplex">assocPathComplex</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.asyncRun" href="#pamda.pamda_core.pamda.asyncRun">asyncRun</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.asyncWait" href="#pamda.pamda_core.pamda.asyncWait">asyncWait</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.clamp" href="#pamda.pamda_core.pamda.clamp">clamp</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.curry" href="#pamda.pamda_core.pamda.curry">curry</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.curryTyped" href="#pamda.pamda_core.pamda.curryTyped">curryTyped</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.dec" href="#pamda.pamda_core.pamda.dec">dec</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.difference" href="#pamda.pamda_core.pamda.difference">difference</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.dissocPath" href="#pamda.pamda_core.pamda.dissocPath">dissocPath</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.flatten" href="#pamda.pamda_core.pamda.flatten">flatten</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.flip" href="#pamda.pamda_core.pamda.flip">flip</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.getArity" href="#pamda.pamda_core.pamda.getArity">getArity</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.groupBy" href="#pamda.pamda_core.pamda.groupBy">groupBy</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.groupKeys" href="#pamda.pamda_core.pamda.groupKeys">groupKeys</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.groupWith" href="#pamda.pamda_core.pamda.groupWith">groupWith</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.hardRound" href="#pamda.pamda_core.pamda.hardRound">hardRound</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.hasPath" href="#pamda.pamda_core.pamda.hasPath">hasPath</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.head" href="#pamda.pamda_core.pamda.head">head</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.inc" href="#pamda.pamda_core.pamda.inc">inc</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.intersection" href="#pamda.pamda_core.pamda.intersection">intersection</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.map" href="#pamda.pamda_core.pamda.map">map</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.mean" href="#pamda.pamda_core.pamda.mean">mean</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.median" href="#pamda.pamda_core.pamda.median">median</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.mergeDeep" href="#pamda.pamda_core.pamda.mergeDeep">mergeDeep</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.nest" href="#pamda.pamda_core.pamda.nest">nest</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.nestItem" href="#pamda.pamda_core.pamda.nestItem">nestItem</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.path" href="#pamda.pamda_core.pamda.path">path</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.pathOr" href="#pamda.pamda_core.pamda.pathOr">pathOr</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.pipe" href="#pamda.pamda_core.pamda.pipe">pipe</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.pluck" href="#pamda.pamda_core.pamda.pluck">pluck</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.pluckIf" href="#pamda.pamda_core.pamda.pluckIf">pluckIf</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.reduce" href="#pamda.pamda_core.pamda.reduce">reduce</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.safeDivide" href="#pamda.pamda_core.pamda.safeDivide">safeDivide</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.safeDivideDefault" href="#pamda.pamda_core.pamda.safeDivideDefault">safeDivideDefault</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.symmetricDifference" href="#pamda.pamda_core.pamda.symmetricDifference">symmetricDifference</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.tail" href="#pamda.pamda_core.pamda.tail">tail</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.thunkify" href="#pamda.pamda_core.pamda.thunkify">thunkify</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.unnest" href="#pamda.pamda_core.pamda.unnest">unnest</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.zip" href="#pamda.pamda_core.pamda.zip">zip</a></code></li>
+<li><code><a title="pamda.pamda_core.pamda.zipObj" href="#pamda.pamda_core.pamda.zipObj">zipObj</a></code></li>
 </ul>
 </li>
 </ul>

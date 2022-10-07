@@ -2,19 +2,19 @@ import types
 from pamda.pamda_curry import curry_obj
 
 
-def curry_wrap(clsFnMethod):
+def typed_curry_wrap(clsFnMethod):
     if isinstance(clsFnMethod, staticmethod):
-        return staticmethod(curry_obj(clsFnMethod.__func__))
+        return staticmethod(curry_obj(clsFnMethod.__func__).typeEnforce())
     elif isinstance(clsFnMethod, classmethod):
-        return classmethod(curry_obj(clsFnMethod.__func__))
+        return classmethod(curry_obj(clsFnMethod.__func__).typeEnforce())
     elif isinstance(clsFnMethod, (types.FunctionType, types.MethodType)):
-        return curry_obj(clsFnMethod)
+        return curry_obj(clsFnMethod).typeEnforce()
     else:
         for key, value in clsFnMethod.__dict__.items():
             if hasattr(value, "__call__") or isinstance(
                 value, (classmethod, staticmethod)
             ):
-                setattr(clsFnMethod, key, curry_wrap(value))
+                setattr(clsFnMethod, key, typed_curry_wrap(value))
         return clsFnMethod
 
 

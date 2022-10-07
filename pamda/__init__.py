@@ -1,6 +1,6 @@
 import sys
 
 if sys.version_info[0] == 3:
-    from pamda.pamda import *
+    from .pamda import pamda
 elif sys.version_info[0] < 3:
     from pamda import *

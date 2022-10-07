@@ -38,6 +38,11 @@ out=pamda.assocPath(path=['a','b','c'], value=3, data=data)
 if out!={'a':{'b':{'c':3}}}:
     print('assocPath failed')
 
+data={'a':['b','c','d']}
+out=pamda.assocPath(path=['a',1], value='e', data=data)
+if out!={'a':['b','e','d']}:
+    print('assocPath failed')
+
 #assocPathComplex
 data={'a':{'b':1}}
 out=pamda.assocPathComplex(default=[2], default_fn=lambda x:x+[1], path=['a','c'], data=data)

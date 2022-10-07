@@ -1,8 +1,10 @@
 import csv
 import json
 from pamda import pamda_wrappers
+import type_enforced
 
 
+@type_enforced.Enforcer
 @pamda_wrappers.staticmethod_wrap
 class pamda_utils:
     ######################
@@ -120,7 +122,6 @@ class pamda_utils:
 
     ######################
     # Helpful Functions
-    @pamda_wrappers.curry_wrap
     def getMethods(object):
         """
         Function:
@@ -154,35 +155,35 @@ class pamda_utils:
             if callable(getattr(object, fn)) and not fn.startswith("__")
         ]
 
-    @pamda_wrappers.curry_wrap
-    def getForceDict(object: dict, key: str):
+    def getForceDict(object: [dict, list], key: [str, int]):
         """
         Function:
 
-        - Returns a value from a dictionary given a key and forces that value to be a dictionary
+        - Returns a value from a dictionary (or list) given a key (or index)  and forces that value to be a dictionary if it is not a dictionary (or a list)
         - Note: This updates the object in place to force the value from the key to be a dictionary
 
         Requires:
 
         - `object`:
-            - Type: dict
-            - What: The object from which to look for a key
+            - Type: dict | list
+            - What: The object from which to look for a key or index
         - `key`:
-            - Type: str
-            - What: The key to look up in the object
+            - Type: str | int
+            - What: The key or index to look up in the object
 
         Example:
 
         ```
-        data = {'a':{}, 'b':1}
+        data = {'a':{}, 'b':1, 'c':[]}
 
         pamda.getForceDict(data, 'a') #=> {}
         pamda.getForceDict(data, 'b') #=> {}
+        pamda.getForceDict(data, 'c') #=> []
 
         # Note that the object has been updated in place
-        data #=> {'a':{}, 'b':{}}
+        data #=> {'a':{}, 'b':{}, 'c':[]}
         ```
         """
-        if not isinstance(object.get(key), dict):
+        if not isinstance(object.get(key), (dict, list)):
             object.__setitem__(key, {})
         return object.get(key)

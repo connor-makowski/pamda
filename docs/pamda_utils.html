@@ -29,8 +29,10 @@
 <pre><code class="python">import csv
 import json
 from pamda import pamda_wrappers
+import type_enforced
 
 
+@type_enforced.Enforcer
 @pamda_wrappers.staticmethod_wrap
 class pamda_utils:
     ######################
@@ -148,7 +150,6 @@ class pamda_utils:
 
     ######################
     # Helpful Functions
-    @pamda_wrappers.curry_wrap
     def getMethods(object):
         &#34;&#34;&#34;
         Function:
@@ -182,36 +183,36 @@ class pamda_utils:
             if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)
         ]
 
-    @pamda_wrappers.curry_wrap
-    def getForceDict(object: dict, key: str):
+    def getForceDict(object: [dict, list], key: [str, int]):
         &#34;&#34;&#34;
         Function:
 
-        - Returns a value from a dictionary given a key and forces that value to be a dictionary
+        - Returns a value from a dictionary (or list) given a key (or index)  and forces that value to be a dictionary if it is not a dictionary (or a list)
         - Note: This updates the object in place to force the value from the key to be a dictionary
 
         Requires:
 
         - `object`:
-            - Type: dict
-            - What: The object from which to look for a key
+            - Type: dict | list
+            - What: The object from which to look for a key or index
         - `key`:
-            - Type: str
-            - What: The key to look up in the object
+            - Type: str | int
+            - What: The key or index to look up in the object
 
         Example:
 
         ```
-        data = {&#39;a&#39;:{}, &#39;b&#39;:1}
+        data = {&#39;a&#39;:{}, &#39;b&#39;:1, &#39;c&#39;:[]}
 
         pamda.getForceDict(data, &#39;a&#39;) #=&gt; {}
         pamda.getForceDict(data, &#39;b&#39;) #=&gt; {}
+        pamda.getForceDict(data, &#39;c&#39;) #=&gt; []
 
         # Note that the object has been updated in place
-        data #=&gt; {&#39;a&#39;:{}, &#39;b&#39;:{}}
+        data #=&gt; {&#39;a&#39;:{}, &#39;b&#39;:{}, &#39;c&#39;:[]}
         ```
         &#34;&#34;&#34;
-        if not isinstance(object.get(key), dict):
+        if not isinstance(object.get(key), (dict, list)):
             object.__setitem__(key, {})
         return object.get(key)</code></pre>
 </details>
@@ -234,7 +235,8 @@ class pamda_utils:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@pamda_wrappers.staticmethod_wrap
+<pre><code class="python">@type_enforced.Enforcer
+@pamda_wrappers.staticmethod_wrap
 class pamda_utils:
     ######################
     # Data Handling
@@ -351,7 +353,6 @@ class pamda_utils:
 
     ######################
     # Helpful Functions
-    @pamda_wrappers.curry_wrap
     def getMethods(object):
         &#34;&#34;&#34;
         Function:
@@ -385,36 +386,36 @@ class pamda_utils:
             if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)
         ]
 
-    @pamda_wrappers.curry_wrap
-    def getForceDict(object: dict, key: str):
+    def getForceDict(object: [dict, list], key: [str, int]):
         &#34;&#34;&#34;
         Function:
 
-        - Returns a value from a dictionary given a key and forces that value to be a dictionary
+        - Returns a value from a dictionary (or list) given a key (or index)  and forces that value to be a dictionary if it is not a dictionary (or a list)
         - Note: This updates the object in place to force the value from the key to be a dictionary
 
         Requires:
 
         - `object`:
-            - Type: dict
-            - What: The object from which to look for a key
+            - Type: dict | list
+            - What: The object from which to look for a key or index
         - `key`:
-            - Type: str
-            - What: The key to look up in the object
+            - Type: str | int
+            - What: The key or index to look up in the object
 
         Example:
 
         ```
-        data = {&#39;a&#39;:{}, &#39;b&#39;:1}
+        data = {&#39;a&#39;:{}, &#39;b&#39;:1, &#39;c&#39;:[]}
 
         pamda.getForceDict(data, &#39;a&#39;) #=&gt; {}
         pamda.getForceDict(data, &#39;b&#39;) #=&gt; {}
+        pamda.getForceDict(data, &#39;c&#39;) #=&gt; []
 
         # Note that the object has been updated in place
-        data #=&gt; {&#39;a&#39;:{}, &#39;b&#39;:{}}
+        data #=&gt; {&#39;a&#39;:{}, &#39;b&#39;:{}, &#39;c&#39;:[]}
         ```
         &#34;&#34;&#34;
-        if not isinstance(object.get(key), dict):
+        if not isinstance(object.get(key), (dict, list)):
             object.__setitem__(key, {})
         return object.get(key)</code></pre>
 </details>
@@ -422,19 +423,145 @@ class pamda_utils:
 <ul class="hlist">
 <li><a title="pamda.pamda.pamda" href="pamda.html#pamda.pamda.pamda">pamda</a></li>
 </ul>
-<h3>Class variables</h3>
-<dl>
-<dt id="pamda.pamda_utils.pamda_utils.getForceDict"><code class="name">var <span class="ident">getForceDict</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="pamda.pamda_utils.pamda_utils.getMethods"><code class="name">var <span class="ident">getMethods</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
 <h3>Static methods</h3>
 <dl>
+<dt id="pamda.pamda_utils.pamda_utils.getForceDict"><code class="name flex">
+<span>def <span class="ident">getForceDict</span></span>(<span>object: [<class 'dict'>, <class 'list'>], key: [<class 'str'>, <class 'int'>])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Returns a value from a dictionary (or list) given a key (or index)
+and forces that value to be a dictionary if it is not a dictionary (or a list)</li>
+<li>Note: This updates the object in place to force the value from the key to be a dictionary</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>object</code>:<ul>
+<li>Type: dict | list</li>
+<li>What: The object from which to look for a key or index</li>
+</ul>
+</li>
+<li><code>key</code>:<ul>
+<li>Type: str | int</li>
+<li>What: The key or index to look up in the object</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>data = {'a':{}, 'b':1, 'c':[]}
+
+pamda.getForceDict(data, 'a') #=&gt; {}
+pamda.getForceDict(data, 'b') #=&gt; {}
+pamda.getForceDict(data, 'c') #=&gt; []
+
+# Note that the object has been updated in place
+data #=&gt; {'a':{}, 'b':{}, 'c':[]}
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getForceDict(object: [dict, list], key: [str, int]):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns a value from a dictionary (or list) given a key (or index)  and forces that value to be a dictionary if it is not a dictionary (or a list)
+    - Note: This updates the object in place to force the value from the key to be a dictionary
+
+    Requires:
+
+    - `object`:
+        - Type: dict | list
+        - What: The object from which to look for a key or index
+    - `key`:
+        - Type: str | int
+        - What: The key or index to look up in the object
+
+    Example:
+
+    ```
+    data = {&#39;a&#39;:{}, &#39;b&#39;:1, &#39;c&#39;:[]}
+
+    pamda.getForceDict(data, &#39;a&#39;) #=&gt; {}
+    pamda.getForceDict(data, &#39;b&#39;) #=&gt; {}
+    pamda.getForceDict(data, &#39;c&#39;) #=&gt; []
+
+    # Note that the object has been updated in place
+    data #=&gt; {&#39;a&#39;:{}, &#39;b&#39;:{}, &#39;c&#39;:[]}
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(object.get(key), (dict, list)):
+        object.__setitem__(key, {})
+    return object.get(key)</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_utils.pamda_utils.getMethods"><code class="name flex">
+<span>def <span class="ident">getMethods</span></span>(<span>object)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function:</p>
+<ul>
+<li>Returns the callable methods of a class (dunder-excluded) as a list of strs</li>
+</ul>
+<p>Requires:</p>
+<ul>
+<li><code>object</code>:<ul>
+<li>Type: any</li>
+<li>What: Any python object</li>
+<li>Default: 1</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>class MyClass:
+    def A(self):
+        pass
+
+    def B(self):
+        pass
+
+
+pamda.getMethods(MyClass) #=&gt; ['A', 'B']
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getMethods(object):
+    &#34;&#34;&#34;
+    Function:
+
+    - Returns the callable methods of a class (dunder-excluded) as a list of strs
+
+    Requires:
+
+    - `object`:
+        - Type: any
+        - What: Any python object
+        - Default: 1
+
+    Example:
+
+    ```
+    class MyClass:
+        def A(self):
+            pass
+
+        def B(self):
+            pass
+
+
+    pamda.getMethods(MyClass) #=&gt; [&#39;A&#39;, &#39;B&#39;]
+    ```
+    &#34;&#34;&#34;
+    return [
+        fn
+        for fn in dir(object)
+        if callable(getattr(object, fn)) and not fn.startswith(&#34;__&#34;)
+    ]</code></pre>
+</details>
+</dd>
 <dt id="pamda.pamda_utils.pamda_utils.read_csv"><code class="name flex">
 <span>def <span class="ident">read_csv</span></span>(<span>filename: str, has_header: bool = True, return_dict: bool = True)</span>
 </code></dt>

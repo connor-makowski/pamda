@@ -30,19 +30,19 @@
 from pamda.pamda_curry import curry_obj
 
 
-def curry_wrap(clsFnMethod):
+def typed_curry_wrap(clsFnMethod):
     if isinstance(clsFnMethod, staticmethod):
-        return staticmethod(curry_obj(clsFnMethod.__func__))
+        return staticmethod(curry_obj(clsFnMethod.__func__).typeEnforce())
     elif isinstance(clsFnMethod, classmethod):
-        return classmethod(curry_obj(clsFnMethod.__func__))
+        return classmethod(curry_obj(clsFnMethod.__func__).typeEnforce())
     elif isinstance(clsFnMethod, (types.FunctionType, types.MethodType)):
-        return curry_obj(clsFnMethod)
+        return curry_obj(clsFnMethod).typeEnforce()
     else:
         for key, value in clsFnMethod.__dict__.items():
             if hasattr(value, &#34;__call__&#34;) or isinstance(
                 value, (classmethod, staticmethod)
             ):
-                setattr(clsFnMethod, key, curry_wrap(value))
+                setattr(clsFnMethod, key, typed_curry_wrap(value))
         return clsFnMethod
 
 
@@ -92,31 +92,6 @@ def classmethod_wrap(clsFnMethod):
         return clsFnMethod</code></pre>
 </details>
 </dd>
-<dt id="pamda.pamda_wrappers.curry_wrap"><code class="name flex">
-<span>def <span class="ident">curry_wrap</span></span>(<span>clsFnMethod)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def curry_wrap(clsFnMethod):
-    if isinstance(clsFnMethod, staticmethod):
-        return staticmethod(curry_obj(clsFnMethod.__func__))
-    elif isinstance(clsFnMethod, classmethod):
-        return classmethod(curry_obj(clsFnMethod.__func__))
-    elif isinstance(clsFnMethod, (types.FunctionType, types.MethodType)):
-        return curry_obj(clsFnMethod)
-    else:
-        for key, value in clsFnMethod.__dict__.items():
-            if hasattr(value, &#34;__call__&#34;) or isinstance(
-                value, (classmethod, staticmethod)
-            ):
-                setattr(clsFnMethod, key, curry_wrap(value))
-        return clsFnMethod</code></pre>
-</details>
-</dd>
 <dt id="pamda.pamda_wrappers.staticmethod_wrap"><code class="name flex">
 <span>def <span class="ident">staticmethod_wrap</span></span>(<span>clsFnMethod)</span>
 </code></dt>
@@ -133,6 +108,31 @@ def classmethod_wrap(clsFnMethod):
         for key, value in clsFnMethod.__dict__.items():
             if hasattr(value, &#34;__call__&#34;):
                 setattr(clsFnMethod, key, staticmethod_wrap(value))
+        return clsFnMethod</code></pre>
+</details>
+</dd>
+<dt id="pamda.pamda_wrappers.typed_curry_wrap"><code class="name flex">
+<span>def <span class="ident">typed_curry_wrap</span></span>(<span>clsFnMethod)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def typed_curry_wrap(clsFnMethod):
+    if isinstance(clsFnMethod, staticmethod):
+        return staticmethod(curry_obj(clsFnMethod.__func__).typeEnforce())
+    elif isinstance(clsFnMethod, classmethod):
+        return classmethod(curry_obj(clsFnMethod.__func__).typeEnforce())
+    elif isinstance(clsFnMethod, (types.FunctionType, types.MethodType)):
+        return curry_obj(clsFnMethod).typeEnforce()
+    else:
+        for key, value in clsFnMethod.__dict__.items():
+            if hasattr(value, &#34;__call__&#34;) or isinstance(
+                value, (classmethod, staticmethod)
+            ):
+                setattr(clsFnMethod, key, typed_curry_wrap(value))
         return clsFnMethod</code></pre>
 </details>
 </dd>
@@ -155,8 +155,8 @@ def classmethod_wrap(clsFnMethod):
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="pamda.pamda_wrappers.classmethod_wrap" href="#pamda.pamda_wrappers.classmethod_wrap">classmethod_wrap</a></code></li>
-<li><code><a title="pamda.pamda_wrappers.curry_wrap" href="#pamda.pamda_wrappers.curry_wrap">curry_wrap</a></code></li>
 <li><code><a title="pamda.pamda_wrappers.staticmethod_wrap" href="#pamda.pamda_wrappers.staticmethod_wrap">staticmethod_wrap</a></code></li>
+<li><code><a title="pamda.pamda_wrappers.typed_curry_wrap" href="#pamda.pamda_wrappers.typed_curry_wrap">typed_curry_wrap</a></code></li>
 </ul>
 </li>
 </ul>
