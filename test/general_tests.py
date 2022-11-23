@@ -10,9 +10,7 @@ except:
 
 @pamda.thunkify
 def test(name, wait):
-    print(f'{name} start')
     time.sleep(wait)
-    print(f'{name} end')
     return wait
 
 async_test_a = pamda.asyncRun(test('a',2))
@@ -32,4 +30,5 @@ def negate(x):
 
 data=6
 # You can pipe data through multiple functions for clean functional programming
-print(pamda.pipe([square, half, negate])(data)) #=> -18
+if pamda.pipe([square, half, negate])(data) != -18:
+    print ('pipe failed!')
