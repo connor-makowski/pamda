@@ -1,16 +1,29 @@
 import types, threading
+from functools import update_wrapper
+import type_enforced
 
 
-class curry_fn:
+class curry_obj:
     def __init__(
-        self, __fn__, *__args__, __flips__=[], __isThunk__=False, **__kwargs__
+        self,
+        __fn__,
+        *__args__,
+        __flips__=[],
+        __fnExecute__=None,
+        __isThunk__=False,
+        __isTypeEnforced__=False,
+        **__kwargs__,
     ):
-        self.__doc__ = __fn__.__doc__
-        self.__name__ = __fn__.__name__ + "_curried"
+        update_wrapper(self, __fn__)
         self.__fn__ = __fn__
+        self.__fnExecute__ = (
+            __fnExecute__ if __fnExecute__ is not None else __fn__
+        )
         self.__args__ = __args__
         self.__kwargs__ = __kwargs__
+        self.__isCurried__ = True
         self.__isThunk__ = __isThunk__
+        self.__isTypeEnforced__ = __isTypeEnforced__
         self.__flips__ = __flips__
         self.__fnArity__ = self.__getFnArity__()
         self.__arity__ = self.__getArity__(__args__, __kwargs__)
@@ -27,15 +40,17 @@ class curry_fn:
             if len(self.__flips__) > 0:
                 new_args = self.__unflipArgs__(new_args)
             if (not self.__isThunk__) or (len(args) + len(kwargs) == 0):
-                results = self.__fn__(*new_args, **new_kwargs)
+                results = self.__fnExecute__(*new_args, **new_kwargs)
                 if self.__thread__ != None:
                     self.__thread_results__ = results
                 return results
-        return curry_fn(
+        return curry_obj(
             self.__fn__,
             *new_args,
             __flips__=self.__flips__,
             __isThunk__=self.__isThunk__,
+            __isTypeEnforced__=self.__isTypeEnforced__,
+            __fnExecute__=self.__fnExecute__,
             **new_kwargs,
         )
 
@@ -51,7 +66,7 @@ class curry_fn:
                 "A non function was passed as a function and does not have any arity. See the stack trace above for more information."
             )
         extra_method_input_count = (
-            1 if isinstance(self.__fn__, types.MethodType) else 0
+            1 if isinstance(self.__fn__, (types.MethodType)) else 0
         )
         return self.__fn__.__code__.co_argcount - extra_method_input_count
 
@@ -79,6 +94,12 @@ class curry_fn:
             f"({self.__fn__.__module__}.{self.__fn__.__qualname__}_curried): "
         )
         raise Exception(pre_message + message)
+
+    def typeEnforce(self):
+        if not self.__isTypeEnforced__:
+            self.__fnExecute__ = type_enforced.Enforcer(self.__fnExecute__)
+            self.__isTypeEnforced__ = True
+        return self
 
     def asyncRun(self, daemon=False):
         if not self.__isThunk__ and self.__arity__ == 0:
