@@ -7,7 +7,7 @@ Inspired heavily by [Ramda](https://ramdajs.com/docs/).
 
 Documentation for Pamda Functions
 --------
-https://connor-makowski.github.io/pamda/pamda.html
+https://connor-makowski.github.io/pamda/pamda_core.html
 
 Key Features
 --------
