@@ -7,7 +7,7 @@ Inspired heavily by [Ramda](https://ramdajs.com/docs/).
 
 Documentation for Pamda Functions
 --------
-https://connor-makowski.github.io/pamda/pamda_core.html
+https://connor-makowski.github.io/pamda/pamda.html
 
 Key Features
 --------
@@ -71,12 +71,12 @@ For enforcing types, pamda relies on [type_enforced](https://github.com/connor-m
 
 ```py
 >>> from pamda import pamda
->>>
->>> # Pamda C
+>>> 
+>>> # Pamda CurryTyped
 >>> @pamda.curryTyped
 ... def add(a:int,b:int):
 ...     return a+b
-...
+... 
 >>> add(1)(1)
 2
 >>> add(1)(1.5)
@@ -84,13 +84,13 @@ Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
   File "/home/conmak/development/personal/pamda/pamda/pamda_curry.py", line 43, in __call__
     results = self.__fnExecute__(*new_args, **new_kwargs)
-  File "/home/conmak/development/personal/pamda/venv/lib/python3.10/site-packages/type_enforced/enforcer.py", line 85, in __call__
+  File "/home/conmak/development/personal/pamda/venv/lib/python3.10/site-packages/type_enforced/enforcer.py", line 90, in __call__
     self.__check_type__(assigned_vars.get(key), value, key)
-  File "/home/conmak/development/personal/pamda/venv/lib/python3.10/site-packages/type_enforced/enforcer.py", line 107, in __check_type__
+  File "/home/conmak/development/personal/pamda/venv/lib/python3.10/site-packages/type_enforced/enforcer.py", line 112, in __check_type__
     self.__exception__(
   File "/home/conmak/development/personal/pamda/venv/lib/python3.10/site-packages/type_enforced/enforcer.py", line 34, in __exception__
-    raise Exception(f"({self.__fn__.__qualname__}): {message}")
-Exception: (add): Type mismatch for typed variable `b`. Expected one of the following `[<class 'int'>]` but got `<class 'float'>` instead.
+    raise TypeError(f"({self.__fn__.__qualname__}): {message}")
+TypeError: (add): Type mismatch for typed variable `b`. Expected one of the following `[<class 'int'>]` but got `<class 'float'>` instead.
 ```
 
 
@@ -156,9 +156,8 @@ def half(x):
 def negate(x):
     return -x
 
-data=6
 # You can pipe data through multiple functions for clean functional programming
-pamda.pipe([square, half, negate])(data) #=> -18
+pamda.pipe([square, half, negate])(args=(6,),kwargs={}) #=> -18
 ```
 
 ## Use pamda as a subclass
