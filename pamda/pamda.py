@@ -200,7 +200,7 @@ class pamda(pamda_utils):
         Requires:
 
         - `fn`:
-            - Type: function | method
+            - Type: thunkified function | thunkified method
             - What: The function or method to run asychronously
             - Note: The supplied `fn` must have an arity of 0
 
@@ -449,7 +449,7 @@ class pamda(pamda_utils):
         """
         Function:
 
-        - Combines two lists into a list of no duplicates items present in the first list but not the second
+        - Combines two lists into a list of no duplicate items present in the first list but not the second
 
         Requires:
 
@@ -506,7 +506,7 @@ class pamda(pamda_utils):
         """
         Function:
 
-        - Flattens a list of lists to a single list
+        - Flattens a list of lists of lists ... into a single list depth first
 
         Requires:
 
@@ -516,11 +516,19 @@ class pamda(pamda_utils):
         Example:
 
         ```
-        data=[['a','b'],[1,2]]
+        data=[['a','b'],[1,[2]]]
         pamda.flatten(data=data) #=> ['a','b',1,2]
         ```
         """
-        return [i for sub_list in data for i in sub_list]
+        def iter_flatten(data):
+            out = []
+            for i in data:
+                if isinstance(i, list):
+                    out.extend(iter_flatten(i))
+                else:
+                    out.append(i)
+            return out
+        return iter_flatten(data)
 
     def flip(self, fn):
         """
@@ -662,8 +670,8 @@ class pamda(pamda_utils):
         #=>}
         ```
         """
-        fn = self.curry(fn)
-        if fn.__arity__ != 1:
+        curried_fn = self.curry(fn)
+        if curried_fn.__arity__ != 1:
             raise Exception(
                 "groupBy `fn` must only take one parameter as its input"
             )
@@ -672,16 +680,11 @@ class pamda(pamda_utils):
             path = fn(i)
             if not isinstance(path, str):
                 raise Exception(
-                    "groupBy `fn` must return a str but instead returned {}".format(
-                        path
-                    )
+                    f"groupBy `fn` must return a str but instead returned {path}"
                 )
-            output = self.assocPathComplex(
-                default=[],
-                default_fn=lambda x: x + [i],
-                path=[fn(i)],
-                data=output,
-            )
+            if path not in output:
+                output[path] = []
+            output[path].append(i)
         return output
 
     def groupKeys(self, keys: list, data: list):
@@ -716,14 +719,9 @@ class pamda(pamda_utils):
         #=> ]
         ```
         """
-        if len(keys) == 0:
-            raise Exception(
-                "groupKeys `keys` list must have at least one item in it"
-            )
-        output = list(self.nestItem(keys, data).values())
-        for i in range(len(keys) - 1):
-            output = self.unnest([list(i.values()) for i in output])
-        return output
+        def keyFn(item):
+            return str(([item[key] for key in keys]))
+        return list(self.groupBy(keyFn, data).values())
 
     def groupWith(self, fn, data: list):
         """
@@ -753,8 +751,8 @@ class pamda(pamda_utils):
         pamda.groupWith(areEqual,data) #=> [[1], [2], [3], [1, 1], [2, 2], [3, 3, 3]]
         ```
         """
-        fn = self.curry(fn)
-        if fn.__arity__ != 2:
+        curried_fn = self.curry(fn)
+        if curried_fn.__arity__ != 2:
             raise Exception("groupWith `fn` must take exactly two parameters")
         output = []
         start = True
@@ -1024,7 +1022,7 @@ class pamda(pamda_utils):
             return (data[int(length / 2)] + data[int(length / 2) - 1]) / 2
         return data[int(length / 2)]
 
-    def mergeDeep(self, update_data: dict, data: dict):
+    def mergeDeep(self, update_data, data):
         """
         Function:
 
@@ -1034,10 +1032,10 @@ class pamda(pamda_utils):
         Requires:
 
         - `update_data`:
-            - Type: dict
+            - Type: any
             - What: The new data that will take precedence during merging
         - `data`:
-            - Type: dict
+            - Type: any
             - What: The original data that will be merged into
 
         Example:
@@ -1108,12 +1106,12 @@ class pamda(pamda_utils):
         if len(data) == 0:
             raise Exception("Attempting to `nest` from an empty list")
         nested_output = {}
-        for item in data:
-            nested_output = self.assocPathComplex(
-                data=nested_output,
-                path=[item[key] for key in path_keys],
-                default=[],
-                default_fn=lambda x: x + [item[value_key]],
+        grouped_data = self.groupKeys(keys=path_keys, data=data)
+        for item in grouped_data:
+            nested_output = self.assocPath(
+                path = [item[0].get(key) for key in path_keys],
+                value = [i.get(value_key) for i in item],
+                data = nested_output
             )
         return nested_output
 
@@ -1144,7 +1142,7 @@ class pamda(pamda_utils):
             {'x_1':'a','x_2':'b'},
             {'x_1':'a','x_2':'e'}
         ]
-        pamda.nest(
+        pamda.nestItem
             path_keys=['x_1','x_2'],
             data=data
         )
@@ -1152,15 +1150,17 @@ class pamda(pamda_utils):
 
         ```
         """
+        if not isinstance(data, list):
+            raise Exception("Attempting to `nest` an object that is not a list")
         if len(data) == 0:
-            raise Exception("Attempting to `nestItem` from an empty list")
+            raise Exception("Attempting to `nest` from an empty list")
         nested_output = {}
-        for item in data:
-            nested_output = self.assocPathComplex(
-                data=nested_output,
-                path=[item[key] for key in path_keys],
-                default=[],
-                default_fn=lambda x: x + [item],
+        grouped_data = self.groupKeys(keys=path_keys, data=data)
+        for item in grouped_data:
+            nested_output = self.assocPath(
+                path = [item[0].get(key) for key in path_keys],
+                value = item,
+                data = nested_output
             )
         return nested_output
 
@@ -1221,7 +1221,7 @@ class pamda(pamda_utils):
             path[-1], default
         )
 
-    def pipe(self, fns: list, data):
+    def pipe(self, fns: list, args:tuple, kwargs:dict):
         """
         Function:
 
@@ -1236,21 +1236,25 @@ class pamda(pamda_utils):
             - Notes: Any further function in the list can only be unary (single input)
             - Notes: A function can be curried, but is not required to be
             - Notes: You may opt to curry functions and add inputs to make them unary
-        - `data`:
-            - Type: any
-            - What: The data to be piped through the specified `fns`
+        - `args`:
+            - Type: tuple
+            - What: a tuple of positional arguments to pass to the first function in `fns`
+        - `kwargs`:
+            - Type: dict
+            - What: a dictionary of keyword arguments to pass to the first function in `fns`
 
         Examples:
 
         ```
         data=['abc','def']
-        pamda.pipe(fns=[pamda.head, pamda.tail], data=data) #=> 'c'
+        pamda.pipe(fns=[pamda.head, pamda.tail], args=(data), kwargs={}) #=> 'c'
+        pamda.pipe(fns=[pamda.head, pamda.tail], args=(), kwargs={'data':data}) #=> 'c'
         ```
 
         ```
         data={'a':{'b':'c'}}
         curriedPath=pamda.curry(pamda.path)
-        pamda.pipe(fns=[curriedPath('a'), curriedPath('b')], data=data) #=> 'c'
+        pamda.pipe(fns=[curriedPath('a'), curriedPath('b')], args=(), kwargs={'data':data}) #=> 'c'
         ```
         """
         if len(fns) == 0:
@@ -1263,9 +1267,10 @@ class pamda(pamda_utils):
             raise Exception(
                 "Only the first function in `fns` can have n arity (accept n args). All other functions must have an arity of one (accepting one argument)."
             )
-        for fn in fns:
-            data = fn(data)
-        return data
+        out = fns[0](*args, **kwargs)
+        for fn in fns[1:]:
+            out = fn(out)
+        return out
 
     def pluck(self, path: [list, str], data: list):
         """
@@ -1295,7 +1300,7 @@ class pamda(pamda_utils):
         return [self.path(data=i, path=path) for i in data]
 
     def pluckIf(
-        self, if_path: list, if_vals: list, path: [list, str], data: list
+        self, fn, path: [list, str], data: list
     ):
         """
         Function:
@@ -1304,13 +1309,10 @@ class pamda(pamda_utils):
 
         Requires:
 
-        - `if_path`:
-            - Type: list of strs
-            - What: Path to check if the `if_val` matches
-        - `if_vals`:
-            - Type: list of any types
-            - What: If the `if_path`s value is in this list, this item is returned
-            - Note: Items should be the same type as objects at end of `if_path`
+        - `fn`:
+            - Type: function
+            - What: A function to take in each item in data and return a boolean
+            - Note: Only items that return true are plucked
         - `path`:
             - Type: list of strs
             - What: The path to pull given the data
@@ -1322,17 +1324,14 @@ class pamda(pamda_utils):
         Example:
 
         ```
+
         data=[{'a':{'b':1, 'c':'d'}},{'a':{'b':2, 'c':'e'}}]
-        pamda.pluck(if_path=['a','c'], if_vals=['d'], path=['a','b'], data=data) #=> [1]
+        pamda.pluck(fn:lambda x: x['a']['b']==1, path=['a','c'], data=data) #=> ['d']
         ```
         """
         if len(data) == 0:
             raise Exception("Attempting to pluck from an empty list")
-        return [
-            self.path(data=i, path=path)
-            for i in data
-            if self.path(data=i, path=if_path) in if_vals
-        ]
+        return [self.path(data=i, path=path) for i in data if fn(i)]
 
     def reduce(self, fn, initial_accumulator, data: list):
         """
@@ -1567,7 +1566,7 @@ class pamda(pamda_utils):
         data=['fe','fi',['fo',['fum']]]
         pamda.unnest(
             data=data
-        ) #=> =['fe','fi','fo',['fum']]
+        ) #=> ['fe','fi','fo',['fum']]
         ```
         """
         if not len(data) > 0:

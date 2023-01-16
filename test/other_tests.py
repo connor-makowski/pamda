@@ -1,6 +1,8 @@
 from pamda import pamda
 import time
 
+print('\n===============\nOther Tests:\n===============')
+
 # Type Enforcement
 try:
     pamda.add('a',1)
@@ -8,6 +10,7 @@ try:
 except:
     pass
 
+# Async Testing
 @pamda.thunkify
 def test(name, wait):
     time.sleep(wait)
@@ -17,18 +20,3 @@ async_test_a = pamda.asyncRun(test('a',2))
 async_test_b = pamda.asyncRun(test('b',1))
 async_test_a.asyncWait()
 async_test_c = pamda.asyncRun(test('c',1))
-
-
-def square(x):
-    return x**2
-
-def half(x):
-    return x/2
-
-def negate(x):
-    return -x
-
-data=6
-# You can pipe data through multiple functions for clean functional programming
-if pamda.pipe([square, half, negate])(data) != -18:
-    print ('pipe failed!')
