@@ -19,27 +19,7 @@ data = [
     {'color':'blue', 'size':i%sizes, 'shape':'cube'} for i in range(n_per_group)
 ]
 
-# groupBy
-@pamda_timer
-def test_groupBy():
-    pamda.groupBy(lambda x: x['color']+x['shape'], data)
-
-# groupKeys
-@pamda_timer
-def test_groupKeys():
-    pamda.groupKeys(['color', 'size'], data)
-
-# nest
-@pamda_timer
-def test_nest():
-    pamda.nest(['color', 'size'], 'size', data)
-
-# nestItem
-@pamda_timer
-def test_nestItem():
-    pamda.nestItem(['color', 'size'], data)
-
-test_groupBy()
-test_groupKeys()
-test_nest()
-test_nestItem()
+pamda_timer(pamda.groupBy)(lambda x: x['color']+x['shape'], data)
+pamda_timer(pamda.groupKeys)(['color', 'size'], data)
+pamda_timer(pamda.nest)(['color', 'size'], 'size', data)
+pamda_timer(pamda.nestItem)(['color', 'size'], data)
