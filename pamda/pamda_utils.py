@@ -1,5 +1,4 @@
-import csv
-import json
+import csv, json, ast
 from pamda import pamda_wrappers
 import type_enforced
 
@@ -10,12 +9,13 @@ class pamda_utils:
     ######################
     # Data Handling
     def read_csv(
-        filename: str, has_header: bool = True, return_dict: bool = True
+        filename: str, return_dict: bool = True, cast_items:bool = False, cast_dict: [dict, None] = None
     ):
         """
         Function:
 
         - Reads the contents of a csv and converts it to list of dicts or list of lists
+        - Note: The csv must have a header row indicating the names of each column
 
         Requires:
 
@@ -25,30 +25,60 @@ class pamda_utils:
 
         Optional:
 
-        - `has_header`:
-            - Type: bool
-            - What: Flag to indicate if the csv has an initial row that identifies columns
-            - Default: True
-            - Note: Returns a list of lists
         - `return_dict`:
             - Type: bool
             - What: Flag to indicate if the csv should be converted to:
-                - True: list of dicts
-                - False: list of lists
-            - Note: If True, requires `has_header` to be True as the header determines the keys of the dicts
+                - True: list of dicts (with each key being the associated column header)
+                - False: list of lists (with the first row being the headers)
+            - Default: True
+        - `cast_items`:
+            - Type: bool
+            - What: Flag to indicate if an attempt to cast each item to a proper type
+            - Default: True
+            - Note: This is useful for converting strings to ints, floats, etc.
+            - Note: This works in conjunction with `cast_dict`
+                - If `cast_dict` is not None, then an automated attempt to cast the items will be made
+        - `cast_dict`:
+            - Type: dict
+            - What: A dictionary of functions to cast each column (by name) in the csv
+            - Default: None
+            - Note: Unspecified column names will be treated as strings
+            - Note: `cast_items` must be `True` to use this
+            - EG: {
+                'user_id': lambda x: int(x),
+                'year': lambda x: int(x),
+                'pass': lambda x: x.lower()=='true',
+            }
         """
         with open(filename) as f:
             file_data = csv.reader(f, delimiter=",", quotechar='"')
-            if has_header:
-                headers = next(file_data)
-            if has_header and return_dict:
-                return [dict(zip(headers, i)) for i in file_data]
-            elif not has_header and return_dict:
-                raise Exception(
-                    "If `return_dict` is True, `has_header` must also be True."
-                )
+            headers = next(file_data)
+            if cast_items:
+                if cast_dict is not None:
+                    def cast(obj, name):
+                        return cast_dict.get(name, lambda x: x)(obj)
+                else:
+                    def cast(obj, name):
+                        if not isinstance(obj, str):
+                            return obj
+                        if obj == "" or obj.lower() == 'none' or obj.lower() == 'null':
+                            return None
+                        if obj.lower() == "true":
+                            return True
+                        if obj.lower() == "false":
+                            return False
+                        try:
+                            float_obj = float(obj)
+                            return int(float_obj) if float_obj == int(float_obj) else float_obj
+                        except:
+                            return obj
+                data = [{header:cast(item,header) for header, item in zip(headers, row)} for row in file_data]
             else:
-                return [i for i in file_data]
+                data = [dict(zip(headers, row)) for row in file_data]
+            if return_dict:
+                return data
+            else:
+                return [headers]+[list(item.values()) for item in data]
 
     def write_csv(filename: str, data):
         """

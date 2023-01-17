@@ -44,21 +44,25 @@ class pamda_timer:
             - Type: function | method
             - What: The name of the process being timed
         &#34;&#34;&#34;
-        if not __fn__.__dict__.get(&#34;__isCurried__&#34;):
-            __fn__ = curry_obj(__fn__)
-        if __fn__.__arity__ != 0:
-            raise Exception(&#34;The function being timed must have an arity of 0. Consider thunkifying the function first.&#34;)
         self.__fn__ = __fn__
-        update_wrapper(self, __fn__)
 
-    def __call__(self):
+    def __call__(self, *args, **kwargs):
         &#34;&#34;&#34;
         Function:
 
-        Test the timer by running the function being timed.
+        Test the function processing time.
+
+        Optional:
+
+        - `args`:
+            - Type: any
+            - What: The arguments to pass to the function
+        - `kwargs`:
+            - Type: any
+            - What: The keyword arguments to pass to the function
         &#34;&#34;&#34;
         start = time.time()
-        out = self.__fn__()
+        out = self.__fn__(*args, **kwargs)
         print(f&#34;{self.__fn__.__qualname__}: {round(time.time() - start,4)}s&#34;)
         return out
 
@@ -109,21 +113,25 @@ class pamda_timer:
             - Type: function | method
             - What: The name of the process being timed
         &#34;&#34;&#34;
-        if not __fn__.__dict__.get(&#34;__isCurried__&#34;):
-            __fn__ = curry_obj(__fn__)
-        if __fn__.__arity__ != 0:
-            raise Exception(&#34;The function being timed must have an arity of 0. Consider thunkifying the function first.&#34;)
         self.__fn__ = __fn__
-        update_wrapper(self, __fn__)
 
-    def __call__(self):
+    def __call__(self, *args, **kwargs):
         &#34;&#34;&#34;
         Function:
 
-        Test the timer by running the function being timed.
+        Test the function processing time.
+
+        Optional:
+
+        - `args`:
+            - Type: any
+            - What: The arguments to pass to the function
+        - `kwargs`:
+            - Type: any
+            - What: The keyword arguments to pass to the function
         &#34;&#34;&#34;
         start = time.time()
-        out = self.__fn__()
+        out = self.__fn__(*args, **kwargs)
         print(f&#34;{self.__fn__.__qualname__}: {round(time.time() - start,4)}s&#34;)
         return out
 
