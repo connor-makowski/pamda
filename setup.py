@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 setup(
   name = 'pamda',
   packages = ['pamda'],
-  version = '2.1.0',
+  version = '2.1.1',
   license='MIT',
   description = 'Python wrapper of object oriented processes for functional programming styles similar to Ramda',
   long_description=long_description,
