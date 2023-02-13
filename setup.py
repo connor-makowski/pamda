@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 setup(
   name = 'pamda',
   packages = ['pamda'],
-  version = '2.1.1',
+  version = '2.1.2',
   license='MIT',
   description = 'Python wrapper of object oriented processes for functional programming styles similar to Ramda',
   long_description=long_description,
@@ -15,10 +15,10 @@ setup(
   author = 'Connor Makowski',
   author_email = 'connor.m.makowski@gmail.com',
   url = 'https://github.com/connor-makowski/pamda',
-  download_url = 'https://github.com/connor-makowski/pamda/dist/pamda-1.0.0.tar.gz',
+  download_url = 'https://github.com/connor-makowski/pamda/dist/pamda-2.1.2.tar.gz',
   keywords = ['data', 'ramda', 'pamda','functional'],
   install_requires=[
-        "type_enforced==0.0.14"
+        "type_enforced>=0.0.15"
   ],
   classifiers=[
     'Development Status :: 3 - Alpha',
