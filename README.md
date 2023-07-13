@@ -1,16 +1,16 @@
-Pamda
-==========
+# Pamda
+[![PyPI version](https://badge.fury.io/py/pamda.svg)](https://badge.fury.io/py/pamda)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Python wrapper for functional programming in object oriented structures.
 
 Inspired heavily by [Ramda](https://ramdajs.com/docs/).
 
 
-Documentation for Pamda Functions
---------
+## Documentation for Pamda Functions
 https://connor-makowski.github.io/pamda/pamda.html
 
-Key Features
---------
+## Key Features
 
 - Simplified functional programming for python
 - Core Functions include:
@@ -20,8 +20,7 @@ Key Features
 - List based path access and features for nested dictionaries
 
 
-Setup
-----------
+## Setup
 
 Make sure you have Python 3.6.x (or higher) installed on your system. You can download it [here](https://www.python.org/downloads/).
 
@@ -31,9 +30,9 @@ Make sure you have Python 3.6.x (or higher) installed on your system. You can do
 pip install pamda
 ```
 
-# Getting Started
+## Getting Started
 
-## Basic Usage
+### Basic Usage
 ```py
 from pamda import pamda
 
@@ -45,7 +44,7 @@ pamda.path(['a','b'])(data) #=> 1
 # https://connor-makowski.github.io/pamda/pamda.html
 ```
 
-## Curry Usage
+### Curry Usage
 ```py
 from pamda import pamda
 
@@ -94,7 +93,7 @@ TypeError: (add): Type mismatch for typed variable `b`. Expected one of the foll
 ```
 
 
-## Thunkify Usage
+### Thunkify Usage
 ```py
 from pamda import pamda
 
@@ -143,7 +142,7 @@ c start
 c end
 ```
 
-## Pipe
+### Pipe
 ```py
 from pamda import pamda
 
@@ -160,7 +159,7 @@ def negate(x):
 pamda.pipe([square, half, negate])(args=(6,),kwargs={}) #=> -18
 ```
 
-## Use pamda as a subclass
+### Use pamda as a subclass
 ```py
 from pamda import pamda
 
@@ -178,7 +177,7 @@ def addUp(a,b):
 addUp(1)(2) #=> 3
 ```
 
-# Pamda Utils
+## Pamda Utils
 
 - Pamda also ships with a few helpful utilities
 - Check out the documentation here:
