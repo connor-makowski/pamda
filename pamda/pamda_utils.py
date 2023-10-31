@@ -9,7 +9,7 @@ class pamda_utils:
     ######################
     # Data Handling
     def read_csv(
-        filename: str, return_dict: bool = True, cast_items:bool = False, cast_dict: [dict, None] = None
+        filename: str, return_dict: bool = True, cast_items:bool = True, cast_dict: [dict, None] = None
     ):
         """
         Function:
