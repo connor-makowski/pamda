@@ -120,6 +120,7 @@ class pamda(pamda_utils):
         Function:
 
         - Ensures a path exists within a nested dictionary
+        - Note: This updates the object in place, but also returns the object
 
         Requires:
 
@@ -155,6 +156,7 @@ class pamda(pamda_utils):
         Function:
 
         - Ensures a path exists within a nested dictionary
+        - Note: This updates the object in place, but also returns the object
 
         Requires:
 
@@ -476,6 +478,7 @@ class pamda(pamda_utils):
         Function:
 
         - Removes the value at the end of a path within a nested dictionary
+        - Note: This updates the object in place, but also returns the object
 
         Requires:
 
