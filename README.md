@@ -22,7 +22,7 @@ https://connor-makowski.github.io/pamda/pamda/pamda.html
 
 ## Setup
 
-Make sure you have Python 3.6.x (or higher) installed on your system. You can download it [here](https://www.python.org/downloads/).
+Make sure you have Python 3.9.x (or higher) installed on your system. You can download it [here](https://www.python.org/downloads/).
 
 ### Installation
 
