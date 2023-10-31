@@ -29,4 +29,4 @@ dependencies = ["type_enforced>=0.0.16",]
 [project.urls]
 "Homepage" = "https://github.com/connor-makowski/pamda"
 "Bug Tracker" = "https://github.com/connor-makowski/pamda/issues"
-"Documentation" = "https://connor-makowski.github.io/pamda/pamda.html"
+"Documentation" = "https://connor-makowski.github.io/pamda/pamda/pamda.html"
