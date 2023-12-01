@@ -9,7 +9,11 @@ class pamda_utils:
     ######################
     # Data Handling
     def read_csv(
-        filename: str, return_dict: bool = True, cast_items:bool = True, cast_dict: [dict, None] = None
+        filename: str,
+        return_dict: bool = True,
+        cast_items: bool = True,
+        cast_dict: [dict, None] = None,
+        return_type: [str, None] = None,
     ):
         """
         Function:
@@ -22,6 +26,7 @@ class pamda_utils:
         - `filename`:
             - Type: str
             - What: The filepath of the csv to read
+                - Note: The first row of the csv must be the header row
 
         Optional:
 
@@ -31,6 +36,23 @@ class pamda_utils:
                 - True: list of dicts (with each key being the associated column header)
                 - False: list of lists (with the first row being the headers)
             - Default: True
+            - Notes:
+                - This has been deprecated in favor of `return_type`
+                - This has been kept for backwards compatibility
+                - If return_type is specified, this will be ignored
+        - `return_type`:
+            - Type: str
+            - Options:
+                - `list_of_dicts` (default if `return_dict` is True)
+                    - A list of dictionaries with each key being the associated column header
+                - `dict_of_lists`
+                    - A dictionary of lists with each key being the associated column header and each value being a list of the values in that column
+                - `list_of_row_lists`
+                    - A list of lists (records) with each row being a list of the values in that row
+                    - The first row is the header row
+                - `list_of_col_lists`
+                    - A list of lists (columns) with each column being a list of the values in that column
+                    - The first item in each sublist is the header for that column
         - `cast_items`:
             - Type: bool
             - What: Flag to indicate if an attempt to cast each item to a proper type
@@ -38,6 +60,16 @@ class pamda_utils:
             - Note: This is useful for converting strings to ints, floats, etc.
             - Note: This works in conjunction with `cast_dict`
                 - If `cast_dict` is not None, then an automated attempt to cast the items will be made
+                - For automated casting, the following rules are applied to each item in the data:
+                    - If the item is a string:
+                        - If the string is empty, `None` will be returned
+                        - If the string is "None" or "null", `None` will be returned
+                        - If the string is "True" or "true", `True` will be returned
+                        - If the string is "False" or "false", `False` will be returned
+                        - If the string is a valid float, the float will be returned
+                        - If the string is a valid int, the int will be returned
+                        - Otherwise, the string will be returned
+                    - If the item is not a string, it will be returned as is
         - `cast_dict`:
             - Type: dict
             - What: A dictionary of functions to cast each column (by name) in the csv
@@ -50,35 +82,60 @@ class pamda_utils:
                 'pass': lambda x: x.lower()=='true',
             }
         """
+        assert return_type in [
+            None,
+            "list_of_dicts",
+            "dict_of_lists",
+            "list_of_row_lists",
+            "list_of_col_lists",
+        ], f"Invalid return_type: {return_type}"
         with open(filename) as f:
             file_data = csv.reader(f, delimiter=",", quotechar='"')
             headers = next(file_data)
-            if cast_items:
-                if cast_dict is not None:
-                    def cast(obj, name):
-                        return cast_dict.get(name, lambda x: x)(obj)
-                else:
-                    def cast(obj, name):
-                        if not isinstance(obj, str):
-                            return obj
-                        if obj == "" or obj.lower() == 'none' or obj.lower() == 'null':
-                            return None
-                        if obj.lower() == "true":
-                            return True
-                        if obj.lower() == "false":
-                            return False
-                        try:
-                            float_obj = float(obj)
-                            return int(float_obj) if float_obj == int(float_obj) else float_obj
-                        except:
-                            return obj
-                data = [{header:cast(item,header) for header, item in zip(headers, row)} for row in file_data]
+            data = list(zip(*[row for row in file_data]))
+        if cast_items:
+            if cast_dict is not None:
+                for idx, header in enumerate(headers):
+                    cast_fn = cast_dict.get(header, lambda x: x)
+                    data[idx] = [cast_fn(item) for item in data[idx]]
             else:
-                data = [dict(zip(headers, row)) for row in file_data]
-            if return_dict:
-                return data
-            else:
-                return [headers]+[list(item.values()) for item in data]
+
+                def cast(obj):
+                    if not isinstance(obj, str):
+                        return obj
+                    obj_lower = obj.lower()
+                    if obj == "" or obj_lower == "none" or obj_lower == "null":
+                        return None
+                    if obj_lower == "true":
+                        return True
+                    if obj_lower == "false":
+                        return False
+                    try:
+                        float_obj = float(obj)
+                        return (
+                            int(float_obj)
+                            if float_obj == int(float_obj)
+                            else float_obj
+                        )
+                    except:
+                        return obj
+
+                for idx, header in enumerate(headers):
+                    data[idx] = [cast(item) for item in data[idx]]
+        # Maintain backwards compatibility
+        # TODO: Deprecate this in the next major release
+        if return_type == None:
+            return_type = (
+                "list_of_dicts" if return_dict else "list_of_row_lists"
+            )
+        if return_type == "list_of_dicts":
+            return [dict(zip(headers, row)) for row in zip(*data)]
+        elif return_type == "dict_of_lists":
+            return {header: col for header, col in zip(headers, data)}
+        elif return_type == "list_of_row_lists":
+            return [headers] + [list(row) for row in zip(*data)]
+        elif return_type == "list_of_col_lists":
+            return [[header] + list(col) for header, col in zip(headers, data)]
 
     def write_csv(filename: str, data):
         """

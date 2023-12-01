@@ -1,13 +1,12 @@
-from pamda.pamda_curry import curry_obj
-from functools import update_wrapper
 import time
+
 
 class pamda_timer:
     def __init__(self, __fn__):
         """
         Function:
 
-        Initialize a pamda_timer object. 
+        Initialize a pamda_timer object.
         - Note: This object is used for bare minimum in script timing purposes.
 
         Required:

@@ -89,7 +89,7 @@ class curry_obj:
             args.insert(flip, arg)
         return tuple(args)
 
-    def __exception__(self, message, depth=0):
+    def __exception__(self, message):
         pre_message = (
             f"({self.__fn__.__module__}.{self.__fn__.__qualname__}_curried): "
         )

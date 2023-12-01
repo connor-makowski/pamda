@@ -12,7 +12,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pamda"
-version = "2.2.1"
+version = "2.3.0"
 description = "Python wrapper for api use in the cave_app"
 authors = [
     {name="Connor Makowski", email="conmak@mit.edu"}
@@ -24,7 +24,7 @@ classifiers = [
     'License :: OSI Approved :: MIT License',
     "Operating System :: OS Independent",
 ]
-dependencies = ["type_enforced>=0.0.16",]
+dependencies = ["type_enforced>=1.2.0",]
 
 [project.urls]
 "Homepage" = "https://github.com/connor-makowski/pamda"

@@ -523,6 +523,7 @@ class pamda(pamda_utils):
         pamda.flatten(data=data) #=> ['a','b',1,2]
         ```
         """
+
         def iter_flatten(data):
             out = []
             for i in data:
@@ -531,6 +532,7 @@ class pamda(pamda_utils):
                 else:
                     out.append(i)
             return out
+
         return iter_flatten(data)
 
     def flip(self, fn):
@@ -722,8 +724,10 @@ class pamda(pamda_utils):
         #=> ]
         ```
         """
+
         def keyFn(item):
             return str(([item[key] for key in keys]))
+
         return list(self.groupBy(keyFn, data).values())
 
     def groupWith(self, fn, data: list):
@@ -1112,9 +1116,9 @@ class pamda(pamda_utils):
         grouped_data = self.groupKeys(keys=path_keys, data=data)
         for item in grouped_data:
             nested_output = self.assocPath(
-                path = [item[0].get(key) for key in path_keys],
-                value = [i.get(value_key) for i in item],
-                data = nested_output
+                path=[item[0].get(key) for key in path_keys],
+                value=[i.get(value_key) for i in item],
+                data=nested_output,
             )
         return nested_output
 
@@ -1161,9 +1165,9 @@ class pamda(pamda_utils):
         grouped_data = self.groupKeys(keys=path_keys, data=data)
         for item in grouped_data:
             nested_output = self.assocPath(
-                path = [item[0].get(key) for key in path_keys],
-                value = item,
-                data = nested_output
+                path=[item[0].get(key) for key in path_keys],
+                value=item,
+                data=nested_output,
             )
         return nested_output
 
@@ -1224,7 +1228,7 @@ class pamda(pamda_utils):
             path[-1], default
         )
 
-    def pipe(self, fns: list, args:tuple, kwargs:dict):
+    def pipe(self, fns: list, args: tuple, kwargs: dict):
         """
         Function:
 
@@ -1302,9 +1306,7 @@ class pamda(pamda_utils):
             raise Exception("Attempting to pluck from an empty list")
         return [self.path(data=i, path=path) for i in data]
 
-    def pluckIf(
-        self, fn, path: [list, str], data: list
-    ):
+    def pluckIf(self, fn, path: [list, str], data: list):
         """
         Function:
 
