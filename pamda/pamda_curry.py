@@ -1,4 +1,4 @@
-import types, threading
+import types, threading, ctypes
 from functools import update_wrapper
 import type_enforced
 
@@ -110,6 +110,7 @@ class curry_obj:
             self.__exception__(
                 "`asyncRun` has already been executed on this thunk"
             )
+        self.__thread_completed__ = False
         self.__thread__ = threading.Thread(target=self)
         self.__thread__.setDaemon(daemon)
         self.__thread__.start()
@@ -120,5 +121,46 @@ class curry_obj:
             self.__exception__(
                 f"To `asyncWait` a Function, it must be `asyncRun` first"
             )
-        self.__thread__.join()
+        if not self.__thread_completed__:
+            self.__thread__.join()
+            self.__thread_completed__ = True
         return self.__thread_results__
+
+    def asyncKill(self):
+        if self.__thread__ == None:
+            self.__exception__(
+                f"To `asyncKill` a Function, it must be `asyncRun` first"
+            )
+        if self.__thread_completed__:
+            return self.__thread_results__
+
+        thread_id = self.__thread__.ident
+        if thread_id is None:
+            self.__exception__(
+                f"Cannot `asyncKill` a Function that does not have a thread id"
+            )
+
+        # Use ctypes to set the async exception
+        try:
+            res = ctypes.pythonapi.PyThreadState_SetAsyncExc(
+                ctypes.c_long(thread_id), ctypes.py_object(SystemExit)
+            )
+        except:
+            self.__exception__(
+                f"Failed to `asyncKill`: Something failed when seting the Exit state for thread id ({thread_id})"
+            )
+        if res == 0:
+            self.__exception__(
+                f"Failed to `asyncKill`: Thread id not found ({thread_id})"
+            )
+        elif res == 1:
+            # Success, thread killed join the thread to clean up resources
+            self.__thread_completed__ = True
+            self.__thread__.join()
+            return self.__thread_results__
+        elif res > 1:
+            # Something is wrong, set it back to 0
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0)
+            self.__exception__(
+                f"Failed to `asyncKill`: ctypes returned multiple results for thread id ({thread_id}). This should not happen. Returned thread state back to normal."
+            )

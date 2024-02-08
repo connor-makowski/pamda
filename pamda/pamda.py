@@ -193,6 +193,52 @@ class pamda(pamda_utils):
         )
         return data
 
+    def asyncKill(self, fn: curry_obj):
+        """
+        Function:
+
+        - Kills an asynchronous function that is currently running
+        - Returns:
+            - `None` if the function has not yet finished running
+            - The result of the function if it has finished running
+
+        Requires:
+
+        - `fn`:
+            - Type: thunkified function | thunkified method
+            - What: The function or method to run asychronously
+            - Note: The supplied `fn` must already be asynchronously running
+
+        Notes:
+
+        - See also `asyncRun` and `asyncWait`
+        - A thunkified function currently running asynchronously can call `asyncKill` on itself
+        - If a function has already finished running, calling `asyncKill` on it will have no effect
+        - `asyncKill` does not kill threads that are sleeping (EG: `time.sleep`), but will kill the thread once the sleep is finished
+
+        Example:
+
+        ```
+        import time
+        from pamda import pamda
+
+        @pamda.thunkify
+        def test(name, wait):
+            waited = 0
+            while waited < wait:
+                time.sleep(1)
+                waited += 1
+                print(f'{name} has waited {waited} seconds')
+
+        async_test = pamda.asyncRun(test('a',3))
+        time.sleep(1)
+        pamda.asyncKill(async_test)
+        # Alternatively:
+        # async_test.asyncKill()
+        ```
+        """
+        return fn.asyncKill()
+
     def asyncRun(self, fn: curry_obj):
         """
         Function:
@@ -210,6 +256,7 @@ class pamda(pamda_utils):
 
         - To pass inputs to a function in asyncRun, first thunkify the function and pass all arguments before calling `asyncRun` on it
         - To get the results of an `asyncRun` call `asyncWait`
+        - To kill an `asyncRun` mid process call `asyncKill`
         - A thunkified function with arity of 0 can call `asyncRun` on itself
 
         Examples:
