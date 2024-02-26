@@ -1326,6 +1326,48 @@ class pamda(pamda_utils):
             out = fn(out)
         return out
 
+    def pivot(self, data: [list[dict], dict[list]]):
+        """
+        Function:
+
+        - Pivots a list of dictionaries into a dictionary of lists
+        - Pivots a dictionary of lists into a list of dictionaries
+
+        Requires:
+
+        - `data`:
+            - Type: list of dicts | dict of lists
+            - What: The data to pivot
+            - Note: If a list of dictionaries is passed, all dictionaries must have the same keys
+            - Note: If a dictionary of lists is passed, all lists must have the same length
+
+        Example:
+
+        ```
+        data=[
+            {'a':1,'b':2},
+            {'a':3,'b':4}
+        ]
+        pamda.pivot(data=data) #=> {'a':[1,3],'b':[2,4]}
+
+        data={'a':[1,3],'b':[2,4]}
+        pamda.pivot(data=data)
+        #=> [
+        #=>     {'a':1,'b':2},
+        #=>     {'a':3,'b':4}
+        #=> ]
+        ```
+        """
+        if isinstance(data, list):
+            return {
+                key: [record[key] for record in data] for key in data[0].keys()
+            }
+        else:
+            return [
+                {key: data[key][i] for key in data.keys()}
+                for i in range(len(data[list(data.keys())[0]]))
+            ]
+
     def pluck(self, path: [list, str], data: list):
         """
         Function:
@@ -1384,6 +1426,62 @@ class pamda(pamda_utils):
         if len(data) == 0:
             raise Exception("Attempting to pluck from an empty list")
         return [self.path(data=i, path=path) for i in data if fn(i)]
+
+    def project(self, keys: list[str], data: list[dict]):
+        """
+        Function:
+
+        - Returns a list of dictionaries with only the keys provided
+        - Analogous to SQL's `SELECT` statement
+
+        Requires:
+
+        - `keys`:
+            - Type: list of strs
+            - What: The keys to select from each dictionary in the data list
+        - `data`:
+            - Type: list of dicts
+            - What: The list of dictionaries to select from
+
+        Example:
+
+        ```
+        data=[
+            {'a':1,'b':2,'c':3},
+            {'a':4,'b':5,'c':6}
+        ]
+        pamda.project(keys=['a','c'], data=data)
+        #=> [
+        #=>     {'a':1,'c':3},
+        #=>     {'a':4,'c':6}
+        #=> ]
+        ```
+        """
+        return [{key: record[key] for key in keys} for record in data]
+
+    def props(self, keys: list[str], data: dict):
+        """
+        Function:
+
+        - Returns the values of a list of keys within a dictionary
+
+        Requires:
+
+        - `keys`:
+            - Type: list of strs
+            - What: The keys to pull given the data
+        - `data`:
+            - Type: dict
+            - What: A dictionary to get the keys from
+
+        Example:
+        ```
+        data={'a':1,'b':2,'c':3}
+        pamda.props(keys=['a','c'], data=data)
+        #=> [1,3]
+        ```
+        """
+        return [data[key] for key in keys]
 
     def reduce(self, fn, initial_accumulator, data: list):
         """

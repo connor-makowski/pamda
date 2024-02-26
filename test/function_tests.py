@@ -282,6 +282,27 @@ curriedPath=pamda.curry(pamda.path)
 if pamda.pipe(fns=[curriedPath(['a','b'])], args=(data,), kwargs={}) != 'c':
     print('pipe failed (3)')
 
+# pivot
+data=[
+    {'a':'a1', 'b':'b1', 'c':'c1'},
+    {'a':'a2', 'b':'b2', 'c':'c2'},
+]
+expected = {'a': ['a1', 'a2'], 'b': ['b1', 'b2'], 'c': ['c1', 'c2']}
+if pamda.pivot(data) != expected:
+    print('pivot failed (0)')
+
+data = {
+    'a': ['a1', 'a2'],
+    'b': ['b1', 'b2'],
+    'c': ['c1', 'c2']
+}
+expected = [
+    {'a': 'a1', 'b': 'b1', 'c': 'c1'},
+    {'a': 'a2', 'b': 'b2', 'c': 'c2'}
+]
+if pamda.pivot(data) != expected:
+    print('pivot failed (1)')
+
 # pluck
 data=[{'a':{'b':1, 'c':'d'}},{'a':{'b':2, 'c':'e'}}]
 if pamda.pluck(path=['a','b'], data=data) != [1,2]:
@@ -291,6 +312,19 @@ if pamda.pluck(path=['a','b'], data=data) != [1,2]:
 data=[{'a':{'b':1, 'c':'d'}},{'a':{'b':2, 'c':'e'}}]
 if pamda.pluckIf(fn=lambda x: x['a']['b']==1, path=['a','c'], data=data) != ['d']:
     print('pluckIf failed')
+
+# project
+data=[
+    {'a':1, 'b':2, 'c':3},
+    {'a':4, 'b':5, 'c':6}
+]
+if pamda.project(keys=['a','c'], data=data) != [{'a':1, 'c':3}, {'a':4, 'c':6}]:
+    print('project failed')
+
+# props
+data={'a':1, 'b':2, 'c':3}
+if pamda.props(keys=['a','c'], data=data) != [1,3]:
+    print('props failed')
 
 # reduce
 if pamda.reduce(fn=pamda.add, initial_accumulator=0, data=[1,2,3]) != 6:
