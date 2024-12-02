@@ -271,6 +271,12 @@ class pamda_utils:
         data #=> {'a':{}, 'b':{}, 'c':[]}
         ```
         """
-        if not isinstance(object.get(key), (dict, list)):
-            object.__setitem__(key, {})
-        return object.get(key)
+        # TODO: Clean this up for faster performance
+        if isinstance(object, dict):
+            value = object.get(key)
+        else:
+            value = object[key]
+        if not isinstance(value, (dict, list)):
+            value = {}
+            object.__setitem__(key, value)
+        return value
