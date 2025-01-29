@@ -17,7 +17,7 @@ export version_options="$VERSION $OLD_DOC_VERSIONS"
 # generate the docs for a version function:
 function generate_docs() {
     INPUT_VERSION=$1
-    pdoc -o ./docs/$INPUT_VERSION -t ./doc_template type_enforced
+    pdoc -o ./docs/$INPUT_VERSION -t ./doc_template pamda
 }
 
 pip install -r requirements.txt
