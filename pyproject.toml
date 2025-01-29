@@ -12,8 +12,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pamda"
-version = "2.6.0"
-description = "Python wrapper for api use in the cave_app"
+version = "2.6.1"
+description = "Functional programming for python"
 authors = [
     {name="Connor Makowski", email="conmak@mit.edu"}
 ]
