@@ -51,9 +51,6 @@
                         <li>
                                 <a class="function" href="#curry_obj.asyncWait">asyncWait</a>
                         </li>
-                        <li>
-                                <a class="function" href="#curry_obj.asyncKill">asyncKill</a>
-                        </li>
                 </ul>
 
             </li>
@@ -114,7 +111,7 @@
 
                         <label class="view-source-button" for="mod-pamda_curry-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="kn">import</span> <span class="nn">types</span><span class="o">,</span> <span class="nn">threading</span><span class="o">,</span> <span class="nn">ctypes</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="kn">import</span> <span class="nn">types</span><span class="o">,</span> <span class="nn">threading</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">update_wrapper</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span> <span class="nn">type_enforced</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a>
@@ -226,60 +223,18 @@
 </span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
 </span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>                <span class="s2">&quot;`asyncRun` has already been executed on this thunk&quot;</span>
 </span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>            <span class="p">)</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">setDaemon</span><span class="p">(</span><span class="n">daemon</span><span class="p">)</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>        <span class="k">return</span> <span class="bp">self</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="k">def</span> <span class="nf">asyncWait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>                <span class="sa">f</span><span class="s2">&quot;To `asyncWait` a Function, it must be `asyncRun` first&quot;</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>            <span class="p">)</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span><span class="p">:</span>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_results__</span>
-</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>    <span class="k">def</span> <span class="nf">asyncKill</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>                <span class="sa">f</span><span class="s2">&quot;To `asyncKill` a Function, it must be `asyncRun` first&quot;</span>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>            <span class="p">)</span>
-</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span><span class="p">:</span>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_results__</span>
-</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>
-</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>        <span class="n">thread_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">ident</span>
-</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>        <span class="k">if</span> <span class="n">thread_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>                <span class="sa">f</span><span class="s2">&quot;Cannot `asyncKill` a Function that does not have a thread id&quot;</span>
-</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>            <span class="p">)</span>
-</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>        <span class="c1"># Use ctypes to set the async exception</span>
-</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">pythonapi</span><span class="o">.</span><span class="n">PyThreadState_SetAsyncExc</span><span class="p">(</span>
-</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>                <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">(</span><span class="n">thread_id</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">py_object</span><span class="p">(</span><span class="ne">SystemExit</span><span class="p">)</span>
-</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>            <span class="p">)</span>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>        <span class="k">except</span><span class="p">:</span>
-</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>                <span class="sa">f</span><span class="s2">&quot;Failed to `asyncKill`: Something failed when seting the Exit state for thread id (</span><span class="si">{</span><span class="n">thread_id</span><span class="si">}</span><span class="s2">)&quot;</span>
-</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>            <span class="p">)</span>
-</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>        <span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>                <span class="sa">f</span><span class="s2">&quot;Failed to `asyncKill`: Thread id not found (</span><span class="si">{</span><span class="n">thread_id</span><span class="si">}</span><span class="s2">)&quot;</span>
-</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>            <span class="p">)</span>
-</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>        <span class="k">elif</span> <span class="n">res</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>            <span class="c1"># Success, thread killed join the thread to clean up resources</span>
-</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_results__</span>
-</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>        <span class="k">elif</span> <span class="n">res</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>            <span class="c1"># Something is wrong, set it back to 0</span>
-</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>            <span class="n">ctypes</span><span class="o">.</span><span class="n">pythonapi</span><span class="o">.</span><span class="n">PyThreadState_SetAsyncExc</span><span class="p">(</span><span class="n">thread_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>                <span class="sa">f</span><span class="s2">&quot;Failed to `asyncKill`: ctypes returned multiple results for thread id (</span><span class="si">{</span><span class="n">thread_id</span><span class="si">}</span><span class="s2">). This should not happen. Returned thread state back to normal.&quot;</span>
-</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>            <span class="p">)</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">setDaemon</span><span class="p">(</span><span class="n">daemon</span><span class="p">)</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>        <span class="k">return</span> <span class="bp">self</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>    <span class="k">def</span> <span class="nf">asyncWait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>                <span class="sa">f</span><span class="s2">&quot;To `asyncWait` a Function, it must be `asyncRun` first&quot;</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>            <span class="p">)</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_results__</span>
 </span></pre></div>
 
 
@@ -402,60 +357,18 @@
 </span><span id="curry_obj-111"><a href="#curry_obj-111"><span class="linenos">111</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
 </span><span id="curry_obj-112"><a href="#curry_obj-112"><span class="linenos">112</span></a>                <span class="s2">&quot;`asyncRun` has already been executed on this thunk&quot;</span>
 </span><span id="curry_obj-113"><a href="#curry_obj-113"><span class="linenos">113</span></a>            <span class="p">)</span>
-</span><span id="curry_obj-114"><a href="#curry_obj-114"><span class="linenos">114</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="curry_obj-115"><a href="#curry_obj-115"><span class="linenos">115</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
-</span><span id="curry_obj-116"><a href="#curry_obj-116"><span class="linenos">116</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">setDaemon</span><span class="p">(</span><span class="n">daemon</span><span class="p">)</span>
-</span><span id="curry_obj-117"><a href="#curry_obj-117"><span class="linenos">117</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-</span><span id="curry_obj-118"><a href="#curry_obj-118"><span class="linenos">118</span></a>        <span class="k">return</span> <span class="bp">self</span>
-</span><span id="curry_obj-119"><a href="#curry_obj-119"><span class="linenos">119</span></a>
-</span><span id="curry_obj-120"><a href="#curry_obj-120"><span class="linenos">120</span></a>    <span class="k">def</span> <span class="nf">asyncWait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="curry_obj-121"><a href="#curry_obj-121"><span class="linenos">121</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="curry_obj-122"><a href="#curry_obj-122"><span class="linenos">122</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="curry_obj-123"><a href="#curry_obj-123"><span class="linenos">123</span></a>                <span class="sa">f</span><span class="s2">&quot;To `asyncWait` a Function, it must be `asyncRun` first&quot;</span>
-</span><span id="curry_obj-124"><a href="#curry_obj-124"><span class="linenos">124</span></a>            <span class="p">)</span>
-</span><span id="curry_obj-125"><a href="#curry_obj-125"><span class="linenos">125</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span><span class="p">:</span>
-</span><span id="curry_obj-126"><a href="#curry_obj-126"><span class="linenos">126</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-</span><span id="curry_obj-127"><a href="#curry_obj-127"><span class="linenos">127</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="curry_obj-128"><a href="#curry_obj-128"><span class="linenos">128</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_results__</span>
-</span><span id="curry_obj-129"><a href="#curry_obj-129"><span class="linenos">129</span></a>
-</span><span id="curry_obj-130"><a href="#curry_obj-130"><span class="linenos">130</span></a>    <span class="k">def</span> <span class="nf">asyncKill</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="curry_obj-131"><a href="#curry_obj-131"><span class="linenos">131</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="curry_obj-132"><a href="#curry_obj-132"><span class="linenos">132</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="curry_obj-133"><a href="#curry_obj-133"><span class="linenos">133</span></a>                <span class="sa">f</span><span class="s2">&quot;To `asyncKill` a Function, it must be `asyncRun` first&quot;</span>
-</span><span id="curry_obj-134"><a href="#curry_obj-134"><span class="linenos">134</span></a>            <span class="p">)</span>
-</span><span id="curry_obj-135"><a href="#curry_obj-135"><span class="linenos">135</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span><span class="p">:</span>
-</span><span id="curry_obj-136"><a href="#curry_obj-136"><span class="linenos">136</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_results__</span>
-</span><span id="curry_obj-137"><a href="#curry_obj-137"><span class="linenos">137</span></a>
-</span><span id="curry_obj-138"><a href="#curry_obj-138"><span class="linenos">138</span></a>        <span class="n">thread_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">ident</span>
-</span><span id="curry_obj-139"><a href="#curry_obj-139"><span class="linenos">139</span></a>        <span class="k">if</span> <span class="n">thread_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="curry_obj-140"><a href="#curry_obj-140"><span class="linenos">140</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="curry_obj-141"><a href="#curry_obj-141"><span class="linenos">141</span></a>                <span class="sa">f</span><span class="s2">&quot;Cannot `asyncKill` a Function that does not have a thread id&quot;</span>
-</span><span id="curry_obj-142"><a href="#curry_obj-142"><span class="linenos">142</span></a>            <span class="p">)</span>
-</span><span id="curry_obj-143"><a href="#curry_obj-143"><span class="linenos">143</span></a>
-</span><span id="curry_obj-144"><a href="#curry_obj-144"><span class="linenos">144</span></a>        <span class="c1"># Use ctypes to set the async exception</span>
-</span><span id="curry_obj-145"><a href="#curry_obj-145"><span class="linenos">145</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="curry_obj-146"><a href="#curry_obj-146"><span class="linenos">146</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">pythonapi</span><span class="o">.</span><span class="n">PyThreadState_SetAsyncExc</span><span class="p">(</span>
-</span><span id="curry_obj-147"><a href="#curry_obj-147"><span class="linenos">147</span></a>                <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">(</span><span class="n">thread_id</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">py_object</span><span class="p">(</span><span class="ne">SystemExit</span><span class="p">)</span>
-</span><span id="curry_obj-148"><a href="#curry_obj-148"><span class="linenos">148</span></a>            <span class="p">)</span>
-</span><span id="curry_obj-149"><a href="#curry_obj-149"><span class="linenos">149</span></a>        <span class="k">except</span><span class="p">:</span>
-</span><span id="curry_obj-150"><a href="#curry_obj-150"><span class="linenos">150</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="curry_obj-151"><a href="#curry_obj-151"><span class="linenos">151</span></a>                <span class="sa">f</span><span class="s2">&quot;Failed to `asyncKill`: Something failed when seting the Exit state for thread id (</span><span class="si">{</span><span class="n">thread_id</span><span class="si">}</span><span class="s2">)&quot;</span>
-</span><span id="curry_obj-152"><a href="#curry_obj-152"><span class="linenos">152</span></a>            <span class="p">)</span>
-</span><span id="curry_obj-153"><a href="#curry_obj-153"><span class="linenos">153</span></a>        <span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="curry_obj-154"><a href="#curry_obj-154"><span class="linenos">154</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="curry_obj-155"><a href="#curry_obj-155"><span class="linenos">155</span></a>                <span class="sa">f</span><span class="s2">&quot;Failed to `asyncKill`: Thread id not found (</span><span class="si">{</span><span class="n">thread_id</span><span class="si">}</span><span class="s2">)&quot;</span>
-</span><span id="curry_obj-156"><a href="#curry_obj-156"><span class="linenos">156</span></a>            <span class="p">)</span>
-</span><span id="curry_obj-157"><a href="#curry_obj-157"><span class="linenos">157</span></a>        <span class="k">elif</span> <span class="n">res</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="curry_obj-158"><a href="#curry_obj-158"><span class="linenos">158</span></a>            <span class="c1"># Success, thread killed join the thread to clean up resources</span>
-</span><span id="curry_obj-159"><a href="#curry_obj-159"><span class="linenos">159</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="curry_obj-160"><a href="#curry_obj-160"><span class="linenos">160</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-</span><span id="curry_obj-161"><a href="#curry_obj-161"><span class="linenos">161</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_results__</span>
-</span><span id="curry_obj-162"><a href="#curry_obj-162"><span class="linenos">162</span></a>        <span class="k">elif</span> <span class="n">res</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="curry_obj-163"><a href="#curry_obj-163"><span class="linenos">163</span></a>            <span class="c1"># Something is wrong, set it back to 0</span>
-</span><span id="curry_obj-164"><a href="#curry_obj-164"><span class="linenos">164</span></a>            <span class="n">ctypes</span><span class="o">.</span><span class="n">pythonapi</span><span class="o">.</span><span class="n">PyThreadState_SetAsyncExc</span><span class="p">(</span><span class="n">thread_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-</span><span id="curry_obj-165"><a href="#curry_obj-165"><span class="linenos">165</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="curry_obj-166"><a href="#curry_obj-166"><span class="linenos">166</span></a>                <span class="sa">f</span><span class="s2">&quot;Failed to `asyncKill`: ctypes returned multiple results for thread id (</span><span class="si">{</span><span class="n">thread_id</span><span class="si">}</span><span class="s2">). This should not happen. Returned thread state back to normal.&quot;</span>
-</span><span id="curry_obj-167"><a href="#curry_obj-167"><span class="linenos">167</span></a>            <span class="p">)</span>
+</span><span id="curry_obj-114"><a href="#curry_obj-114"><span class="linenos">114</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+</span><span id="curry_obj-115"><a href="#curry_obj-115"><span class="linenos">115</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">setDaemon</span><span class="p">(</span><span class="n">daemon</span><span class="p">)</span>
+</span><span id="curry_obj-116"><a href="#curry_obj-116"><span class="linenos">116</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</span><span id="curry_obj-117"><a href="#curry_obj-117"><span class="linenos">117</span></a>        <span class="k">return</span> <span class="bp">self</span>
+</span><span id="curry_obj-118"><a href="#curry_obj-118"><span class="linenos">118</span></a>
+</span><span id="curry_obj-119"><a href="#curry_obj-119"><span class="linenos">119</span></a>    <span class="k">def</span> <span class="nf">asyncWait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="curry_obj-120"><a href="#curry_obj-120"><span class="linenos">120</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="curry_obj-121"><a href="#curry_obj-121"><span class="linenos">121</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
+</span><span id="curry_obj-122"><a href="#curry_obj-122"><span class="linenos">122</span></a>                <span class="sa">f</span><span class="s2">&quot;To `asyncWait` a Function, it must be `asyncRun` first&quot;</span>
+</span><span id="curry_obj-123"><a href="#curry_obj-123"><span class="linenos">123</span></a>            <span class="p">)</span>
+</span><span id="curry_obj-124"><a href="#curry_obj-124"><span class="linenos">124</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</span><span id="curry_obj-125"><a href="#curry_obj-125"><span class="linenos">125</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_results__</span>
 </span></pre></div>
 
 
@@ -588,11 +501,10 @@
 </span><span id="curry_obj.asyncRun-111"><a href="#curry_obj.asyncRun-111"><span class="linenos">111</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
 </span><span id="curry_obj.asyncRun-112"><a href="#curry_obj.asyncRun-112"><span class="linenos">112</span></a>                <span class="s2">&quot;`asyncRun` has already been executed on this thunk&quot;</span>
 </span><span id="curry_obj.asyncRun-113"><a href="#curry_obj.asyncRun-113"><span class="linenos">113</span></a>            <span class="p">)</span>
-</span><span id="curry_obj.asyncRun-114"><a href="#curry_obj.asyncRun-114"><span class="linenos">114</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="curry_obj.asyncRun-115"><a href="#curry_obj.asyncRun-115"><span class="linenos">115</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
-</span><span id="curry_obj.asyncRun-116"><a href="#curry_obj.asyncRun-116"><span class="linenos">116</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">setDaemon</span><span class="p">(</span><span class="n">daemon</span><span class="p">)</span>
-</span><span id="curry_obj.asyncRun-117"><a href="#curry_obj.asyncRun-117"><span class="linenos">117</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-</span><span id="curry_obj.asyncRun-118"><a href="#curry_obj.asyncRun-118"><span class="linenos">118</span></a>        <span class="k">return</span> <span class="bp">self</span>
+</span><span id="curry_obj.asyncRun-114"><a href="#curry_obj.asyncRun-114"><span class="linenos">114</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+</span><span id="curry_obj.asyncRun-115"><a href="#curry_obj.asyncRun-115"><span class="linenos">115</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">setDaemon</span><span class="p">(</span><span class="n">daemon</span><span class="p">)</span>
+</span><span id="curry_obj.asyncRun-116"><a href="#curry_obj.asyncRun-116"><span class="linenos">116</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</span><span id="curry_obj.asyncRun-117"><a href="#curry_obj.asyncRun-117"><span class="linenos">117</span></a>        <span class="k">return</span> <span class="bp">self</span>
 </span></pre></div>
 
 
@@ -610,70 +522,13 @@
 
     </div>
     <a class="headerlink" href="#curry_obj.asyncWait"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="curry_obj.asyncWait-120"><a href="#curry_obj.asyncWait-120"><span class="linenos">120</span></a>    <span class="k">def</span> <span class="nf">asyncWait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="curry_obj.asyncWait-121"><a href="#curry_obj.asyncWait-121"><span class="linenos">121</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="curry_obj.asyncWait-122"><a href="#curry_obj.asyncWait-122"><span class="linenos">122</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="curry_obj.asyncWait-123"><a href="#curry_obj.asyncWait-123"><span class="linenos">123</span></a>                <span class="sa">f</span><span class="s2">&quot;To `asyncWait` a Function, it must be `asyncRun` first&quot;</span>
-</span><span id="curry_obj.asyncWait-124"><a href="#curry_obj.asyncWait-124"><span class="linenos">124</span></a>            <span class="p">)</span>
-</span><span id="curry_obj.asyncWait-125"><a href="#curry_obj.asyncWait-125"><span class="linenos">125</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span><span class="p">:</span>
-</span><span id="curry_obj.asyncWait-126"><a href="#curry_obj.asyncWait-126"><span class="linenos">126</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-</span><span id="curry_obj.asyncWait-127"><a href="#curry_obj.asyncWait-127"><span class="linenos">127</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="curry_obj.asyncWait-128"><a href="#curry_obj.asyncWait-128"><span class="linenos">128</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_results__</span>
-</span></pre></div>
-
-
-    
-
-                            </div>
-                            <div id="curry_obj.asyncKill" class="classattr">
-                                        <input id="curry_obj.asyncKill-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">asyncKill</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="curry_obj.asyncKill-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#curry_obj.asyncKill"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="curry_obj.asyncKill-130"><a href="#curry_obj.asyncKill-130"><span class="linenos">130</span></a>    <span class="k">def</span> <span class="nf">asyncKill</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="curry_obj.asyncKill-131"><a href="#curry_obj.asyncKill-131"><span class="linenos">131</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="curry_obj.asyncKill-132"><a href="#curry_obj.asyncKill-132"><span class="linenos">132</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="curry_obj.asyncKill-133"><a href="#curry_obj.asyncKill-133"><span class="linenos">133</span></a>                <span class="sa">f</span><span class="s2">&quot;To `asyncKill` a Function, it must be `asyncRun` first&quot;</span>
-</span><span id="curry_obj.asyncKill-134"><a href="#curry_obj.asyncKill-134"><span class="linenos">134</span></a>            <span class="p">)</span>
-</span><span id="curry_obj.asyncKill-135"><a href="#curry_obj.asyncKill-135"><span class="linenos">135</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span><span class="p">:</span>
-</span><span id="curry_obj.asyncKill-136"><a href="#curry_obj.asyncKill-136"><span class="linenos">136</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_results__</span>
-</span><span id="curry_obj.asyncKill-137"><a href="#curry_obj.asyncKill-137"><span class="linenos">137</span></a>
-</span><span id="curry_obj.asyncKill-138"><a href="#curry_obj.asyncKill-138"><span class="linenos">138</span></a>        <span class="n">thread_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">ident</span>
-</span><span id="curry_obj.asyncKill-139"><a href="#curry_obj.asyncKill-139"><span class="linenos">139</span></a>        <span class="k">if</span> <span class="n">thread_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="curry_obj.asyncKill-140"><a href="#curry_obj.asyncKill-140"><span class="linenos">140</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="curry_obj.asyncKill-141"><a href="#curry_obj.asyncKill-141"><span class="linenos">141</span></a>                <span class="sa">f</span><span class="s2">&quot;Cannot `asyncKill` a Function that does not have a thread id&quot;</span>
-</span><span id="curry_obj.asyncKill-142"><a href="#curry_obj.asyncKill-142"><span class="linenos">142</span></a>            <span class="p">)</span>
-</span><span id="curry_obj.asyncKill-143"><a href="#curry_obj.asyncKill-143"><span class="linenos">143</span></a>
-</span><span id="curry_obj.asyncKill-144"><a href="#curry_obj.asyncKill-144"><span class="linenos">144</span></a>        <span class="c1"># Use ctypes to set the async exception</span>
-</span><span id="curry_obj.asyncKill-145"><a href="#curry_obj.asyncKill-145"><span class="linenos">145</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="curry_obj.asyncKill-146"><a href="#curry_obj.asyncKill-146"><span class="linenos">146</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">pythonapi</span><span class="o">.</span><span class="n">PyThreadState_SetAsyncExc</span><span class="p">(</span>
-</span><span id="curry_obj.asyncKill-147"><a href="#curry_obj.asyncKill-147"><span class="linenos">147</span></a>                <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">(</span><span class="n">thread_id</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">py_object</span><span class="p">(</span><span class="ne">SystemExit</span><span class="p">)</span>
-</span><span id="curry_obj.asyncKill-148"><a href="#curry_obj.asyncKill-148"><span class="linenos">148</span></a>            <span class="p">)</span>
-</span><span id="curry_obj.asyncKill-149"><a href="#curry_obj.asyncKill-149"><span class="linenos">149</span></a>        <span class="k">except</span><span class="p">:</span>
-</span><span id="curry_obj.asyncKill-150"><a href="#curry_obj.asyncKill-150"><span class="linenos">150</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="curry_obj.asyncKill-151"><a href="#curry_obj.asyncKill-151"><span class="linenos">151</span></a>                <span class="sa">f</span><span class="s2">&quot;Failed to `asyncKill`: Something failed when seting the Exit state for thread id (</span><span class="si">{</span><span class="n">thread_id</span><span class="si">}</span><span class="s2">)&quot;</span>
-</span><span id="curry_obj.asyncKill-152"><a href="#curry_obj.asyncKill-152"><span class="linenos">152</span></a>            <span class="p">)</span>
-</span><span id="curry_obj.asyncKill-153"><a href="#curry_obj.asyncKill-153"><span class="linenos">153</span></a>        <span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="curry_obj.asyncKill-154"><a href="#curry_obj.asyncKill-154"><span class="linenos">154</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="curry_obj.asyncKill-155"><a href="#curry_obj.asyncKill-155"><span class="linenos">155</span></a>                <span class="sa">f</span><span class="s2">&quot;Failed to `asyncKill`: Thread id not found (</span><span class="si">{</span><span class="n">thread_id</span><span class="si">}</span><span class="s2">)&quot;</span>
-</span><span id="curry_obj.asyncKill-156"><a href="#curry_obj.asyncKill-156"><span class="linenos">156</span></a>            <span class="p">)</span>
-</span><span id="curry_obj.asyncKill-157"><a href="#curry_obj.asyncKill-157"><span class="linenos">157</span></a>        <span class="k">elif</span> <span class="n">res</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="curry_obj.asyncKill-158"><a href="#curry_obj.asyncKill-158"><span class="linenos">158</span></a>            <span class="c1"># Success, thread killed join the thread to clean up resources</span>
-</span><span id="curry_obj.asyncKill-159"><a href="#curry_obj.asyncKill-159"><span class="linenos">159</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__thread_completed__</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="curry_obj.asyncKill-160"><a href="#curry_obj.asyncKill-160"><span class="linenos">160</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-</span><span id="curry_obj.asyncKill-161"><a href="#curry_obj.asyncKill-161"><span class="linenos">161</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_results__</span>
-</span><span id="curry_obj.asyncKill-162"><a href="#curry_obj.asyncKill-162"><span class="linenos">162</span></a>        <span class="k">elif</span> <span class="n">res</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="curry_obj.asyncKill-163"><a href="#curry_obj.asyncKill-163"><span class="linenos">163</span></a>            <span class="c1"># Something is wrong, set it back to 0</span>
-</span><span id="curry_obj.asyncKill-164"><a href="#curry_obj.asyncKill-164"><span class="linenos">164</span></a>            <span class="n">ctypes</span><span class="o">.</span><span class="n">pythonapi</span><span class="o">.</span><span class="n">PyThreadState_SetAsyncExc</span><span class="p">(</span><span class="n">thread_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-</span><span id="curry_obj.asyncKill-165"><a href="#curry_obj.asyncKill-165"><span class="linenos">165</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
-</span><span id="curry_obj.asyncKill-166"><a href="#curry_obj.asyncKill-166"><span class="linenos">166</span></a>                <span class="sa">f</span><span class="s2">&quot;Failed to `asyncKill`: ctypes returned multiple results for thread id (</span><span class="si">{</span><span class="n">thread_id</span><span class="si">}</span><span class="s2">). This should not happen. Returned thread state back to normal.&quot;</span>
-</span><span id="curry_obj.asyncKill-167"><a href="#curry_obj.asyncKill-167"><span class="linenos">167</span></a>            <span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="curry_obj.asyncWait-119"><a href="#curry_obj.asyncWait-119"><span class="linenos">119</span></a>    <span class="k">def</span> <span class="nf">asyncWait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="curry_obj.asyncWait-120"><a href="#curry_obj.asyncWait-120"><span class="linenos">120</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="curry_obj.asyncWait-121"><a href="#curry_obj.asyncWait-121"><span class="linenos">121</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exception__</span><span class="p">(</span>
+</span><span id="curry_obj.asyncWait-122"><a href="#curry_obj.asyncWait-122"><span class="linenos">122</span></a>                <span class="sa">f</span><span class="s2">&quot;To `asyncWait` a Function, it must be `asyncRun` first&quot;</span>
+</span><span id="curry_obj.asyncWait-123"><a href="#curry_obj.asyncWait-123"><span class="linenos">123</span></a>            <span class="p">)</span>
+</span><span id="curry_obj.asyncWait-124"><a href="#curry_obj.asyncWait-124"><span class="linenos">124</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__thread__</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</span><span id="curry_obj.asyncWait-125"><a href="#curry_obj.asyncWait-125"><span class="linenos">125</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thread_results__</span>
 </span></pre></div>
 
 
