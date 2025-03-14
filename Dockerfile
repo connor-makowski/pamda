@@ -1,12 +1,13 @@
 # syntax = docker/dockerfile:1
 
 ## Uncomment the version of python you want to test against
-# FROM python:3.9-alpine
-# FROM python:3.10-alpine
-# FROM python:3.11-alpine
-# FROM python:3.12-alpine
-# FROM python:3.13-alpine
-FROM python:3.14-rc-alpine
+# FROM python:3.10-slim
+# FROM python:3.11-slim
+# FROM python:3.12-slim
+FROM python:3.13-slim
+# FROM python:3.14-rc-slim
+# # Temp Fix only needed for 3.14 until a wheel cffi is available
+# RUN apt-get update && apt-get install -y gcc libffi-dev
 
 # Set the working directory to /app
 WORKDIR /app/
@@ -15,11 +16,8 @@ WORKDIR /app/
 # This includes egg installing the pamda package
 COPY pamda/__init__.py /app/pamda/__init__.py
 COPY pyproject.toml /app/pyproject.toml
-RUN pip install -e .
+COPY requirements.txt /app/requirements.txt
+RUN pip install -r requirements.txt
 
-COPY ./util_test_helper.sh /app/util_test_helper.sh
-COPY ./test/function_tests.py /app/test/function_tests.py
-
-CMD ["/bin/ash"]
-# Comment out ENTRYPOINT to drop into an interactive shell for debugging when using test.sh
-ENTRYPOINT ["/app/util_test_helper.sh"]
+# Drop into a shell by default
+CMD ["/bin/bash"]
