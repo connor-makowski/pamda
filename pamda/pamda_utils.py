@@ -12,8 +12,8 @@ class pamda_utils:
         filename: str,
         return_dict: bool = True,
         cast_items: bool = True,
-        cast_dict: [dict, None] = None,
-        return_type: [str, None] = None,
+        cast_dict: dict | str | None = None,
+        return_type: str | None = None,
     ):
         """
         Function:
@@ -242,7 +242,7 @@ class pamda_utils:
             if callable(getattr(object, fn)) and not fn.startswith("__")
         ]
 
-    def getForceDict(object: [dict, list], key: [str, int]):
+    def getForceDict(object: dict | list, key: str | int):
         """
         Function:
 

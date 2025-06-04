@@ -2,6 +2,7 @@ from functools import reduce
 from pamda.pamda_utils import pamda_utils
 from pamda.pamda_curry import curry_obj
 from pamda import pamda_wrappers
+from typing import Any
 
 
 @pamda_wrappers.typed_curry_wrap
@@ -55,7 +56,7 @@ class pamda(pamda_utils):
             out.append(acc)
         return out
 
-    def add(self, a: [int, float], b: [int, float]):
+    def add(self, a: int | float, b: int | float):
         """
         Function:
 
@@ -115,7 +116,7 @@ class pamda(pamda_utils):
         data[index] = fn(data[index])
         return data
 
-    def assocPath(self, path: [list, str], value, data: dict):
+    def assocPath(self, path: list | str , value, data: dict):
         """
         Function:
 
@@ -150,7 +151,7 @@ class pamda(pamda_utils):
         return data
 
     def assocPathComplex(
-        self, default, default_fn, path: [str, list], data: dict
+        self, default, default_fn, path: list | str, data: dict
     ):
         """
         Function:
@@ -359,7 +360,7 @@ class pamda(pamda_utils):
         return fn.asyncWait()
 
     def clamp(
-        self, minimum: [int, float], maximum: [int, float], a: [int, float]
+        self, minimum: int | float, maximum: int | float, a: int | float
     ):
         """
         Function:
@@ -472,7 +473,7 @@ class pamda(pamda_utils):
             return fn().typeEnforce()
         return curry_obj(fn).typeEnforce()
 
-    def dec(self, a: [int, float]):
+    def dec(self, a: int | float):
         """
         Function:
 
@@ -520,7 +521,7 @@ class pamda(pamda_utils):
         """
         return list(set(a).difference(set(b)))
 
-    def dissocPath(self, path: [str, list], data: dict):
+    def dissocPath(self, path: list | str, data: dict):
         """
         Function:
 
@@ -823,7 +824,7 @@ class pamda(pamda_utils):
         output.append(sublist)
         return output
 
-    def hasPath(self, path: [list, str], data: dict):
+    def hasPath(self, path: list | str , data: dict):
         """
         Function:
 
@@ -851,7 +852,7 @@ class pamda(pamda_utils):
             path = [path]
         return path[-1] in reduce(lambda x, y: x.get(y, {}), path[:-1], data)
 
-    def hardRound(self, decimal_places: int, a: [int, float]):
+    def hardRound(self, decimal_places: int, a: int | float):
         """
         Function:
 
@@ -878,7 +879,7 @@ class pamda(pamda_utils):
         """
         return int(a * (10**decimal_places) + 0.5) / (10**decimal_places)
 
-    def head(self, data: [list, str]):
+    def head(self, data: list | str ):
         """
         Function:
 
@@ -905,7 +906,7 @@ class pamda(pamda_utils):
             raise Exception("Attempting to call `head` on an empty list or str")
         return data[0]
 
-    def inc(self, a: [int, float]):
+    def inc(self, a: int | float):
         """
         Function:
 
@@ -952,7 +953,7 @@ class pamda(pamda_utils):
         """
         return list(set(a).intersection(set(b)))
 
-    def map(self, fn, data: [list, dict]):
+    def map(self, fn, data: list | dict):
         """
         Function:
 
@@ -1218,7 +1219,7 @@ class pamda(pamda_utils):
             )
         return nested_output
 
-    def path(self, path: [list, str], data: dict):
+    def path(self, path: list | str , data: dict):
         """
         Function:
 
@@ -1243,7 +1244,7 @@ class pamda(pamda_utils):
         """
         return self.pathOr(None, path, data)
 
-    def pathOr(self, default, path: [list, str], data: dict):
+    def pathOr(self, default, path: list | str , data: dict):
         """
         Function:
 
@@ -1326,7 +1327,7 @@ class pamda(pamda_utils):
             out = fn(out)
         return out
 
-    def pivot(self, data: [list[dict], dict[list]]):
+    def pivot(self, data: list[dict]|dict[Any,list]):
         """
         Function:
 
@@ -1368,7 +1369,7 @@ class pamda(pamda_utils):
                 for i in range(len(data[list(data.keys())[0]]))
             ]
 
-    def pluck(self, path: [list, str], data: list):
+    def pluck(self, path: list | str , data: list):
         """
         Function:
 
@@ -1395,7 +1396,7 @@ class pamda(pamda_utils):
             raise Exception("Attempting to pluck from an empty list")
         return [self.path(data=i, path=path) for i in data]
 
-    def pluckIf(self, fn, path: [list, str], data: list):
+    def pluckIf(self, fn, path: list | str , data: list):
         """
         Function:
 
@@ -1533,7 +1534,7 @@ class pamda(pamda_utils):
             acc = fn(acc, i)
         return acc
 
-    def safeDivide(self, denominator: [int, float], a: [int, float]):
+    def safeDivide(self, denominator: int | float, a: int | float):
         """
         Function:
 
@@ -1560,9 +1561,9 @@ class pamda(pamda_utils):
 
     def safeDivideDefault(
         self,
-        default_denominator: [int, float],
-        denominator: [int, float],
-        a: [int, float],
+        default_denominator: int | float,
+        denominator: int | float,
+        a: int | float,
     ):
         """
         Function:
@@ -1620,7 +1621,7 @@ class pamda(pamda_utils):
         """
         return list(set(a).difference(set(b))) + list(set(b).difference(set(a)))
 
-    def tail(self, data: [str, list]):
+    def tail(self, data: list | str):
         """
         Function:
 
