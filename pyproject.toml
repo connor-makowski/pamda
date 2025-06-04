@@ -12,19 +12,19 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pamda"
-version = "2.6.1"
+version = "2.7.0"
 description = "Functional programming for python"
 authors = [
     {name="Connor Makowski", email="conmak@mit.edu"}
 ]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 classifiers = [
     "Programming Language :: Python :: 3",
     'License :: OSI Approved :: MIT License',
     "Operating System :: OS Independent",
 ]
-dependencies = ["type_enforced>=1.2.0",]
+dependencies = ["type_enforced>=2.1.0,<3.0.0",]
 
 [project.urls]
 "Homepage" = "https://github.com/connor-makowski/pamda"

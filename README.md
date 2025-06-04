@@ -70,12 +70,12 @@ For enforcing types, pamda relies on [type_enforced](https://github.com/connor-m
 
 ```py
 >>> from pamda import pamda
->>> 
+>>>
 >>> # Pamda CurryTyped
 >>> @pamda.curryTyped
 ... def add(a:int,b:int):
 ...     return a+b
-... 
+...
 >>> add(1)(1)
 2
 >>> add(1)(1.5)
