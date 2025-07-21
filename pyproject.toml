@@ -12,7 +12,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pamda"
-version = "2.7.1"
+version = "2.7.2"
 description = "Functional programming for python"
 authors = [
     {name="Connor Makowski", email="conmak@mit.edu"}

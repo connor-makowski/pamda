@@ -1,7 +1,8 @@
 import time
+from functools import update_wrapper
+from type_enforced.utils import Partial
 
-
-class pamda_timer:
+class PamdaTimer:
     def __init__(self, __fn__, units="ms", iterations=1, print_call=True):
         """
         Function:
@@ -27,6 +28,7 @@ class pamda_timer:
             - Type: bool
             - What: Whether to print the function call time when this object is called. Default is True.
         """
+        update_wrapper(self, __fn__)
         self.__fn__ = __fn__
         self.units = units
         self.iterations = iterations
@@ -117,3 +119,19 @@ class pamda_timer:
             "max": max_time * self.__divisor__,
             "std": stdev_time * self.__divisor__,
         }
+    
+def pamda_timer(fn, units="ms", iterations=1, print_call=True):
+    """
+    Function:
+    Create a pamda_timer object.
+    A wrapper function to create a pamda_timer object with the specified parameters.
+
+    Optional:
+
+    - `units`: str, the units for the time measurement (default is "ms")
+    - `iterations`: int, the number of iterations to run the function when getting time statistics (default is 1)
+    - `print_call`: bool, whether to print the function call time when this object is called (default is True)
+    """
+    return PamdaTimer(fn, units=units, iterations=iterations, print_call=print_call)
+    
+pamda_timer = Partial(pamda_timer, units="ms", iterations=1, print_call=True)
