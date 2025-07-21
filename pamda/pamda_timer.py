@@ -31,7 +31,9 @@ class pamda_timer:
         self.units = units
         self.iterations = iterations
         self.print_call = print_call
-        assert isinstance(self.iterations, int) and self.iterations > 0, "Iterations must be a positive integer."
+        assert (
+            isinstance(self.iterations, int) and self.iterations > 0
+        ), "Iterations must be a positive integer."
         if units not in ["s", "ms", "us"]:
             raise ValueError("Invalid units. Use 's', 'ms', or 'us'.")
         if units == "s":
@@ -60,7 +62,9 @@ class pamda_timer:
         out = self.__fn__(*args, **kwargs)
         time_taken = time.time() - start
         if self.print_call:
-            print(f"{self.__fn__.__qualname__}: {round(time_taken * self.__divisor__, 4)}{self.units}")
+            print(
+                f"{self.__fn__.__qualname__}: {round(time_taken * self.__divisor__, 4)}{self.units}"
+            )
         return out
 
     def __repr__(self):
@@ -91,14 +95,17 @@ class pamda_timer:
             self.__fn__(*args, **kwargs)
             time_taken = time.time() - start
             timing_history.append(time_taken)
-        
+
         avg_time = sum(timing_history) / len(timing_history)
         min_time = min(timing_history)
         max_time = max(timing_history)
         if self.iterations == 1:
             stdev_time = 0
         else:
-            stdev_time = (sum((x - avg_time) ** 2 for x in timing_history) / len(timing_history)) ** 0.5
+            stdev_time = (
+                sum((x - avg_time) ** 2 for x in timing_history)
+                / len(timing_history)
+            ) ** 0.5
 
         return {
             "module": self.__fn__.__module__,
