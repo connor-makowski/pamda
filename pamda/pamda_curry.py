@@ -53,6 +53,14 @@ class curry_obj:
             __fnExecute__=self.__fnExecute__,
             **new_kwargs,
         )
+    
+    def __get__(self, instance, owner):
+        def bind(*args, **kwargs):
+            if instance is not None and self.__arity__ == self.__fnArity__:
+                return self.__call__(instance, *args, **kwargs)
+            else:
+                return self.__call__(*args, **kwargs)
+        return bind
 
     def __repr__(self):
         return f"<curried {self.__fn__.__module__}.{self.__fn__.__qualname__} object at {hex(id(self))}>"
