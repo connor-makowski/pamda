@@ -116,7 +116,7 @@ class pamda(pamda_utils):
         data[index] = fn(data[index])
         return data
 
-    def assocPath(self, path: list | str, value, data: dict):
+    def assocPath(self, path: list | str | int | tuple, value, data: dict):
         """
         Function:
 
@@ -126,7 +126,7 @@ class pamda(pamda_utils):
         Requires:
 
         - `path`:
-            - Type: list of strs | str
+            - Type: list[str | int | tuple] | str | int | tuple
             - What: The path to check
             - Note: If a string is passed, assumes a single item path list with that string
         - `value`:
@@ -143,7 +143,7 @@ class pamda(pamda_utils):
         pamda.assocPath(path=['a','c'], value=3, data=data) #=> {'a':{'b':1, 'c':3}}
         ```
         """
-        if isinstance(path, str):
+        if not isinstance(path, list):
             path = [path]
         reduce(pamda_utils.getForceDict, path[:-1], data).__setitem__(
             path[-1], value
@@ -151,7 +151,7 @@ class pamda(pamda_utils):
         return data
 
     def assocPathComplex(
-        self, default, default_fn, path: list | str, data: dict
+        self, default, default_fn, path: list | int | float | tuple, data: dict
     ):
         """
         Function:
@@ -169,7 +169,7 @@ class pamda(pamda_utils):
             - What: A unary (single input) function that takes in the current path item (or default) and adjusts it
             - Example: `lambda x: x` # Returns the value in the dict or the default value if none was present
         - `path`:
-            - Type: list of strs
+            - Type: list[str | int | tuple] | str | int | tuple
             - What: The path to check
         - `data`:
             - Type: dict
@@ -186,7 +186,7 @@ class pamda(pamda_utils):
             raise Exception(
                 "`assocPathComplex` `default_fn` must be an unary (single input) function."
             )
-        if isinstance(path, str):
+        if not isinstance(path, list):
             path = [path]
         path_object = reduce(pamda_utils.getForceDict, path[:-1], data)
         path_object.__setitem__(
@@ -519,7 +519,7 @@ class pamda(pamda_utils):
         """
         return list(set(a).difference(set(b)))
 
-    def dissocPath(self, path: list | str, data: dict):
+    def dissocPath(self, path: list | str | int | tuple, data: dict):
         """
         Function:
 
@@ -543,7 +543,7 @@ class pamda(pamda_utils):
         pamda.dissocPath(path=['a','b','c'], data=data) #=> {'a':{'b':{'d':1}}}
         ```
         """
-        if isinstance(path, str):
+        if not isinstance(path, list):
             path = [path]
         if not self.hasPath(path=path, data=data):
             raise Exception("Path does not exist")

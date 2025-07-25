@@ -242,7 +242,7 @@ class pamda_utils:
             if callable(getattr(object, fn)) and not fn.startswith("__")
         ]
 
-    def getForceDict(object: dict | list, key: str | int):
+    def getForceDict(object: dict | list, key: str | int | tuple):
         """
         Function:
 

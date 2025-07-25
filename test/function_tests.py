@@ -26,6 +26,11 @@ out = pamda.assocPath(path=["a", "c"], value=3, data=data)
 if out != {"a": {"b": 1, "c": 3}}:
     print("assocPath failed")
 
+data = {("a","b"): 1}
+out = pamda.assocPath(path=("a", "c"), value=3, data=data)
+if out != {("a", "b"): 1, ("a", "c"): 3}:
+    print("assocPath failed")
+
 data = {"a": {"b": 1}}
 out = pamda.assocPath(path=["a", "b", "c"], value=3, data=data)
 if out != {"a": {"b": {"c": 3}}}:
