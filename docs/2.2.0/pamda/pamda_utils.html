@@ -60,7 +60,7 @@
 <footer>
 <select id="version-selector">
     <option value="latest">latest</option>
-        <option value="2.7.2">2.7.2</option>
+        <option value="2.7.3">2.7.3</option>
         <option value="2.6.1">2.6.1</option>
         <option value="2.5.0">2.5.0</option>
         <option value="2.4.0">2.4.0</option>
@@ -361,7 +361,7 @@
 </span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a>            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">fn</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">fn</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">)</span>
 </span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a>        <span class="p">]</span>
 </span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a>
-</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">getForceDict</span><span class="p">(</span><span class="nb">object</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">):</span>
+</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">getForceDict</span><span class="p">(</span><span class="nb">object</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">):</span>
 </span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a><span class="sd">        Function:</span>
 </span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>
@@ -655,7 +655,7 @@
 </span><span id="pamda_utils-243"><a href="#pamda_utils-243"><span class="linenos">243</span></a>            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">fn</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">fn</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">)</span>
 </span><span id="pamda_utils-244"><a href="#pamda_utils-244"><span class="linenos">244</span></a>        <span class="p">]</span>
 </span><span id="pamda_utils-245"><a href="#pamda_utils-245"><span class="linenos">245</span></a>
-</span><span id="pamda_utils-246"><a href="#pamda_utils-246"><span class="linenos">246</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">getForceDict</span><span class="p">(</span><span class="nb">object</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">):</span>
+</span><span id="pamda_utils-246"><a href="#pamda_utils-246"><span class="linenos">246</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">getForceDict</span><span class="p">(</span><span class="nb">object</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">):</span>
 </span><span id="pamda_utils-247"><a href="#pamda_utils-247"><span class="linenos">247</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="pamda_utils-248"><a href="#pamda_utils-248"><span class="linenos">248</span></a><span class="sd">        Function:</span>
 </span><span id="pamda_utils-249"><a href="#pamda_utils-249"><span class="linenos">249</span></a>
@@ -1207,13 +1207,13 @@ pamda.getMethods(MyClass) #=&gt; ['A', 'B']
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">getForceDict</span><span class="signature pdoc-code condensed">(<span class="param"><span class="nb">object</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span>, </span><span class="param"><span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span></span><span class="return-annotation">):</span></span>
+        <span class="name">getForceDict</span><span class="signature pdoc-code condensed">(<span class="param"><span class="nb">object</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span>, </span><span class="param"><span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="pamda_utils.getForceDict-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#pamda_utils.getForceDict"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="pamda_utils.getForceDict-246"><a href="#pamda_utils.getForceDict-246"><span class="linenos">246</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">getForceDict</span><span class="p">(</span><span class="nb">object</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="pamda_utils.getForceDict-246"><a href="#pamda_utils.getForceDict-246"><span class="linenos">246</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">getForceDict</span><span class="p">(</span><span class="nb">object</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">):</span>
 </span><span id="pamda_utils.getForceDict-247"><a href="#pamda_utils.getForceDict-247"><span class="linenos">247</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="pamda_utils.getForceDict-248"><a href="#pamda_utils.getForceDict-248"><span class="linenos">248</span></a><span class="sd">        Function:</span>
 </span><span id="pamda_utils.getForceDict-249"><a href="#pamda_utils.getForceDict-249"><span class="linenos">249</span></a>

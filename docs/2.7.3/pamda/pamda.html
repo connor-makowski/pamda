@@ -186,7 +186,7 @@
 <footer>
 <select id="version-selector">
     <option value="latest">latest</option>
-        <option value="2.7.2">2.7.2</option>
+        <option value="2.7.3">2.7.3</option>
         <option value="2.6.1">2.6.1</option>
         <option value="2.5.0">2.5.0</option>
         <option value="2.4.0">2.4.0</option>
@@ -361,7 +361,7 @@
 </span><span id="L-116"><a href="#L-116"><span class="linenos"> 116</span></a>        <span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
 </span><span id="L-117"><a href="#L-117"><span class="linenos"> 117</span></a>        <span class="k">return</span> <span class="n">data</span>
 </span><span id="L-118"><a href="#L-118"><span class="linenos"> 118</span></a>
-</span><span id="L-119"><a href="#L-119"><span class="linenos"> 119</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">assocPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos"> 119</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">assocPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 </span><span id="L-120"><a href="#L-120"><span class="linenos"> 120</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-121"><a href="#L-121"><span class="linenos"> 121</span></a><span class="sd">        Function:</span>
 </span><span id="L-122"><a href="#L-122"><span class="linenos"> 122</span></a>
@@ -371,7 +371,7 @@
 </span><span id="L-126"><a href="#L-126"><span class="linenos"> 126</span></a><span class="sd">        Requires:</span>
 </span><span id="L-127"><a href="#L-127"><span class="linenos"> 127</span></a>
 </span><span id="L-128"><a href="#L-128"><span class="linenos"> 128</span></a><span class="sd">        - `path`:</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos"> 129</span></a><span class="sd">            - Type: list of strs | str</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos"> 129</span></a><span class="sd">            - Type: list[str | int | tuple] | str | int | tuple</span>
 </span><span id="L-130"><a href="#L-130"><span class="linenos"> 130</span></a><span class="sd">            - What: The path to check</span>
 </span><span id="L-131"><a href="#L-131"><span class="linenos"> 131</span></a><span class="sd">            - Note: If a string is passed, assumes a single item path list with that string</span>
 </span><span id="L-132"><a href="#L-132"><span class="linenos"> 132</span></a><span class="sd">        - `value`:</span>
@@ -388,7 +388,7 @@
 </span><span id="L-143"><a href="#L-143"><span class="linenos"> 143</span></a><span class="sd">        pamda.assocPath(path=[&#39;a&#39;,&#39;c&#39;], value=3, data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:3}}</span>
 </span><span id="L-144"><a href="#L-144"><span class="linenos"> 144</span></a><span class="sd">        ```</span>
 </span><span id="L-145"><a href="#L-145"><span class="linenos"> 145</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-146"><a href="#L-146"><span class="linenos"> 146</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos"> 146</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
 </span><span id="L-147"><a href="#L-147"><span class="linenos"> 147</span></a>            <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
 </span><span id="L-148"><a href="#L-148"><span class="linenos"> 148</span></a>        <span class="n">reduce</span><span class="p">(</span><span class="n">pamda_utils</span><span class="o">.</span><span class="n">getForceDict</span><span class="p">,</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span>
 </span><span id="L-149"><a href="#L-149"><span class="linenos"> 149</span></a>            <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">value</span>
@@ -396,7 +396,7 @@
 </span><span id="L-151"><a href="#L-151"><span class="linenos"> 151</span></a>        <span class="k">return</span> <span class="n">data</span>
 </span><span id="L-152"><a href="#L-152"><span class="linenos"> 152</span></a>
 </span><span id="L-153"><a href="#L-153"><span class="linenos"> 153</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">assocPathComplex</span><span class="p">(</span>
-</span><span id="L-154"><a href="#L-154"><span class="linenos"> 154</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">default_fn</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos"> 154</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">default_fn</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span>
 </span><span id="L-155"><a href="#L-155"><span class="linenos"> 155</span></a>    <span class="p">):</span>
 </span><span id="L-156"><a href="#L-156"><span class="linenos"> 156</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-157"><a href="#L-157"><span class="linenos"> 157</span></a><span class="sd">        Function:</span>
@@ -414,7 +414,7 @@
 </span><span id="L-169"><a href="#L-169"><span class="linenos"> 169</span></a><span class="sd">            - What: A unary (single input) function that takes in the current path item (or default) and adjusts it</span>
 </span><span id="L-170"><a href="#L-170"><span class="linenos"> 170</span></a><span class="sd">            - Example: `lambda x: x` # Returns the value in the dict or the default value if none was present</span>
 </span><span id="L-171"><a href="#L-171"><span class="linenos"> 171</span></a><span class="sd">        - `path`:</span>
-</span><span id="L-172"><a href="#L-172"><span class="linenos"> 172</span></a><span class="sd">            - Type: list of strs</span>
+</span><span id="L-172"><a href="#L-172"><span class="linenos"> 172</span></a><span class="sd">            - Type: list[str | int | tuple] | str | int | tuple</span>
 </span><span id="L-173"><a href="#L-173"><span class="linenos"> 173</span></a><span class="sd">            - What: The path to check</span>
 </span><span id="L-174"><a href="#L-174"><span class="linenos"> 174</span></a><span class="sd">        - `data`:</span>
 </span><span id="L-175"><a href="#L-175"><span class="linenos"> 175</span></a><span class="sd">            - Type: dict</span>
@@ -431,7 +431,7 @@
 </span><span id="L-186"><a href="#L-186"><span class="linenos"> 186</span></a>            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
 </span><span id="L-187"><a href="#L-187"><span class="linenos"> 187</span></a>                <span class="s2">&quot;`assocPathComplex` `default_fn` must be an unary (single input) function.&quot;</span>
 </span><span id="L-188"><a href="#L-188"><span class="linenos"> 188</span></a>            <span class="p">)</span>
-</span><span id="L-189"><a href="#L-189"><span class="linenos"> 189</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="L-189"><a href="#L-189"><span class="linenos"> 189</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
 </span><span id="L-190"><a href="#L-190"><span class="linenos"> 190</span></a>            <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
 </span><span id="L-191"><a href="#L-191"><span class="linenos"> 191</span></a>        <span class="n">path_object</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">pamda_utils</span><span class="o">.</span><span class="n">getForceDict</span><span class="p">,</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">)</span>
 </span><span id="L-192"><a href="#L-192"><span class="linenos"> 192</span></a>        <span class="n">path_object</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span>
@@ -764,7 +764,7 @@
 </span><span id="L-519"><a href="#L-519"><span class="linenos"> 519</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-520"><a href="#L-520"><span class="linenos"> 520</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
 </span><span id="L-521"><a href="#L-521"><span class="linenos"> 521</span></a>
-</span><span id="L-522"><a href="#L-522"><span class="linenos"> 522</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dissocPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="L-522"><a href="#L-522"><span class="linenos"> 522</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dissocPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 </span><span id="L-523"><a href="#L-523"><span class="linenos"> 523</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-524"><a href="#L-524"><span class="linenos"> 524</span></a><span class="sd">        Function:</span>
 </span><span id="L-525"><a href="#L-525"><span class="linenos"> 525</span></a>
@@ -788,7 +788,7 @@
 </span><span id="L-543"><a href="#L-543"><span class="linenos"> 543</span></a><span class="sd">        pamda.dissocPath(path=[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;d&#39;:1}}}</span>
 </span><span id="L-544"><a href="#L-544"><span class="linenos"> 544</span></a><span class="sd">        ```</span>
 </span><span id="L-545"><a href="#L-545"><span class="linenos"> 545</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-546"><a href="#L-546"><span class="linenos"> 546</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="L-546"><a href="#L-546"><span class="linenos"> 546</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
 </span><span id="L-547"><a href="#L-547"><span class="linenos"> 547</span></a>            <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
 </span><span id="L-548"><a href="#L-548"><span class="linenos"> 548</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasPath</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">):</span>
 </span><span id="L-549"><a href="#L-549"><span class="linenos"> 549</span></a>            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Path does not exist&quot;</span><span class="p">)</span>
@@ -2151,7 +2151,7 @@
 </span><span id="pamda-117"><a href="#pamda-117"><span class="linenos"> 117</span></a>        <span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
 </span><span id="pamda-118"><a href="#pamda-118"><span class="linenos"> 118</span></a>        <span class="k">return</span> <span class="n">data</span>
 </span><span id="pamda-119"><a href="#pamda-119"><span class="linenos"> 119</span></a>
-</span><span id="pamda-120"><a href="#pamda-120"><span class="linenos"> 120</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">assocPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="pamda-120"><a href="#pamda-120"><span class="linenos"> 120</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">assocPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 </span><span id="pamda-121"><a href="#pamda-121"><span class="linenos"> 121</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="pamda-122"><a href="#pamda-122"><span class="linenos"> 122</span></a><span class="sd">        Function:</span>
 </span><span id="pamda-123"><a href="#pamda-123"><span class="linenos"> 123</span></a>
@@ -2161,7 +2161,7 @@
 </span><span id="pamda-127"><a href="#pamda-127"><span class="linenos"> 127</span></a><span class="sd">        Requires:</span>
 </span><span id="pamda-128"><a href="#pamda-128"><span class="linenos"> 128</span></a>
 </span><span id="pamda-129"><a href="#pamda-129"><span class="linenos"> 129</span></a><span class="sd">        - `path`:</span>
-</span><span id="pamda-130"><a href="#pamda-130"><span class="linenos"> 130</span></a><span class="sd">            - Type: list of strs | str</span>
+</span><span id="pamda-130"><a href="#pamda-130"><span class="linenos"> 130</span></a><span class="sd">            - Type: list[str | int | tuple] | str | int | tuple</span>
 </span><span id="pamda-131"><a href="#pamda-131"><span class="linenos"> 131</span></a><span class="sd">            - What: The path to check</span>
 </span><span id="pamda-132"><a href="#pamda-132"><span class="linenos"> 132</span></a><span class="sd">            - Note: If a string is passed, assumes a single item path list with that string</span>
 </span><span id="pamda-133"><a href="#pamda-133"><span class="linenos"> 133</span></a><span class="sd">        - `value`:</span>
@@ -2178,7 +2178,7 @@
 </span><span id="pamda-144"><a href="#pamda-144"><span class="linenos"> 144</span></a><span class="sd">        pamda.assocPath(path=[&#39;a&#39;,&#39;c&#39;], value=3, data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:3}}</span>
 </span><span id="pamda-145"><a href="#pamda-145"><span class="linenos"> 145</span></a><span class="sd">        ```</span>
 </span><span id="pamda-146"><a href="#pamda-146"><span class="linenos"> 146</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="pamda-147"><a href="#pamda-147"><span class="linenos"> 147</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="pamda-147"><a href="#pamda-147"><span class="linenos"> 147</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
 </span><span id="pamda-148"><a href="#pamda-148"><span class="linenos"> 148</span></a>            <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
 </span><span id="pamda-149"><a href="#pamda-149"><span class="linenos"> 149</span></a>        <span class="n">reduce</span><span class="p">(</span><span class="n">pamda_utils</span><span class="o">.</span><span class="n">getForceDict</span><span class="p">,</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span>
 </span><span id="pamda-150"><a href="#pamda-150"><span class="linenos"> 150</span></a>            <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">value</span>
@@ -2186,7 +2186,7 @@
 </span><span id="pamda-152"><a href="#pamda-152"><span class="linenos"> 152</span></a>        <span class="k">return</span> <span class="n">data</span>
 </span><span id="pamda-153"><a href="#pamda-153"><span class="linenos"> 153</span></a>
 </span><span id="pamda-154"><a href="#pamda-154"><span class="linenos"> 154</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">assocPathComplex</span><span class="p">(</span>
-</span><span id="pamda-155"><a href="#pamda-155"><span class="linenos"> 155</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">default_fn</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span>
+</span><span id="pamda-155"><a href="#pamda-155"><span class="linenos"> 155</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">default_fn</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span>
 </span><span id="pamda-156"><a href="#pamda-156"><span class="linenos"> 156</span></a>    <span class="p">):</span>
 </span><span id="pamda-157"><a href="#pamda-157"><span class="linenos"> 157</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="pamda-158"><a href="#pamda-158"><span class="linenos"> 158</span></a><span class="sd">        Function:</span>
@@ -2204,7 +2204,7 @@
 </span><span id="pamda-170"><a href="#pamda-170"><span class="linenos"> 170</span></a><span class="sd">            - What: A unary (single input) function that takes in the current path item (or default) and adjusts it</span>
 </span><span id="pamda-171"><a href="#pamda-171"><span class="linenos"> 171</span></a><span class="sd">            - Example: `lambda x: x` # Returns the value in the dict or the default value if none was present</span>
 </span><span id="pamda-172"><a href="#pamda-172"><span class="linenos"> 172</span></a><span class="sd">        - `path`:</span>
-</span><span id="pamda-173"><a href="#pamda-173"><span class="linenos"> 173</span></a><span class="sd">            - Type: list of strs</span>
+</span><span id="pamda-173"><a href="#pamda-173"><span class="linenos"> 173</span></a><span class="sd">            - Type: list[str | int | tuple] | str | int | tuple</span>
 </span><span id="pamda-174"><a href="#pamda-174"><span class="linenos"> 174</span></a><span class="sd">            - What: The path to check</span>
 </span><span id="pamda-175"><a href="#pamda-175"><span class="linenos"> 175</span></a><span class="sd">        - `data`:</span>
 </span><span id="pamda-176"><a href="#pamda-176"><span class="linenos"> 176</span></a><span class="sd">            - Type: dict</span>
@@ -2221,7 +2221,7 @@
 </span><span id="pamda-187"><a href="#pamda-187"><span class="linenos"> 187</span></a>            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
 </span><span id="pamda-188"><a href="#pamda-188"><span class="linenos"> 188</span></a>                <span class="s2">&quot;`assocPathComplex` `default_fn` must be an unary (single input) function.&quot;</span>
 </span><span id="pamda-189"><a href="#pamda-189"><span class="linenos"> 189</span></a>            <span class="p">)</span>
-</span><span id="pamda-190"><a href="#pamda-190"><span class="linenos"> 190</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="pamda-190"><a href="#pamda-190"><span class="linenos"> 190</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
 </span><span id="pamda-191"><a href="#pamda-191"><span class="linenos"> 191</span></a>            <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
 </span><span id="pamda-192"><a href="#pamda-192"><span class="linenos"> 192</span></a>        <span class="n">path_object</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">pamda_utils</span><span class="o">.</span><span class="n">getForceDict</span><span class="p">,</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">)</span>
 </span><span id="pamda-193"><a href="#pamda-193"><span class="linenos"> 193</span></a>        <span class="n">path_object</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span>
@@ -2554,7 +2554,7 @@
 </span><span id="pamda-520"><a href="#pamda-520"><span class="linenos"> 520</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="pamda-521"><a href="#pamda-521"><span class="linenos"> 521</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
 </span><span id="pamda-522"><a href="#pamda-522"><span class="linenos"> 522</span></a>
-</span><span id="pamda-523"><a href="#pamda-523"><span class="linenos"> 523</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dissocPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="pamda-523"><a href="#pamda-523"><span class="linenos"> 523</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dissocPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 </span><span id="pamda-524"><a href="#pamda-524"><span class="linenos"> 524</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="pamda-525"><a href="#pamda-525"><span class="linenos"> 525</span></a><span class="sd">        Function:</span>
 </span><span id="pamda-526"><a href="#pamda-526"><span class="linenos"> 526</span></a>
@@ -2578,7 +2578,7 @@
 </span><span id="pamda-544"><a href="#pamda-544"><span class="linenos"> 544</span></a><span class="sd">        pamda.dissocPath(path=[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;d&#39;:1}}}</span>
 </span><span id="pamda-545"><a href="#pamda-545"><span class="linenos"> 545</span></a><span class="sd">        ```</span>
 </span><span id="pamda-546"><a href="#pamda-546"><span class="linenos"> 546</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="pamda-547"><a href="#pamda-547"><span class="linenos"> 547</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="pamda-547"><a href="#pamda-547"><span class="linenos"> 547</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
 </span><span id="pamda-548"><a href="#pamda-548"><span class="linenos"> 548</span></a>            <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
 </span><span id="pamda-549"><a href="#pamda-549"><span class="linenos"> 549</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasPath</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">):</span>
 </span><span id="pamda-550"><a href="#pamda-550"><span class="linenos"> 550</span></a>            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Path does not exist&quot;</span><span class="p">)</span>
@@ -4083,13 +4083,13 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">assocPath</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span>, </span><span class="param"><span class="n">value</span>, </span><span class="param"><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span></span><span class="return-annotation">):</span></span>
+        <span class="name">assocPath</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span>, </span><span class="param"><span class="n">value</span>, </span><span class="param"><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="pamda.assocPath-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#pamda.assocPath"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="pamda.assocPath-120"><a href="#pamda.assocPath-120"><span class="linenos">120</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">assocPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="pamda.assocPath-120"><a href="#pamda.assocPath-120"><span class="linenos">120</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">assocPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 </span><span id="pamda.assocPath-121"><a href="#pamda.assocPath-121"><span class="linenos">121</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="pamda.assocPath-122"><a href="#pamda.assocPath-122"><span class="linenos">122</span></a><span class="sd">        Function:</span>
 </span><span id="pamda.assocPath-123"><a href="#pamda.assocPath-123"><span class="linenos">123</span></a>
@@ -4099,7 +4099,7 @@
 </span><span id="pamda.assocPath-127"><a href="#pamda.assocPath-127"><span class="linenos">127</span></a><span class="sd">        Requires:</span>
 </span><span id="pamda.assocPath-128"><a href="#pamda.assocPath-128"><span class="linenos">128</span></a>
 </span><span id="pamda.assocPath-129"><a href="#pamda.assocPath-129"><span class="linenos">129</span></a><span class="sd">        - `path`:</span>
-</span><span id="pamda.assocPath-130"><a href="#pamda.assocPath-130"><span class="linenos">130</span></a><span class="sd">            - Type: list of strs | str</span>
+</span><span id="pamda.assocPath-130"><a href="#pamda.assocPath-130"><span class="linenos">130</span></a><span class="sd">            - Type: list[str | int | tuple] | str | int | tuple</span>
 </span><span id="pamda.assocPath-131"><a href="#pamda.assocPath-131"><span class="linenos">131</span></a><span class="sd">            - What: The path to check</span>
 </span><span id="pamda.assocPath-132"><a href="#pamda.assocPath-132"><span class="linenos">132</span></a><span class="sd">            - Note: If a string is passed, assumes a single item path list with that string</span>
 </span><span id="pamda.assocPath-133"><a href="#pamda.assocPath-133"><span class="linenos">133</span></a><span class="sd">        - `value`:</span>
@@ -4116,7 +4116,7 @@
 </span><span id="pamda.assocPath-144"><a href="#pamda.assocPath-144"><span class="linenos">144</span></a><span class="sd">        pamda.assocPath(path=[&#39;a&#39;,&#39;c&#39;], value=3, data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:1, &#39;c&#39;:3}}</span>
 </span><span id="pamda.assocPath-145"><a href="#pamda.assocPath-145"><span class="linenos">145</span></a><span class="sd">        ```</span>
 </span><span id="pamda.assocPath-146"><a href="#pamda.assocPath-146"><span class="linenos">146</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="pamda.assocPath-147"><a href="#pamda.assocPath-147"><span class="linenos">147</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="pamda.assocPath-147"><a href="#pamda.assocPath-147"><span class="linenos">147</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
 </span><span id="pamda.assocPath-148"><a href="#pamda.assocPath-148"><span class="linenos">148</span></a>            <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
 </span><span id="pamda.assocPath-149"><a href="#pamda.assocPath-149"><span class="linenos">149</span></a>        <span class="n">reduce</span><span class="p">(</span><span class="n">pamda_utils</span><span class="o">.</span><span class="n">getForceDict</span><span class="p">,</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span>
 </span><span id="pamda.assocPath-150"><a href="#pamda.assocPath-150"><span class="linenos">150</span></a>            <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">value</span>
@@ -4137,7 +4137,7 @@
 <ul>
 <li><code><a href="#pamda.path">path</a></code>:
 <ul>
-<li>Type: list of strs | str</li>
+<li>Type: list[str | int | tuple] | str | int | tuple</li>
 <li>What: The path to check</li>
 <li>Note: If a string is passed, assumes a single item path list with that string</li>
 </ul></li>
@@ -4167,14 +4167,14 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">assocPathComplex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">default</span>, </span><span class="param"><span class="n">default_fn</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span>, </span><span class="param"><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span></span><span class="return-annotation">):</span></span>
+        <span class="name">assocPathComplex</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">default</span>,</span><span class="param">	<span class="n">default_fn</span>,</span><span class="param">	<span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span>,</span><span class="param">	<span class="n">data</span><span class="p">:</span> <span class="nb">dict</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="pamda.assocPathComplex-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#pamda.assocPathComplex"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="pamda.assocPathComplex-154"><a href="#pamda.assocPathComplex-154"><span class="linenos">154</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">assocPathComplex</span><span class="p">(</span>
-</span><span id="pamda.assocPathComplex-155"><a href="#pamda.assocPathComplex-155"><span class="linenos">155</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">default_fn</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span>
+</span><span id="pamda.assocPathComplex-155"><a href="#pamda.assocPathComplex-155"><span class="linenos">155</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">default_fn</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span>
 </span><span id="pamda.assocPathComplex-156"><a href="#pamda.assocPathComplex-156"><span class="linenos">156</span></a>    <span class="p">):</span>
 </span><span id="pamda.assocPathComplex-157"><a href="#pamda.assocPathComplex-157"><span class="linenos">157</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="pamda.assocPathComplex-158"><a href="#pamda.assocPathComplex-158"><span class="linenos">158</span></a><span class="sd">        Function:</span>
@@ -4192,7 +4192,7 @@
 </span><span id="pamda.assocPathComplex-170"><a href="#pamda.assocPathComplex-170"><span class="linenos">170</span></a><span class="sd">            - What: A unary (single input) function that takes in the current path item (or default) and adjusts it</span>
 </span><span id="pamda.assocPathComplex-171"><a href="#pamda.assocPathComplex-171"><span class="linenos">171</span></a><span class="sd">            - Example: `lambda x: x` # Returns the value in the dict or the default value if none was present</span>
 </span><span id="pamda.assocPathComplex-172"><a href="#pamda.assocPathComplex-172"><span class="linenos">172</span></a><span class="sd">        - `path`:</span>
-</span><span id="pamda.assocPathComplex-173"><a href="#pamda.assocPathComplex-173"><span class="linenos">173</span></a><span class="sd">            - Type: list of strs</span>
+</span><span id="pamda.assocPathComplex-173"><a href="#pamda.assocPathComplex-173"><span class="linenos">173</span></a><span class="sd">            - Type: list[str | int | tuple] | str | int | tuple</span>
 </span><span id="pamda.assocPathComplex-174"><a href="#pamda.assocPathComplex-174"><span class="linenos">174</span></a><span class="sd">            - What: The path to check</span>
 </span><span id="pamda.assocPathComplex-175"><a href="#pamda.assocPathComplex-175"><span class="linenos">175</span></a><span class="sd">        - `data`:</span>
 </span><span id="pamda.assocPathComplex-176"><a href="#pamda.assocPathComplex-176"><span class="linenos">176</span></a><span class="sd">            - Type: dict</span>
@@ -4209,7 +4209,7 @@
 </span><span id="pamda.assocPathComplex-187"><a href="#pamda.assocPathComplex-187"><span class="linenos">187</span></a>            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
 </span><span id="pamda.assocPathComplex-188"><a href="#pamda.assocPathComplex-188"><span class="linenos">188</span></a>                <span class="s2">&quot;`assocPathComplex` `default_fn` must be an unary (single input) function.&quot;</span>
 </span><span id="pamda.assocPathComplex-189"><a href="#pamda.assocPathComplex-189"><span class="linenos">189</span></a>            <span class="p">)</span>
-</span><span id="pamda.assocPathComplex-190"><a href="#pamda.assocPathComplex-190"><span class="linenos">190</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="pamda.assocPathComplex-190"><a href="#pamda.assocPathComplex-190"><span class="linenos">190</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
 </span><span id="pamda.assocPathComplex-191"><a href="#pamda.assocPathComplex-191"><span class="linenos">191</span></a>            <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
 </span><span id="pamda.assocPathComplex-192"><a href="#pamda.assocPathComplex-192"><span class="linenos">192</span></a>        <span class="n">path_object</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">pamda_utils</span><span class="o">.</span><span class="n">getForceDict</span><span class="p">,</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">)</span>
 </span><span id="pamda.assocPathComplex-193"><a href="#pamda.assocPathComplex-193"><span class="linenos">193</span></a>        <span class="n">path_object</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span>
@@ -4242,7 +4242,7 @@
 </ul></li>
 <li><code><a href="#pamda.path">path</a></code>:
 <ul>
-<li>Type: list of strs</li>
+<li>Type: list[str | int | tuple] | str | int | tuple</li>
 <li>What: The path to check</li>
 </ul></li>
 <li><code>data</code>:
@@ -5059,13 +5059,13 @@ b=['b','c']
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">dissocPath</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span>, </span><span class="param"><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span></span><span class="return-annotation">):</span></span>
+        <span class="name">dissocPath</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span>, </span><span class="param"><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="pamda.dissocPath-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#pamda.dissocPath"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="pamda.dissocPath-523"><a href="#pamda.dissocPath-523"><span class="linenos">523</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dissocPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="pamda.dissocPath-523"><a href="#pamda.dissocPath-523"><span class="linenos">523</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dissocPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 </span><span id="pamda.dissocPath-524"><a href="#pamda.dissocPath-524"><span class="linenos">524</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="pamda.dissocPath-525"><a href="#pamda.dissocPath-525"><span class="linenos">525</span></a><span class="sd">        Function:</span>
 </span><span id="pamda.dissocPath-526"><a href="#pamda.dissocPath-526"><span class="linenos">526</span></a>
@@ -5089,7 +5089,7 @@ b=['b','c']
 </span><span id="pamda.dissocPath-544"><a href="#pamda.dissocPath-544"><span class="linenos">544</span></a><span class="sd">        pamda.dissocPath(path=[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;], data=data) #=&gt; {&#39;a&#39;:{&#39;b&#39;:{&#39;d&#39;:1}}}</span>
 </span><span id="pamda.dissocPath-545"><a href="#pamda.dissocPath-545"><span class="linenos">545</span></a><span class="sd">        ```</span>
 </span><span id="pamda.dissocPath-546"><a href="#pamda.dissocPath-546"><span class="linenos">546</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="pamda.dissocPath-547"><a href="#pamda.dissocPath-547"><span class="linenos">547</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="pamda.dissocPath-547"><a href="#pamda.dissocPath-547"><span class="linenos">547</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
 </span><span id="pamda.dissocPath-548"><a href="#pamda.dissocPath-548"><span class="linenos">548</span></a>            <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
 </span><span id="pamda.dissocPath-549"><a href="#pamda.dissocPath-549"><span class="linenos">549</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasPath</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">):</span>
 </span><span id="pamda.dissocPath-550"><a href="#pamda.dissocPath-550"><span class="linenos">550</span></a>            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Path does not exist&quot;</span><span class="p">)</span>
