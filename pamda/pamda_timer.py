@@ -4,7 +4,7 @@ from type_enforced.utils import Partial
 
 
 class PamdaTimer:
-    def __init__(self, __fn__, units="ms", iterations=1, print_call=True):
+    def __init__(self, __fn__, units="ms", iterations=1, print_call=True, print_time_stats=False):
         """
         Function:
 
@@ -28,12 +28,16 @@ class PamdaTimer:
         - `print_call`:
             - Type: bool
             - What: Whether to print the function call time when this object is called. Default is True.
+        - `print_time_stats`:
+            - Type: bool
+            - What: Whether to print a simple output line for get_time_stats after all iterations run. Default is False.
         """
         update_wrapper(self, __fn__)
         self.__fn__ = __fn__
         self.units = units
         self.iterations = iterations
         self.print_call = print_call
+        self.print_time_stats = print_time_stats
         assert (
             isinstance(self.iterations, int) and self.iterations > 0
         ), "Iterations must be a positive integer."
@@ -110,7 +114,7 @@ class PamdaTimer:
                 / len(timing_history)
             ) ** 0.5
 
-        return {
+        output = {
             "module": self.__fn__.__module__,
             "function": self.__fn__.__qualname__,
             "unit": self.units,
@@ -120,9 +124,12 @@ class PamdaTimer:
             "max": max_time * self.__divisor__,
             "std": stdev_time * self.__divisor__,
         }
+        if self.print_time_stats:
+            print(f"{output['function']}: {output['avg']} ± {output['std']} {output['unit']} over {output['iterations']} iterations")
+        return output
 
 
-def pamda_timer(fn, units="ms", iterations=1, print_call=True):
+def pamda_timer(fn, units="ms", iterations=1, print_call=True, print_time_stats=False):
     """
     Function:
     Create a pamda_timer object.
@@ -133,10 +140,11 @@ def pamda_timer(fn, units="ms", iterations=1, print_call=True):
     - `units`: str, the units for the time measurement (default is "ms")
     - `iterations`: int, the number of iterations to run the function when getting time statistics (default is 1)
     - `print_call`: bool, whether to print the function call time when this object is called (default is True)
+    - `print_time_stats`: bool, whether to print the time statistics when get_time_stats is called (default is False)
     """
     return PamdaTimer(
-        fn, units=units, iterations=iterations, print_call=print_call
+        fn, units=units, iterations=iterations, print_call=print_call, print_time_stats=print_time_stats
     )
 
 
-pamda_timer = Partial(pamda_timer, units="ms", iterations=1, print_call=True)
+pamda_timer = Partial(pamda_timer, units="ms", iterations=1, print_call=True, print_time_stats=False)

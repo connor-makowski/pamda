@@ -271,7 +271,6 @@ class pamda_utils:
         data #=> {'a':{}, 'b':{}, 'c':[]}
         ```
         """
-        # TODO: Clean this up for faster performance
         if isinstance(object, dict):
             value = object.get(key)
         else:
