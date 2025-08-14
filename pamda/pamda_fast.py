@@ -50,10 +50,9 @@ def __groupByHashable__(fn, data: list):
     output = {}
     for i in data:
         path = fn(i)
-        path_item = output.get(path, [])
-        if not path_item:
-            output[path] = path_item
-        path_item.append(i)
+        if path not in output:
+            output[path] = []
+        output[path].append(i)
     return output
 
 def __mergeDeep__(update_data, data):
