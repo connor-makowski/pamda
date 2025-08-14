@@ -25,6 +25,8 @@ def __assocPath__(path: list | str | int | tuple, value, data: dict):
 
 def __groupByHashable__(fn, data: list):
     """
+    An internal version of pamda.groupBy designed for calling speed
+
     Function:
 
     - Splits a list into a dictionary of sublists keyed by the return hashable of a provided function
@@ -53,3 +55,80 @@ def __groupByHashable__(fn, data: list):
             output[path] = path_item
         path_item.append(i)
     return output
+
+def __mergeDeep__(update_data, data):
+    """
+    An internal version of pamda.mergeDeep designed for calling speed
+
+    Function:
+
+    - Recursively merges two nested dictionaries keeping all keys at each layer
+    - Values from `update_data` are used when keys are present in both dictionaries
+
+    Requires:
+
+    - `update_data`:
+        - Type: any
+        - What: The new data that will take precedence during merging
+    - `data`:
+        - Type: any
+        - What: The original data that will be merged into
+
+    Example:
+
+    ```
+    data={'a':{'b':{'c':'d'},'e':'f'}}
+    update_data={'a':{'b':{'h':'i'},'e':'g'}}
+    pamda.mergeDeep(
+        update_data=update_data,
+        data=data
+    ) #=> {'a':{'b':{'c':'d','h':'i'},'e':'g'}}
+    ```
+    """
+    if not isinstance(data, dict) or not isinstance(update_data, dict):
+        return update_data
+    output = dict(data)
+    keys_original = set(data.keys())
+    keys_update = set(update_data.keys())
+    similar_keys = keys_original.intersection(keys_update)
+    similar_dict = {
+        key: __mergeDeep__(update_data[key], data[key])
+        for key in similar_keys
+    }
+    new_keys = keys_update.difference(keys_original)
+    new_dict = {key: update_data[key] for key in new_keys}
+    output.update(similar_dict)
+    output.update(new_dict)
+    return output
+
+def __pathOr__(default, path: list, data: dict):
+    """
+    An internal version of pamda.pathOr designed for calling speed
+
+    Function:
+
+    - Returns the value of a path within a nested dictionary or a default value if that path does not exist
+    - Does not accept str as path like pamda.pathOr
+
+    Requires:
+
+    - `default`:
+        - Type: any
+        - What: The object to return if the path does not exist
+    - `path`:
+        - Type: list of strs
+        - What: The path to pull given the data
+    - `data`:
+        - Type: dict
+        - What: A dictionary to get the path from
+
+    Example:
+
+    ```
+    data={'a':{'b':1}}
+    pamda.path(default=2, path=['a','c'], data=data) #=> 2
+    ```
+    """
+    return reduce(lambda x, y: x.get(y, {}), path[:-1], data).get(
+        path[-1], default
+    )

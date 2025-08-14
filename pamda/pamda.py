@@ -1,6 +1,6 @@
 from functools import reduce
 from pamda.pamda_utils import pamda_utils
-from pamda.pamda_fast import __getForceDict__, __assocPath__, __groupByHashable__
+from pamda.pamda_fast import __getForceDict__, __assocPath__, __groupByHashable__, __mergeDeep__, __pathOr__
 from pamda.pamda_curry import curry_obj
 from pamda import pamda_wrappers
 from typing import Any
@@ -1091,21 +1091,7 @@ class pamda(pamda_utils):
         ) #=> {'a':{'b':{'c':'d','h':'i'},'e':'g'}}
         ```
         """
-        if not isinstance(data, dict) or not isinstance(update_data, dict):
-            return update_data
-        output = dict(data)
-        keys_original = set(data.keys())
-        keys_update = set(update_data.keys())
-        similar_keys = keys_original.intersection(keys_update)
-        similar_dict = {
-            key: self.mergeDeep(update_data[key], data[key])
-            for key in similar_keys
-        }
-        new_keys = keys_update.difference(keys_original)
-        new_dict = {key: update_data[key] for key in new_keys}
-        output.update(similar_dict)
-        output.update(new_dict)
-        return output
+        return __mergeDeep__(update_data, data)
 
     def nest(self, path_keys: list, value_key: str, data: list):
         """
@@ -1229,7 +1215,9 @@ class pamda(pamda_utils):
         pamda.path(path=['a','b'], data=data) #=> 1
         ```
         """
-        return self.pathOr(None, path, data)
+        if isinstance(path, str):
+            path = [path]
+        return __pathOr__(None, path, data)
 
     def pathOr(self, default, path: list | str, data: dict):
         """
@@ -1381,7 +1369,9 @@ class pamda(pamda_utils):
         """
         if len(data) == 0:
             raise Exception("Attempting to pluck from an empty list")
-        return [self.path(data=i, path=path) for i in data]
+        if isinstance(path, str):
+            path = [path]
+        return [__pathOr__(default=None, path=path, data=i) for i in data]
 
     def pluckIf(self, fn, path: list | str, data: list):
         """
@@ -1395,6 +1385,7 @@ class pamda(pamda_utils):
             - Type: function
             - What: A function to take in each item in data and return a boolean
             - Note: Only items that return true are plucked
+            - Note: Should be a unary function (take one input)
         - `path`:
             - Type: list of strs
             - What: The path to pull given the data
@@ -1413,7 +1404,12 @@ class pamda(pamda_utils):
         """
         if len(data) == 0:
             raise Exception("Attempting to pluck from an empty list")
-        return [self.path(data=i, path=path) for i in data if fn(i)]
+        curried_fn = self.curry(fn)
+        if curried_fn.__arity__ != 1:
+            raise Exception("`pluckIf` `fn` must have an arity of 1 (take one input)")
+        if isinstance(path, str):
+            path = [path]
+        return [__pathOr__(default=None, path=path, data=i) for i in data if fn(i)]
 
     def project(self, keys: list[str], data: list[dict]):
         """
