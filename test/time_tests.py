@@ -28,7 +28,13 @@ data = (
     ]
 )
 
-pamda_timer(pamda.groupBy)(lambda x: x["color"] + x["shape"], data)
-pamda_timer(pamda.groupKeys)(["color", "size"], data)
-pamda_timer(pamda.nest)(["color", "size"], "size", data)
-pamda_timer(pamda.nestItem)(["color", "size"], data)
+for function, args in [
+    (pamda.groupBy, [lambda x: str(x["color"] + x["shape"]), data]),
+    (pamda.groupKeys, [["color", "size"], data]),
+    (pamda.nest, [["color", "size"], "size", data]),
+    (pamda.nestItem, [["color", "size"], data]),
+    (pamda.pluck, ["color", data]),
+    (pamda.pluckIf, [lambda x: x["color"] == "red", ["color"], data]),
+]:
+    pamda_timer(function, iterations=3, print_time_stats=True).get_time_stats(*args)
+

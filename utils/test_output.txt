@@ -10,10 +10,12 @@ Other Tests:
 ===============
 1M Scale Time Tests:
 ===============
-pamda.groupBy: 178.231ms
-pamda.groupKeys: 729.933ms
-pamda.nest: 1863.6248ms
-pamda.nestItem: 1602.1192ms
+pamda.groupBy: 205.85227012634277 ± 2.1523376905177685 ms over 3 iterations
+pamda.groupKeys: 384.05807813008624 ± 7.868488986754496 ms over 3 iterations
+pamda.nest: 661.7047786712646 ± 16.971886165420692 ms over 3 iterations
+pamda.nestItem: 427.9392560323079 ± 3.3924225223584155 ms over 3 iterations
+pamda.pluck: 8104.537407557169 ± 131.89994519558425 ms over 3 iterations
+pamda.pluckIf: 4248.695691426595 ± 10.274071886601726 ms over 3 iterations
 
 ===============
 Type Checking Tests:

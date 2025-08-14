@@ -1,5 +1,6 @@
 from functools import reduce
 from pamda.pamda_utils import pamda_utils
+from pamda.pamda_fast import __getForceDict__, __assocPath__, __groupByHashable__
 from pamda.pamda_curry import curry_obj
 from pamda import pamda_wrappers
 from typing import Any
@@ -145,7 +146,7 @@ class pamda(pamda_utils):
         """
         if not isinstance(path, list):
             path = [path]
-        reduce(pamda_utils.getForceDict, path[:-1], data).__setitem__(
+        reduce(__getForceDict__, path[:-1], data).__setitem__(
             path[-1], value
         )
         return data
@@ -188,7 +189,7 @@ class pamda(pamda_utils):
             )
         if not isinstance(path, list):
             path = [path]
-        path_object = reduce(pamda_utils.getForceDict, path[:-1], data)
+        path_object = reduce(__getForceDict__, path[:-1], data)
         path_object.__setitem__(
             path[-1], default_fn(path_object.get(path[-1], default))
         )
@@ -548,7 +549,7 @@ class pamda(pamda_utils):
         if not self.hasPath(path=path, data=data):
             raise Exception("Path does not exist")
         else:
-            reduce(pamda_utils.getForceDict, path[:-1], data).pop(path[-1])
+            reduce(__getForceDict__, path[:-1], data).pop(path[-1])
         return data
 
     def flatten(self, data: list):
@@ -686,7 +687,7 @@ class pamda(pamda_utils):
         - `fn`:
             - Type: function | method
             - What: The function or method to group by
-            - Note: Must return a string
+            - Note: Must return a string (or other hashable object)
             - Note: This function must be unary (take one input)
             - Note: This function is applied to each item in the list recursively
         - `data`:
@@ -726,17 +727,7 @@ class pamda(pamda_utils):
             raise Exception(
                 "groupBy `fn` must only take one parameter as its input"
             )
-        output = {}
-        for i in data:
-            path = fn(i)
-            if not isinstance(path, str):
-                raise Exception(
-                    f"groupBy `fn` must return a str but instead returned {path}"
-                )
-            if path not in output:
-                output[path] = []
-            output[path].append(i)
-        return output
+        return __groupByHashable__(fn = fn, data = data)
 
     def groupKeys(self, keys: list, data: list):
         """
@@ -770,11 +761,9 @@ class pamda(pamda_utils):
         #=> ]
         ```
         """
-
-        def keyFn(item):
-            return str(([item[key] for key in keys]))
-
-        return list(self.groupBy(keyFn, data).values())
+        def key_fn(item):
+            return tuple([item[key] for key in keys])
+        return list(__groupByHashable__(key_fn, data).values())
 
     def groupWith(self, fn, data: list):
         """
@@ -1161,7 +1150,7 @@ class pamda(pamda_utils):
         nested_output = {}
         grouped_data = self.groupKeys(keys=path_keys, data=data)
         for item in grouped_data:
-            nested_output = self.assocPath(
+            nested_output = __assocPath__(
                 path=[item[0].get(key) for key in path_keys],
                 value=[i.get(value_key) for i in item],
                 data=nested_output,
@@ -1210,7 +1199,7 @@ class pamda(pamda_utils):
         nested_output = {}
         grouped_data = self.groupKeys(keys=path_keys, data=data)
         for item in grouped_data:
-            nested_output = self.assocPath(
+            nested_output = __assocPath__(
                 path=[item[0].get(key) for key in path_keys],
                 value=item,
                 data=nested_output,

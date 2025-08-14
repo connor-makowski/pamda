@@ -1,5 +1,6 @@
 import csv, json
 from pamda import pamda_wrappers
+from pamda.pamda_fast import __getForceDict__
 import type_enforced
 
 
@@ -271,11 +272,5 @@ class pamda_utils:
         data #=> {'a':{}, 'b':{}, 'c':[]}
         ```
         """
-        if isinstance(object, dict):
-            value = object.get(key)
-        else:
-            value = object[key]
-        if not isinstance(value, (dict, list)):
-            value = {}
-            object.__setitem__(key, value)
-        return value
+        # TODO: Remove this function in future major release as it is now located in pamda_fast
+        return __getForceDict__(object, key)
