@@ -1,5 +1,6 @@
 from functools import reduce
 
+
 def __getForceDict__(object: dict | list, key: str | int | tuple):
     """
     An internal version of pamda_utils.getForceDict designed for calling speed
@@ -14,14 +15,14 @@ def __getForceDict__(object: dict | list, key: str | int | tuple):
         object.__setitem__(key, value)
     return value
 
+
 def __assocPath__(path: list | str | int | tuple, value, data: dict):
     """
     An internal version of pamda_utils.assocPath designed for calling speed
     """
-    reduce(__getForceDict__, path[:-1], data).__setitem__(
-        path[-1], value
-    )
+    reduce(__getForceDict__, path[:-1], data).__setitem__(path[-1], value)
     return data
+
 
 def __groupByHashable__(fn, data: list):
     """
@@ -54,6 +55,7 @@ def __groupByHashable__(fn, data: list):
             output[path] = []
         output[path].append(i)
     return output
+
 
 def __mergeDeep__(update_data, data):
     """
@@ -91,14 +93,14 @@ def __mergeDeep__(update_data, data):
     keys_update = set(update_data.keys())
     similar_keys = keys_original.intersection(keys_update)
     similar_dict = {
-        key: __mergeDeep__(update_data[key], data[key])
-        for key in similar_keys
+        key: __mergeDeep__(update_data[key], data[key]) for key in similar_keys
     }
     new_keys = keys_update.difference(keys_original)
     new_dict = {key: update_data[key] for key in new_keys}
     output.update(similar_dict)
     output.update(new_dict)
     return output
+
 
 def __pathOr__(default, path: list, data: dict):
     """
@@ -131,6 +133,7 @@ def __pathOr__(default, path: list, data: dict):
     return reduce(lambda x, y: x.get(y, {}), path[:-1], data).get(
         path[-1], default
     )
+
 
 def __getKeyValues__(keys: list, data: dict):
     """

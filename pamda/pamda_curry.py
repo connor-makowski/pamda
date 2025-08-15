@@ -35,7 +35,11 @@ class curry_obj:
         new_args = self.__args__ + args
         new_kwargs = dict(**self.__kwargs__, **kwargs)
         # Create a comprehensive set of assigned variable names to determine arity
-        assigned_vars = set(self.__fn_arg_default_keys__ + self.__fn_arg_keys__[:len(new_args)] + list(new_kwargs.keys()))
+        assigned_vars = set(
+            self.__fn_arg_default_keys__
+            + self.__fn_arg_keys__[: len(new_args)]
+            + list(new_kwargs.keys())
+        )
         arity = self.__fnArity__ - len(assigned_vars)
         if arity < 0:
             self.__exception__("Too many arguments were supplied")
@@ -81,20 +85,25 @@ class curry_obj:
             1 if isinstance(self.__fn__, (types.MethodType)) else 0
         )
         return self.__fn__.__code__.co_argcount - extra_method_input_count
-    
+
     def __get_fn_arg_default_keys__(self):
         """
         Get the default values of the passed function or method and store them in `self.__fn_defaults__`.
         """
         self.__fn_var_keys__ = list(self.__fn__.__code__.co_varnames)
-        self.__fn_arg_keys__ = self.__fn_var_keys__[: self.__fn__.__code__.co_argcount]
+        self.__fn_arg_keys__ = self.__fn_var_keys__[
+            : self.__fn__.__code__.co_argcount
+        ]
         if self.__fn__.__defaults__ is not None:
-            self.__fn_arg_default_keys__ = self.__fn_arg_keys__[-len(self.__fn__.__defaults__):]
+            self.__fn_arg_default_keys__ = self.__fn_arg_keys__[
+                -len(self.__fn__.__defaults__) :
+            ]
         else:
             self.__fn_arg_default_keys__ = []
         if self.__fn__.__kwdefaults__ is not None:
-            self.__fn_arg_default_keys__.extend(list(self.__fn__.__kwdefaults__.keys()))
-
+            self.__fn_arg_default_keys__.extend(
+                list(self.__fn__.__kwdefaults__.keys())
+            )
 
     def thunkify(self):
         self.__isThunk__ = True

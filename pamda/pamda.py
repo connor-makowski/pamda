@@ -1,6 +1,13 @@
 from functools import reduce
 from pamda.pamda_utils import pamda_utils
-from pamda.pamda_fast import __getForceDict__, __assocPath__, __groupByHashable__, __mergeDeep__, __pathOr__, __getKeyValues__
+from pamda.pamda_fast import (
+    __getForceDict__,
+    __assocPath__,
+    __groupByHashable__,
+    __mergeDeep__,
+    __pathOr__,
+    __getKeyValues__,
+)
 from pamda.pamda_curry import curry_obj
 from pamda import pamda_wrappers
 from typing import Any
@@ -146,9 +153,7 @@ class pamda(pamda_utils):
         """
         if not isinstance(path, list):
             path = [path]
-        reduce(__getForceDict__, path[:-1], data).__setitem__(
-            path[-1], value
-        )
+        reduce(__getForceDict__, path[:-1], data).__setitem__(path[-1], value)
         return data
 
     def assocPathComplex(
@@ -727,7 +732,7 @@ class pamda(pamda_utils):
             raise Exception(
                 "groupBy `fn` must only take one parameter as its input"
             )
-        return __groupByHashable__(fn = fn, data = data)
+        return __groupByHashable__(fn=fn, data=data)
 
     def groupKeys(self, keys: list, data: list):
         """
@@ -761,8 +766,10 @@ class pamda(pamda_utils):
         #=> ]
         ```
         """
+
         def key_fn(item):
             return tuple([item[key] for key in keys])
+
         return list(__groupByHashable__(key_fn, data).values())
 
     def groupWith(self, fn, data: list):
@@ -1403,10 +1410,14 @@ class pamda(pamda_utils):
             raise Exception("Attempting to pluck from an empty list")
         curried_fn = self.curry(fn)
         if curried_fn.__arity__ != 1:
-            raise Exception("`pluckIf` `fn` must have an arity of 1 (take one input)")
+            raise Exception(
+                "`pluckIf` `fn` must have an arity of 1 (take one input)"
+            )
         if isinstance(path, str):
             path = [path]
-        return [__pathOr__(default=None, path=path, data=i) for i in data if fn(i)]
+        return [
+            __pathOr__(default=None, path=path, data=i) for i in data if fn(i)
+        ]
 
     def project(self, keys: list[str], data: list[dict]):
         """

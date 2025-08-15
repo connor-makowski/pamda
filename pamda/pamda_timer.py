@@ -4,7 +4,14 @@ from type_enforced.utils import Partial
 
 
 class PamdaTimer:
-    def __init__(self, __fn__, units="ms", iterations=1, print_call=True, print_time_stats=False):
+    def __init__(
+        self,
+        __fn__,
+        units="ms",
+        iterations=1,
+        print_call=True,
+        print_time_stats=False,
+    ):
         """
         Function:
 
@@ -125,11 +132,15 @@ class PamdaTimer:
             "std": stdev_time * self.__divisor__,
         }
         if self.print_time_stats:
-            print(f"{output['function']}: {output['avg']:.3f} ± {output['std']:.3f} {output['unit']} over {output['iterations']} iterations")
+            print(
+                f"{output['function']}: {output['avg']:.3f} ± {output['std']:.3f} {output['unit']} over {output['iterations']} iterations"
+            )
         return output
 
 
-def pamda_timer(fn, units="ms", iterations=1, print_call=True, print_time_stats=False):
+def pamda_timer(
+    fn, units="ms", iterations=1, print_call=True, print_time_stats=False
+):
     """
     Function:
     Create a pamda_timer object.
@@ -143,8 +154,18 @@ def pamda_timer(fn, units="ms", iterations=1, print_call=True, print_time_stats=
     - `print_time_stats`: bool, whether to print the time statistics when get_time_stats is called (default is False)
     """
     return PamdaTimer(
-        fn, units=units, iterations=iterations, print_call=print_call, print_time_stats=print_time_stats
+        fn,
+        units=units,
+        iterations=iterations,
+        print_call=print_call,
+        print_time_stats=print_time_stats,
     )
 
 
-pamda_timer = Partial(pamda_timer, units="ms", iterations=1, print_call=True, print_time_stats=False)
+pamda_timer = Partial(
+    pamda_timer,
+    units="ms",
+    iterations=1,
+    print_call=True,
+    print_time_stats=False,
+)
