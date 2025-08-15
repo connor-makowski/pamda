@@ -131,3 +131,29 @@ def __pathOr__(default, path: list, data: dict):
     return reduce(lambda x, y: x.get(y, {}), path[:-1], data).get(
         path[-1], default
     )
+
+def __getKeyValues__(keys: list, data: dict):
+    """
+    An internal function to pluck the values of keys out of a dictionary designed for calling speed
+
+    Function:
+
+    - Retrieves the values of a list of keys from a dictionary
+    - This is a faster version of getKeys without validation overhead
+
+    Requires:
+
+    - `keys`:
+        - Type: list
+        - What: The list of keys to retrieve from the dictionary
+    - `data`:
+        - Type: dict
+        - What: The dictionary to retrieve the keys from
+
+    Returns:
+
+    - Type: tuple
+    - What: The values of the keys from the dictionary
+
+    """
+    return tuple([data[key] for key in keys])

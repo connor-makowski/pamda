@@ -1,6 +1,6 @@
 from functools import reduce
 from pamda.pamda_utils import pamda_utils
-from pamda.pamda_fast import __getForceDict__, __assocPath__, __groupByHashable__, __mergeDeep__, __pathOr__
+from pamda.pamda_fast import __getForceDict__, __assocPath__, __groupByHashable__, __mergeDeep__, __pathOr__, __getKeyValues__
 from pamda.pamda_curry import curry_obj
 from pamda import pamda_wrappers
 from typing import Any
@@ -975,6 +975,7 @@ class pamda(pamda_utils):
         ```
 
         """
+        # TODO: Check for efficiency gains
         fn = self.curry(fn)
         if fn.__arity__ != 1:
             raise Exception("`map` `fn` must be unary (take one input)")
@@ -1132,10 +1133,9 @@ class pamda(pamda_utils):
         if len(data) == 0:
             raise Exception("Attempting to `nest` from an empty list")
         nested_output = {}
-        grouped_data = self.groupKeys(keys=path_keys, data=data)
-        for item in grouped_data:
+        for item in self.groupKeys(keys=path_keys, data=data):
             nested_output = __assocPath__(
-                path=[item[0].get(key) for key in path_keys],
+                path=__getKeyValues__(path_keys, item[0]),
                 value=[i.get(value_key) for i in item],
                 data=nested_output,
             )
@@ -1181,10 +1181,9 @@ class pamda(pamda_utils):
         if len(data) == 0:
             raise Exception("Attempting to `nest` from an empty list")
         nested_output = {}
-        grouped_data = self.groupKeys(keys=path_keys, data=data)
-        for item in grouped_data:
+        for item in self.groupKeys(keys=path_keys, data=data):
             nested_output = __assocPath__(
-                path=[item[0].get(key) for key in path_keys],
+                path=__getKeyValues__(path_keys, item[0]),
                 value=item,
                 data=nested_output,
             )

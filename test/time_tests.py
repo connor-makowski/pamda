@@ -45,10 +45,13 @@ for i in range(int(data_size/2)):
     path = [f'level{random.randint(1, 10)}' for _ in range(10)]
     __assocPath__(path, random.randint(1, 10), data_merge_b)
 
-data_zip_a = list(range(500000))
-data_zip_b = list(range(500000, 1000000))
+data_zip_a = list(range(int(data_size/2)))
+data_zip_b = list(range(int(data_size/2), data_size))
+
+unflat_data = [[i] for i in range(data_size)]
 
 for function, args in [
+    (pamda.flatten, [unflat_data]),
     (pamda.groupBy, [lambda x: str(x["color"] + x["shape"]), data]),
     (pamda.groupKeys, [["color", "size"], data]),
     (pamda.groupWith, [lambda x,y: x["color"]==y["color"], data]),
@@ -59,6 +62,7 @@ for function, args in [
     (pamda.pluck, ["color", data]),
     (pamda.pluckIf, [lambda x: x["color"] == "red", ["color"], data]),
     (pamda.project, [['color', 'size'], data]),
+    (pamda.unnest, [unflat_data]),
     (pamda.zip, [data_zip_a, data_zip_b]),
     (pamda.zipObj, [data_zip_a, data_zip_b]),
 ]:
