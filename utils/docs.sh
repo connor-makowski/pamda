@@ -9,8 +9,8 @@ echo "from .pamda import pamda" >> pamda/__init__.py
 
 
 # Specify versions for documentation purposes
-VERSION="2.7.3"
-OLD_DOC_VERSIONS="2.6.1 2.5.0 2.4.0 2.3.0 2.2.0 2.1.2 2.0.0 1.0.0 0.0.14"
+VERSION="2.8.0"
+OLD_DOC_VERSIONS="2.7.3 2.6.1 2.5.0 2.4.0 2.3.0 2.2.0 2.1.2 2.0.0 1.0.0 0.0.14"
 export version_options="$VERSION $OLD_DOC_VERSIONS"
 
 # generate the docs for a version function:
