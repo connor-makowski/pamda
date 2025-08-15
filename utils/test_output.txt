@@ -10,13 +10,18 @@ Other Tests:
 ===============
 1M Scale Time Tests:
 ===============
-pamda.groupBy: 172.17588424682617 ± 1.4732150174553762 ms over 3 iterations
-pamda.groupKeys: 361.93275451660156 ± 22.535956424227486 ms over 3 iterations
-pamda.nest: 631.3520272572836 ± 1.2016871815313892 ms over 3 iterations
-pamda.nestItem: 419.47468121846515 ± 1.4357434246146854 ms over 3 iterations
-pamda.pluck: 350.6746292114258 ± 1.8492115816926737 ms over 3 iterations
-pamda.pluckIf: 251.26345952351886 ± 4.8253622919691646 ms over 3 iterations
-pamda.mergeDeep: 2444.4464842478433 ± 309.1836654423926 ms over 3 iterations
+pamda.groupBy: 185.553 ± 5.767 ms over 3 iterations
+pamda.groupKeys: 344.441 ± 4.003 ms over 3 iterations
+pamda.groupWith: 87.253 ± 1.436 ms over 3 iterations
+pamda.mergeDeep: 1171.071 ± 170.027 ms over 3 iterations
+pamda.nest: 663.468 ± 31.276 ms over 3 iterations
+pamda.nestItem: 584.878 ± 162.113 ms over 3 iterations
+pamda.pivot: 120.345 ± 1.116 ms over 3 iterations
+pamda.pluck: 374.634 ± 3.502 ms over 3 iterations
+pamda.pluckIf: 243.244 ± 1.865 ms over 3 iterations
+pamda.project: 339.140 ± 1.459 ms over 3 iterations
+pamda.zip: 68.958 ± 0.450 ms over 3 iterations
+pamda.zipObj: 34.629 ± 6.596 ms over 3 iterations
 
 ===============
 Type Checking Tests:

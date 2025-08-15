@@ -70,7 +70,7 @@ class PamdaTimer:
         time_taken = time.time() - start
         if self.print_call:
             print(
-                f"{self.__fn__.__qualname__}: {round(time_taken * self.__divisor__, 4)}{self.units}"
+                f"{self.__fn__.__qualname__}: {(time_taken * self.__divisor__):.4f}{self.units}"
             )
         return out
 
@@ -125,7 +125,7 @@ class PamdaTimer:
             "std": stdev_time * self.__divisor__,
         }
         if self.print_time_stats:
-            print(f"{output['function']}: {output['avg']} ± {output['std']} {output['unit']} over {output['iterations']} iterations")
+            print(f"{output['function']}: {output['avg']:.3f} ± {output['std']:.3f} {output['unit']} over {output['iterations']} iterations")
         return output
 
 

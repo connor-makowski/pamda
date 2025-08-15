@@ -796,13 +796,11 @@ class pamda(pamda_utils):
         curried_fn = self.curry(fn)
         if curried_fn.__arity__ != 2:
             raise Exception("groupWith `fn` must take exactly two parameters")
+        previous = data[0]
         output = []
-        start = True
-        for i in data:
-            if start:
-                sublist = [i]
-                start = False
-            elif fn(i, previous):
+        sublist = [previous]
+        for i in data[1:]:
+            if fn(i, previous):
                 sublist.append(i)
             else:
                 output.append(sublist)
@@ -1736,7 +1734,7 @@ class pamda(pamda_utils):
         pamda.zip(a=a, b=b) #=> [['a',1],['b',2]]
         ```
         """
-        return [list(item) for item in zip(a, b)]
+        return list(map(list, zip(a, b)))
 
     def zipObj(self, a: list, b: list):
         """

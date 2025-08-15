@@ -36,23 +36,31 @@ data = (
 
 # Make a simple 10 tier nested structure for testing mergeDeep with random keys in each layer
 data_merge_a = {}
-for i in range(data_size):
+for i in range(int(data_size/2)):
     path = [f'level{random.randint(1, 10)}' for _ in range(10)]
     __assocPath__(path, random.randint(1, 10), data_merge_a)
 
 data_merge_b = {}
-for i in range(data_size):
+for i in range(int(data_size/2)):
     path = [f'level{random.randint(1, 10)}' for _ in range(10)]
     __assocPath__(path, random.randint(1, 10), data_merge_b)
+
+data_zip_a = list(range(500000))
+data_zip_b = list(range(500000, 1000000))
 
 for function, args in [
     (pamda.groupBy, [lambda x: str(x["color"] + x["shape"]), data]),
     (pamda.groupKeys, [["color", "size"], data]),
+    (pamda.groupWith, [lambda x,y: x["color"]==y["color"], data]),
+    (pamda.mergeDeep, [data_merge_a, data_merge_b]),
     (pamda.nest, [["color", "size"], "size", data]),
     (pamda.nestItem, [["color", "size"], data]),
+    (pamda.pivot, [data]),
     (pamda.pluck, ["color", data]),
     (pamda.pluckIf, [lambda x: x["color"] == "red", ["color"], data]),
-    (pamda.mergeDeep, [data_merge_a, data_merge_b]),
+    (pamda.project, [['color', 'size'], data]),
+    (pamda.zip, [data_zip_a, data_zip_b]),
+    (pamda.zipObj, [data_zip_a, data_zip_b]),
 ]:
     pamda_timer(function, iterations=3, print_time_stats=True).get_time_stats(*args)
 
