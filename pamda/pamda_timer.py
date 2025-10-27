@@ -100,7 +100,16 @@ class PamdaTimer:
             - What: The keyword arguments to pass to the function
 
         Returns:
-            - A dictionary containing the average, minimum, maximum, and total time taken by the function.
+            - A dictionary containing the:
+                - module: (str) - The module where the function is defined
+                - function: (str) - The name of the function being timed
+                - unit: (str) - The time unit used for measurements
+                - iterations: (int) - The number of iterations run
+                - avg: (float) - The average time taken per iteration in the specified units
+                - min: (float) - The minimum time taken for a single iteration in the specified units
+                - max: (float) - The maximum time taken for a single iteration in the specified units
+                - std: (float) - The standard deviation of time taken by the function in the specified units
+                - raw: (list[float]) - The raw timing history in the specified units
         """
         timing_history = []
 
@@ -130,6 +139,7 @@ class PamdaTimer:
             "min": min_time * self.__divisor__,
             "max": max_time * self.__divisor__,
             "std": stdev_time * self.__divisor__,
+            "raw": [i * self.__divisor__ for i in timing_history],
         }
         if self.print_time_stats:
             print(

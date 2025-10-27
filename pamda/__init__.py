@@ -183,4 +183,5 @@ addUp(1)(2) #=> 3
 - Pamda also ships with a few helpful utilities
 - Check out the documentation here:
   - https://connor-makowski.github.io/pamda/pamda_utils.html"""
+
 from .pamda import pamda
