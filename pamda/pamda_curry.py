@@ -67,7 +67,7 @@ class curry_obj:
                 return self.__call__(instance, *args, **kwargs)
             else:
                 return self.__call__(*args, **kwargs)
-
+        update_wrapper(bind, self)
         return bind
 
     def __repr__(self):
