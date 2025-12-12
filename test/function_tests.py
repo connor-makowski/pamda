@@ -276,15 +276,17 @@ if out != expected:
     print("nestItem failed")
 
 # path
-data = {"a": {"b": 1}}
-if pamda.path(path=["a", "b"], data=data) != 1:
+data = {"a": {"b": 1}, "c": [2]}
+if pamda.path(path=["a", "b"], data=data) != 1 or pamda.path(path=["c", 0], data=data) != 2:
     print("path failed")
 
 # pathOr
-data = {"a": {"b": 1}}
+data = {"a": {"b": 1}, "c": [2]}
 if (
     pamda.pathOr(default=2, path=["a", "b"], data=data) != 1
     or pamda.pathOr(default=2, path=["a", "c"], data=data) != 2
+    or pamda.pathOr(default=3, path=["c", 0], data=data) != 2
+    or pamda.pathOr(default=3, path=["c", 1], data=data) != 3
 ):
     print("pathOr failed")
 

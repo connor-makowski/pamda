@@ -4,15 +4,17 @@ from functools import reduce
 def __getForceDict__(object: dict | list, key: str | int | tuple):
     """
     An internal version of pamda_utils.getForceDict designed for calling speed
-
     """
-    if isinstance(object, dict):
-        value = object.get(key)
-    else:
+    try:
         value = object[key]
-    if not isinstance(value, (dict, list)):
+        if not isinstance(value, (dict, list)):
+            value = {}
+            object.__setitem__(key, value)
+    except (KeyError, IndexError):
         value = {}
         object.__setitem__(key, value)
+    except Exception as e:
+        raise e
     return value
 
 
@@ -130,9 +132,10 @@ def __pathOr__(default, path: list, data: dict):
     pamda.path(default=2, path=['a','c'], data=data) #=> 2
     ```
     """
-    return reduce(lambda x, y: x.get(y, {}), path[:-1], data).get(
-        path[-1], default
-    )
+    try:
+       return reduce(lambda x, y: x[y], path, data)
+    except (KeyError, IndexError, TypeError):
+        return default
 
 
 def __getKeyValues__(keys: list, data: dict):

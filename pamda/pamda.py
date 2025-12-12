@@ -842,7 +842,11 @@ class pamda(pamda_utils):
         """
         if isinstance(path, str):
             path = [path]
-        return path[-1] in reduce(lambda x, y: x.get(y, {}), path[:-1], data)
+        try:
+            reduce(lambda x, y: x[y], path, data)
+            return True
+        except (KeyError, IndexError, TypeError):
+            return False
 
     def hardRound(self, decimal_places: int, a: int | float):
         """
@@ -1251,9 +1255,10 @@ class pamda(pamda_utils):
         """
         if isinstance(path, str):
             path = [path]
-        return reduce(lambda x, y: x.get(y, {}), path[:-1], data).get(
-            path[-1], default
-        )
+        try:
+            return reduce(lambda x, y: x[y], path, data)
+        except (KeyError, IndexError, TypeError):
+            return default
 
     def pipe(self, fns: list, args: tuple, kwargs: dict):
         """

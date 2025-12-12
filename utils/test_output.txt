@@ -14,20 +14,20 @@ Other Tests:
 ===============
 1M Scale Time Tests:
 ===============
-pamda.flatten: 227.860 ± 8.548 ms over 3 iterations
-pamda.groupBy: 182.839 ± 1.411 ms over 3 iterations
-pamda.groupKeys: 479.388 ± 171.981 ms over 3 iterations
-pamda.groupWith: 88.488 ± 1.818 ms over 3 iterations
-pamda.mergeDeep: 921.322 ± 63.857 ms over 3 iterations
-pamda.nest: 795.567 ± 194.508 ms over 3 iterations
-pamda.nestItem: 440.521 ± 5.846 ms over 3 iterations
-pamda.pivot: 112.725 ± 2.755 ms over 3 iterations
-pamda.pluck: 385.449 ± 8.974 ms over 3 iterations
-pamda.pluckIf: 240.922 ± 3.358 ms over 3 iterations
-pamda.project: 340.388 ± 1.272 ms over 3 iterations
-pamda.unnest: 46.449 ± 0.089 ms over 3 iterations
-pamda.zip: 69.724 ± 0.482 ms over 3 iterations
-pamda.zipObj: 32.121 ± 7.093 ms over 3 iterations
+pamda.flatten: 217.960 ± 6.338 ms over 3 iterations
+pamda.groupBy: 169.459 ± 1.142 ms over 3 iterations
+pamda.groupKeys: 476.685 ± 188.862 ms over 3 iterations
+pamda.groupWith: 89.048 ± 2.176 ms over 3 iterations
+pamda.mergeDeep: 929.277 ± 3.793 ms over 3 iterations
+pamda.nest: 790.968 ± 205.264 ms over 3 iterations
+pamda.nestItem: 434.739 ± 4.389 ms over 3 iterations
+pamda.pivot: 113.660 ± 2.379 ms over 3 iterations
+pamda.pluck: 319.922 ± 2.427 ms over 3 iterations
+pamda.pluckIf: 208.963 ± 2.669 ms over 3 iterations
+pamda.project: 310.778 ± 0.917 ms over 3 iterations
+pamda.unnest: 53.034 ± 1.755 ms over 3 iterations
+pamda.zip: 68.769 ± 0.940 ms over 3 iterations
+pamda.zipObj: 33.025 ± 6.648 ms over 3 iterations
 
 ===============
 Type Checking Tests:
