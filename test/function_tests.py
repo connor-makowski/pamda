@@ -277,7 +277,10 @@ if out != expected:
 
 # path
 data = {"a": {"b": 1}, "c": [2]}
-if pamda.path(path=["a", "b"], data=data) != 1 or pamda.path(path=["c", 0], data=data) != 2:
+if (
+    pamda.path(path=["a", "b"], data=data) != 1
+    or pamda.path(path=["c", 0], data=data) != 2
+):
     print("path failed")
 
 # pathOr

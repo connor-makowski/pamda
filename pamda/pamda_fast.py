@@ -133,7 +133,7 @@ def __pathOr__(default, path: list, data: dict):
     ```
     """
     try:
-       return reduce(lambda x, y: x[y], path, data)
+        return reduce(lambda x, y: x[y], path, data)
     except (KeyError, IndexError, TypeError):
         return default
 
