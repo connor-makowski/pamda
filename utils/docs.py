@@ -16,16 +16,30 @@ env = {
 
 
 def generate_docs(version):
+    out_dir = str(root / "docs" / version)
+    template_dir = str(root / "doc_template")
+
     if version != "./" and version != VERSION:
+        # Use an isolated environment per old version so their (older)
+        # dependencies don't clobber the current venv.
+        tarball = str(root / "dist" / f"pamda-{version}.tar.gz")
         subprocess.run(
-            [sys.executable, "-m", "pip", "install", str(root / "dist" / f"pamda-{version}.tar.gz")],
+            [
+                "uv", "run", "--isolated",
+                "--with", tarball,
+                "--with", "pdoc",
+                "pdoc", "-o", out_dir, "-t", template_dir, "pamda",
+            ],
             check=True,
+            env=env,
+            cwd=str(root),
         )
-    subprocess.run(
-        [sys.executable, "-m", "pdoc", "-o", str(root / "docs" / version), "-t", str(root / "doc_template"), "pamda"],
-        check=True,
-        env=env,
-    )
+    else:
+        subprocess.run(
+            [sys.executable, "-m", "pdoc", "-o", out_dir, "-t", template_dir, "pamda"],
+            check=True,
+            env=env,
+        )
 
 
 # Build __init__.py from README
@@ -36,6 +50,3 @@ generate_docs("./")
 generate_docs(VERSION)
 for version in OLD_DOC_VERSIONS:
     generate_docs(version)
-
-# Reinstall current package as editable
-subprocess.run([sys.executable, "-m", "pip", "install", "-e", str(root)], check=True)
