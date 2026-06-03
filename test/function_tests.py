@@ -3,7 +3,9 @@ from pamda import pamda
 
 
 def test_accumulate():
-    out = pamda.accumulate(fn=pamda.add, initial_accumulator=0, data=[1, 2, 3, 4])
+    out = pamda.accumulate(
+        fn=pamda.add, initial_accumulator=0, data=[1, 2, 3, 4]
+    )
     assert out == [1, 3, 6, 10]
 
 
@@ -256,15 +258,19 @@ def test_pipe():
     assert pamda.pipe(fns=[add, double], args=(1, 2), kwargs={}) == 6
 
     data = ["abc", "def"]
-    assert pamda.pipe(fns=[pamda.head, pamda.tail], args=(data,), kwargs={}) == "c"
     assert (
-        pamda.pipe(fns=[pamda.head, pamda.tail], args=(), kwargs={"data": data}) == "c"
+        pamda.pipe(fns=[pamda.head, pamda.tail], args=(data,), kwargs={}) == "c"
+    )
+    assert (
+        pamda.pipe(fns=[pamda.head, pamda.tail], args=(), kwargs={"data": data})
+        == "c"
     )
 
     data = {"a": {"b": "c"}}
     curriedPath = pamda.curry(pamda.path)
     assert (
-        pamda.pipe(fns=[curriedPath(["a", "b"])], args=(data,), kwargs={}) == "c"
+        pamda.pipe(fns=[curriedPath(["a", "b"])], args=(data,), kwargs={})
+        == "c"
     )
 
 
@@ -312,7 +318,9 @@ def test_props():
 
 
 def test_reduce():
-    assert pamda.reduce(fn=pamda.add, initial_accumulator=0, data=[1, 2, 3]) == 6
+    assert (
+        pamda.reduce(fn=pamda.add, initial_accumulator=0, data=[1, 2, 3]) == 6
+    )
 
 
 def test_safeDivide():

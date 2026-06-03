@@ -6,64 +6,54 @@
 
 ---
 
+> **IMPORTANT — DO NOT RUN A RELEASE CYCLE.** Do not bump versions, generate docs, build distributions, or publish to PyPI. Release steps are owner-only. If you think a release is needed, flag it and stop.
+
+---
+
 ## Directory Layout
 
 ```
 pamda/
-  __init__.py        # Package export (pamda) + README as module docstring
-  pamda.py           # Core: pamda class with all public functions
-  pamda_curry.py     # curry_obj: the currying engine (thunkify, flip, asyncRun, asyncWait, asyncKill, typeEnforce)
-  pamda_fast.py      # Internal __dunder__-named fast versions of hot-path functions
-  pamda_timer.py     # PamdaTimer / pamda_timer decorator for in-script benchmarking
-  pamda_utils.py     # pamda_utils: file I/O (read_csv, write_csv, read_json, write_json) + getMethods, getForceDict
-  pamda_wrappers.py  # Class-level decorator wrappers (typed_curry_wrap, staticmethod_wrap, classmethod_wrap)
+  __init__.py         # Package export (pamda) + README as module docstring
+  pamda.py            # Core: pamda class with all public functions
+  pamda_curry.py      # curry_obj: the currying engine (thunkify, flip, asyncRun, asyncWait, asyncKill, typeEnforce)
+  pamda_fast.py       # Internal __dunder__-named fast versions of hot-path functions
+  pamda_timer.py      # PamdaTimer / pamda_timer decorator for in-script benchmarking
+  pamda_utils.py      # pamda_utils: file I/O (read_csv, write_csv, read_json, write_json) + getMethods, getForceDict
+  pamda_wrappers.py   # Class-level decorator wrappers (typed_curry_wrap, staticmethod_wrap, classmethod_wrap)
 test/
-  curry_tests.py     # curry / thunkify behavior
-  function_tests.py  # All core pamda functions
-  other_tests.py     # Async (asyncRun, asyncWait, asyncKill) + type enforcement
-  benchmarks.py      # 1M-scale performance benchmarks — run manually, not collected by pytest
+  curry_tests.py      # curry / thunkify behavior
+  function_tests.py   # All core pamda functions
+  other_tests.py      # Async (asyncRun, asyncWait, asyncKill) + type enforcement
   type_check_tests.py # curryTyped and type annotation enforcement
-  util_tests.py      # File I/O utilities and pamda_timer
-  test_data/         # CSV/JSON fixtures used by util_tests
+  util_tests.py       # File I/O utilities and pamda_timer
+  test_data/          # CSV/JSON fixtures used by util_tests
 utils/
-  test.sh            # Legacy: run all test/*.py files with python (superseded by pytest)
-  prettify.sh        # autoflake (unused imports) + black (line-length=80)
-  docs.sh            # Generate pdoc HTML docs — do NOT run unless releasing
-prettify.sh          # Root-level shortcut: runs utils/prettify.sh directly (no Docker)
-run.sh               # Docker wrapper for all dev commands
-Dockerfile           # Python 3.13 by default; comment/uncomment to test other versions
-pyproject.toml       # black config: line-length=80, target py39; project version + pytest config
-setup.cfg            # Version mirrored here (both must be updated on release)
-publish.sh           # PyPI publishing script
+  benchmarks.py       # 1M-scale performance benchmarks
+  prettify.py         # autoflake (unused imports) + black (line-length=80)
+  docs.py             # Generate pdoc HTML docs — DO NOT RUN (release only)
+noxfile.py            # nox sessions: runs pytest across Python 3.11–3.14
+run.sh                # Docker wrapper for legacy dev commands
+Dockerfile            # Python 3.13 by default; comment/uncomment to test other versions
+pyproject.toml        # project metadata, dependencies, black + pytest config
+setup.cfg             # version mirrored here (both must match pyproject.toml on release)
+publish.sh            # PyPI publishing script — DO NOT RUN
 ```
 
 ---
 
 ## Development Commands
 
-### Local (uv)
-
 | Command | What it does |
 |---|---|
-| `uv run pytest` | Run all tests |
-| `uv run pytest -v` | Run all tests with verbose output |
-| `./prettify.sh` | Format with autoflake + black |
-| `python test/benchmarks.py` | Run 1M-scale performance benchmarks (not part of test suite) |
+| `uv run nox` | Run tests across Python 3.11, 3.12, 3.13, 3.14 |
+| `uv run nox -s tests-3.14` | Run tests on a single Python version |
+| `uv run pytest` | Run tests in the local venv only |
+| `uv run pytest -v` | Run tests with verbose output |
+| `uv run python ./utils/prettify.py` | Format with autoflake + black |
+| `uv run python ./test/benchmarks.py` | Run 1M-scale performance benchmarks |
 
 Dev dependencies are declared in `[dependency-groups] dev` in `pyproject.toml`. Install them with `uv sync --group dev`.
-
-### Docker (optional)
-
-| Command | What it does |
-|---|---|
-| `./run.sh test` | Run all tests inside Docker |
-| `./run.sh prettify` | Format with autoflake + black |
-| `./run.sh docs` | Regenerate pdoc documentation |
-| `./run.sh` | Drop into a Docker shell |
-
-> **Note:** `./run.sh` requires a TTY. In non-interactive contexts (CI, background tasks) it will fail with "the input device is not a TTY". Ask the user to run it themselves.
-
-**Docs**: **DO NOT generate docs** unless doing a release. Docs are regenerated and versioned at release time only.
 
 ---
 
@@ -151,7 +141,7 @@ Use `#=>` for return value annotations in examples.
 
 ## Test Structure
 
-Tests use pytest. Run with `uv run pytest`. Files matching `*_tests.py` in `test/` are auto-collected (configured in `pyproject.toml`).
+Tests use pytest, collected by nox across Python 3.11–3.14. All files matching `*.py` in `test/`.
 
 **Test pattern:**
 ```python
@@ -172,7 +162,6 @@ def test_some_fn_raises():
 - `other_tests.py` — type enforcement, asyncRun/asyncWait/asyncKill timing
 - `type_check_tests.py` — `curryTyped` with annotated functions
 - `util_tests.py` — `read_csv` return types and casting, `pamda_timer` decorator
-- `benchmarks.py` — 1M-scale benchmarks via `pamda_timer`; run manually, not collected by pytest
 
 When adding a new function, add a corresponding `def test_<fn_name>():` to `function_tests.py` (or a new `*_tests.py` file if testing a distinct subsystem).
 
@@ -182,16 +171,17 @@ When adding a new function, add a corresponding `def test_<fn_name>():` to `func
 
 - **Line length**: 80 characters (black config in `pyproject.toml`)
 - **Python version**: ≥3.11 — use `str | None` union syntax, not `Optional[str]`
-- **Formatting**: always run `./run.sh prettify` (or `./prettify.sh`) before committing
+- **Formatting**: always run `uv run python ./utils/prettify.py` before committing
 - **Runtime dependencies**: only `type_enforced`. Do not add others.
 - **Internal fast functions**: prefix with `__` and suffix with `__` (e.g. `__assocPath__`); import into `pamda.py` from `pamda_fast`
 - **No unnecessary abstractions**: don't create shared helpers unless the same logic appears 3+ times
-- **DO NOT generate docs**: only regenerate at release time
 
 ---
 
-## Release Checklist
+## Release Checklist (owner only — do not execute)
 
 1. Bump `version` in `pyproject.toml` and `setup.cfg` (must match)
-2. Run `./prettify.sh` (or `./run.sh prettify`)
-3. Run `uv run pytest` — all tests must pass
+2. Run `uv run python ./utils/prettify.py`
+3. Run `uv run nox` — all sessions must pass
+4. Run `uv run python ./utils/docs.py` to regenerate docs
+5. Publish via `publish.sh`

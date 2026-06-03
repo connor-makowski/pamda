@@ -4,7 +4,7 @@ target-version = ['py39']
 exclude = '/.*(__pycache__).*/'
 
 [tool.setuptools]
-py-modules = ["pamda"]
+packages = ["pamda"]
 
 [build-system]
 requires = ["setuptools>=61.0"]
