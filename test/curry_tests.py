@@ -6,6 +6,8 @@ print("\n===============\n Curry Tests:\n===============")
 
 from pamda import pamda
 
+all_pass = True
+
 
 @pamda.curry
 def my_fn_wrapper(fn, delay=0):
@@ -29,6 +31,7 @@ try:
     my_function0()
     my_function1()
 except Exception as e:
+    all_pass = False
     print(f"Curry Wrapper Test Failed: {e}")
 
 
@@ -38,6 +41,7 @@ def my_function2(a, b, c=1):
 
 
 if my_function2(1)(1) != 3:
+    all_pass = False
     print("Curry Function Test Failed")
 
 
@@ -47,4 +51,7 @@ def my_function3(a, b, c=1):
 
 
 if my_function3(1)(1)() != 3 or my_function3(1)(1)(2)() != 4:
+    all_pass = False
     print("Curry Function Test Failed")
+
+print("Curry Tests: PASS" if all_pass else "Curry Tests: FAIL")

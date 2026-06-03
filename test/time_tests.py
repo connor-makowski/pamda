@@ -9,6 +9,8 @@ random.seed(42)
 
 print("\n===============\n1M Scale Time Tests:\n===============")
 
+all_pass = True
+
 # Test Parameters
 data_size = 1000000
 sizes = 50000
@@ -69,3 +71,5 @@ for function, args in [
     pamda_timer(function, iterations=3, print_time_stats=True).get_time_stats(
         *args
     )
+
+print("Time Tests: PASS" if all_pass else "Time Tests: FAIL")

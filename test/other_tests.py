@@ -3,9 +3,12 @@ import time
 
 print("\n===============\nOther Tests:\n===============")
 
+all_pass = True
+
 # Type Enforcement
 try:
     pamda.add("a", 1)
+    all_pass = False
     print("Type Enforcement Failed")
 except:
     pass
@@ -34,8 +37,10 @@ try:
     async_test_b.asyncWait()
     async_time = time.time() - start_time
     if async_time < 0.3 or async_time > 0.301:
+        all_pass = False
         print("anyncWait Test Failed")
 except:
+    all_pass = False
     print("asyncWait Test Failed")
 
 try:
@@ -49,6 +54,10 @@ try:
     async_test_b.asyncWait()
     async_time = time.time() - start_time
     if async_time < 0.2 or async_time > 0.201:
+        all_pass = False
         print("asyncKill Test Failed")
 except:
+    all_pass = False
     print("asyncKill Test Failed")
+
+print("Other Tests: PASS" if all_pass else "Other Tests: FAIL")

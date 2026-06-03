@@ -5,6 +5,8 @@ Test type_checking in pamda
 print("\n===============\nType Checking Tests:\n===============")
 from pamda import pamda
 
+all_pass = True
+
 
 @pamda.curryTyped
 def my_fn(a: int, b: list[str]) -> str:
@@ -16,24 +18,24 @@ try:
 except:
     x = None
 
-isPassing = True
-
 try:
     x(["2"])
 except:
-    isPassing = False
+    all_pass = False
 
 try:
     x([2])
-    isPassing = False
+    all_pass = False
 except:
     pass
 
 try:
     x(2)
-    isPassing = False
+    all_pass = False
 except:
     pass
 
-if not isPassing:
+if not all_pass:
     print("Type check test failed")
+
+print("Type Checking Tests: PASS" if all_pass else "Type Checking Tests: FAIL")
