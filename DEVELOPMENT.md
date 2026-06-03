@@ -21,18 +21,18 @@ test/
   curry_tests.py     # curry / thunkify behavior
   function_tests.py  # All core pamda functions
   other_tests.py     # Async (asyncRun, asyncWait, asyncKill) + type enforcement
-  time_tests.py      # 1M-scale performance benchmarks (not pass/fail)
+  benchmarks.py      # 1M-scale performance benchmarks — run manually, not collected by pytest
   type_check_tests.py # curryTyped and type annotation enforcement
   util_tests.py      # File I/O utilities and pamda_timer
   test_data/         # CSV/JSON fixtures used by util_tests
 utils/
-  test.sh            # Run all test/*.py files with python
+  test.sh            # Legacy: run all test/*.py files with python (superseded by pytest)
   prettify.sh        # autoflake (unused imports) + black (line-length=80)
   docs.sh            # Generate pdoc HTML docs — do NOT run unless releasing
 prettify.sh          # Root-level shortcut: runs utils/prettify.sh directly (no Docker)
 run.sh               # Docker wrapper for all dev commands
 Dockerfile           # Python 3.13 by default; comment/uncomment to test other versions
-pyproject.toml       # black config: line-length=80, target py39; project version
+pyproject.toml       # black config: line-length=80, target py39; project version + pytest config
 setup.cfg            # Version mirrored here (both must be updated on release)
 publish.sh           # PyPI publishing script
 ```
@@ -41,7 +41,18 @@ publish.sh           # PyPI publishing script
 
 ## Development Commands
 
-All commands use Docker via `./run.sh`:
+### Local (uv)
+
+| Command | What it does |
+|---|---|
+| `uv run pytest` | Run all tests |
+| `uv run pytest -v` | Run all tests with verbose output |
+| `./prettify.sh` | Format with autoflake + black |
+| `python test/benchmarks.py` | Run 1M-scale performance benchmarks (not part of test suite) |
+
+Dev dependencies are declared in `[dependency-groups] dev` in `pyproject.toml`. Install them with `uv sync --group dev`.
+
+### Docker (optional)
 
 | Command | What it does |
 |---|---|
@@ -51,10 +62,6 @@ All commands use Docker via `./run.sh`:
 | `./run.sh` | Drop into a Docker shell |
 
 > **Note:** `./run.sh` requires a TTY. In non-interactive contexts (CI, background tasks) it will fail with "the input device is not a TTY". Ask the user to run it themselves.
-
-**Prettify without Docker:** `./prettify.sh` runs autoflake + black directly in your local environment (requires dev dependencies installed).
-
-**Test runner details** (`utils/test.sh`): Runs every `.py` file in `test/` with `python`. Each file prints failure messages if something goes wrong; silence = pass. Output is also tee'd to `utils/test_output.txt`.
 
 **Docs**: **DO NOT generate docs** unless doing a release. Docs are regenerated and versioned at release time only.
 
@@ -144,32 +151,30 @@ Use `#=>` for return value annotations in examples.
 
 ## Test Structure
 
-Tests live in `test/`. Each file is standalone: import what's needed, run assertions, print failure messages explicitly. No pass summary is printed — silence means everything passed.
+Tests use pytest. Run with `uv run pytest`. Files matching `*_tests.py` in `test/` are auto-collected (configured in `pyproject.toml`).
 
 **Test pattern:**
 ```python
-# Passing case
-out = pamda.some_fn(valid_input)
-if out != expected:
-    print("some_fn failed")
+import pytest
+from pamda import pamda
 
-# Failure case (should raise)
-try:
-    pamda.some_fn(invalid_input)
-    print("some_fn failed")  # reached means no exception was raised
-except:
-    pass  # expected exception
+def test_some_fn():
+    assert pamda.some_fn(valid_input) == expected
+
+def test_some_fn_raises():
+    with pytest.raises(Exception):
+        pamda.some_fn(invalid_input)
 ```
 
 **Files:**
 - `curry_tests.py` — curry wrapper, curry with defaults, thunkify
-- `function_tests.py` — one test block per public function in `pamda.py`
+- `function_tests.py` — one test function per public function in `pamda.py`
 - `other_tests.py` — type enforcement, asyncRun/asyncWait/asyncKill timing
-- `time_tests.py` — 1M-scale benchmarks via `pamda_timer`; not pass/fail
 - `type_check_tests.py` — `curryTyped` with annotated functions
 - `util_tests.py` — `read_csv` return types and casting, `pamda_timer` decorator
+- `benchmarks.py` — 1M-scale benchmarks via `pamda_timer`; run manually, not collected by pytest
 
-When adding a new function, add a corresponding test block to `function_tests.py` (or a new file if testing a distinct subsystem). Tests are picked up automatically by `utils/test.sh`.
+When adding a new function, add a corresponding `def test_<fn_name>():` to `function_tests.py` (or a new `*_tests.py` file if testing a distinct subsystem).
 
 ---
 
@@ -188,5 +193,5 @@ When adding a new function, add a corresponding test block to `function_tests.py
 ## Release Checklist
 
 1. Bump `version` in `pyproject.toml` and `setup.cfg` (must match)
-2. Run `./run.sh prettify`
-3. Run `./run.sh test` — all tests must pass
+2. Run `./prettify.sh` (or `./run.sh prettify`)
+3. Run `uv run pytest` — all tests must pass

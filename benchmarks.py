@@ -72,4 +72,4 @@ for function, args in [
         *args
     )
 
-print("Time Tests: PASS" if all_pass else "Time Tests: FAIL")
+

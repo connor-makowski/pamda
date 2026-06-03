@@ -22,12 +22,18 @@ https://connor-makowski.github.io/pamda/pamda/pamda.html
 
 ## Setup
 
-Make sure you have Python 3.9.x (or higher) installed on your system. You can download it [here](https://www.python.org/downloads/).
+Make sure you have Python 3.11+ installed on your system. You can download it [here](https://www.python.org/downloads/).
 
 ### Installation
 
 ```
 pip install pamda
+```
+
+Or with [uv](https://github.com/astral-sh/uv):
+
+```
+uv add pamda
 ```
 
 ## Getting Started

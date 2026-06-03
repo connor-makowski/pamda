@@ -1,41 +1,28 @@
-"""
-Test type_checking in pamda
-"""
-
-print("\n===============\nType Checking Tests:\n===============")
+import pytest
 from pamda import pamda
 
-all_pass = True
+
+def test_curryTyped_valid():
+    @pamda.curryTyped
+    def my_fn(a: int, b: list[str]) -> str:
+        return str(a) + b[0]
+
+    assert my_fn(1)(["2"]) == "12"
 
 
-@pamda.curryTyped
-def my_fn(a: int, b: list[str]) -> str:
-    return str(a) + b[0]
+def test_curryTyped_invalid_list_item_type():
+    @pamda.curryTyped
+    def my_fn(a: int, b: list[str]) -> str:
+        return str(a) + b[0]
+
+    with pytest.raises(Exception):
+        my_fn(1)([2])
 
 
-try:
-    x = my_fn(1)
-except:
-    x = None
+def test_curryTyped_invalid_arg_type():
+    @pamda.curryTyped
+    def my_fn(a: int, b: list[str]) -> str:
+        return str(a) + b[0]
 
-try:
-    x(["2"])
-except:
-    all_pass = False
-
-try:
-    x([2])
-    all_pass = False
-except:
-    pass
-
-try:
-    x(2)
-    all_pass = False
-except:
-    pass
-
-if not all_pass:
-    print("Type check test failed")
-
-print("Type Checking Tests: PASS" if all_pass else "Type Checking Tests: FAIL")
+    with pytest.raises(Exception):
+        my_fn(1)(2)

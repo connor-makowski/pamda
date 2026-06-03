@@ -147,8 +147,15 @@ class curry_obj:
                 "`asyncRun` has already been executed on this thunk"
             )
         self.__thread_completed__ = False
-        self.__thread__ = threading.Thread(target=self)
-        self.__thread__.setDaemon(daemon)
+
+        def _run():
+            try:
+                self()
+            except SystemExit:
+                pass
+
+        self.__thread__ = threading.Thread(target=_run)
+        self.__thread__.daemon = daemon
         self.__thread__.start()
         return self
 

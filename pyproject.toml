@@ -26,12 +26,15 @@ classifiers = [
 ]
 dependencies = ["type_enforced>=2.1.0,<3.0.0",]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "autoflake>=2.3.1",
     "black>=25.1.0",
     "build>=1.2.2",
+    "nox>=2026.4.10",
+    "nox-uv>=0.8.0",
     "pdoc>=15.0.1",
+    "pytest>=9.0.3",
     "twine>=6.1.0",
 ]
 
@@ -39,3 +42,8 @@ dev = [
 "Homepage" = "https://github.com/connor-makowski/pamda"
 "Bug Tracker" = "https://github.com/connor-makowski/pamda/issues"
 "Documentation" = "https://connor-makowski.github.io/pamda/pamda/pamda.html"
+
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+python_files = ["*.py"]
