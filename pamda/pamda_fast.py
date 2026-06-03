@@ -1,4 +1,5 @@
 from functools import reduce
+from operator import itemgetter
 
 
 def __getForceDict__(object: dict | list, key: str | int | tuple):
@@ -57,6 +58,28 @@ def __groupByHashable__(fn, data: list):
             output[path] = []
         output[path].append(i)
     return output
+
+
+def __groupKeys__(keys: list, data: list):
+    """
+    An internal version of pamda.groupKeys designed for calling speed
+
+    Uses operator.itemgetter for C-level key extraction instead of a list
+    comprehension, eliminating per-item Python overhead.
+    """
+    if len(keys) == 1:
+        key = keys[0]
+        key_fn = lambda item: item[key]
+    else:
+        getter = itemgetter(*keys)
+        key_fn = getter
+    output = {}
+    for i in data:
+        k = key_fn(i)
+        if k not in output:
+            output[k] = []
+        output[k].append(i)
+    return list(output.values())
 
 
 def __mergeDeep__(update_data, data):
@@ -138,6 +161,19 @@ def __pathOr__(default, path: list, data: dict):
         return default
 
 
+def __pluck__(path: list, data: list):
+    """
+    An internal version of pamda.pluck designed for calling speed
+
+    Special-cases single-key paths to use dict.get() instead of reduce(),
+    eliminating per-item function call overhead for the common case.
+    """
+    if len(path) == 1:
+        key = path[0]
+        return [i.get(key) for i in data]
+    return [__pathOr__(None, path, i) for i in data]
+
+
 def __getKeyValues__(keys: list, data: dict):
     """
     An internal function to pluck the values of keys out of a dictionary designed for calling speed
@@ -163,3 +199,42 @@ def __getKeyValues__(keys: list, data: dict):
 
     """
     return tuple([data[key] for key in keys])
+
+
+def __flatten__(data: list):
+    """
+    An internal version of pamda.flatten designed for calling speed
+
+    Uses an iterative for/else stack instead of recursion. The for loop
+    handles iterator exhaustion at C level, avoiding the StopIteration
+    exception overhead of a try/except next() approach.
+    """
+    out = []
+    stack = [iter(data)]
+    while stack:
+        for item in stack[-1]:
+            if isinstance(item, list):
+                stack.append(iter(item))
+                break
+            out.append(item)
+        else:
+            stack.pop()
+    return out
+
+
+def __unnest__(data: list):
+    """
+    An internal version of pamda.unnest designed for calling speed
+
+    Uses local variable references for extend/append to avoid repeated
+    attribute lookup in the hot loop.
+    """
+    out = []
+    extend = out.extend
+    append = out.append
+    for i in data:
+        if isinstance(i, list):
+            extend(i)
+        else:
+            append(i)
+    return out

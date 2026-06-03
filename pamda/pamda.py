@@ -4,9 +4,13 @@ from pamda.pamda_fast import (
     __getForceDict__,
     __assocPath__,
     __groupByHashable__,
+    __groupKeys__,
     __mergeDeep__,
     __pathOr__,
+    __pluck__,
     __getKeyValues__,
+    __flatten__,
+    __unnest__,
 )
 from pamda.pamda_curry import curry_obj
 from pamda import pamda_wrappers
@@ -575,17 +579,7 @@ class pamda(pamda_utils):
         pamda.flatten(data=data) #=> ['a','b',1,2]
         ```
         """
-
-        def iter_flatten(data):
-            out = []
-            for i in data:
-                if isinstance(i, list):
-                    out.extend(iter_flatten(i))
-                else:
-                    out.append(i)
-            return out
-
-        return iter_flatten(data)
+        return __flatten__(data)
 
     def flip(self, fn):
         """
@@ -732,7 +726,7 @@ class pamda(pamda_utils):
             raise Exception(
                 "groupBy `fn` must only take one parameter as its input"
             )
-        return __groupByHashable__(fn=fn, data=data)
+        return __groupByHashable__(fn, data)
 
     def groupKeys(self, keys: list, data: list):
         """
@@ -766,11 +760,7 @@ class pamda(pamda_utils):
         #=> ]
         ```
         """
-
-        def key_fn(item):
-            return tuple([item[key] for key in keys])
-
-        return list(__groupByHashable__(key_fn, data).values())
+        return __groupKeys__(keys, data)
 
     def groupWith(self, fn, data: list):
         """
@@ -806,7 +796,8 @@ class pamda(pamda_utils):
         previous = data[0]
         output = []
         sublist = [previous]
-        for i in data[1:]:
+        for idx in range(1, len(data)):
+            i = data[idx]
             if fn(i, previous):
                 sublist.append(i)
             else:
@@ -1144,10 +1135,10 @@ class pamda(pamda_utils):
         if len(data) == 0:
             raise Exception("Attempting to `nest` from an empty list")
         nested_output = {}
-        for item in self.groupKeys(keys=path_keys, data=data):
+        for items in __groupKeys__(path_keys, data):
             nested_output = __assocPath__(
-                path=__getKeyValues__(path_keys, item[0]),
-                value=[i.get(value_key) for i in item],
+                path=__getKeyValues__(path_keys, items[0]),
+                value=[i.get(value_key) for i in items],
                 data=nested_output,
             )
         return nested_output
@@ -1192,10 +1183,10 @@ class pamda(pamda_utils):
         if len(data) == 0:
             raise Exception("Attempting to `nest` from an empty list")
         nested_output = {}
-        for item in self.groupKeys(keys=path_keys, data=data):
+        for items in __groupKeys__(path_keys, data):
             nested_output = __assocPath__(
-                path=__getKeyValues__(path_keys, item[0]),
-                value=item,
+                path=__getKeyValues__(path_keys, items[0]),
+                value=items,
                 data=nested_output,
             )
         return nested_output
@@ -1380,7 +1371,7 @@ class pamda(pamda_utils):
             raise Exception("Attempting to pluck from an empty list")
         if isinstance(path, str):
             path = [path]
-        return [__pathOr__(default=None, path=path, data=i) for i in data]
+        return __pluck__(path, data)
 
     def pluckIf(self, fn, path: list | str, data: list):
         """
@@ -1420,6 +1411,9 @@ class pamda(pamda_utils):
             )
         if isinstance(path, str):
             path = [path]
+        if len(path) == 1:
+            key = path[0]
+            return [i.get(key) for i in data if fn(i)]
         return [
             __pathOr__(default=None, path=path, data=i) for i in data if fn(i)
         ]
@@ -1718,13 +1712,7 @@ class pamda(pamda_utils):
         """
         if not len(data) > 0:
             raise Exception("Attempting to call `unnest` on an empty list")
-        output = []
-        for i in data:
-            if isinstance(i, list):
-                output += i
-            else:
-                output.append(i)
-        return output
+        return __unnest__(data)
 
     def zip(self, a: list, b: list):
         """
