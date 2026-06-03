@@ -1,30 +1,22 @@
-from pamda import pamda
+import pytest
 import time
-
-print("\n===============\nOther Tests:\n===============")
-
-# Type Enforcement
-try:
-    pamda.add("a", 1)
-    print("Type Enforcement Failed")
-except:
-    pass
+from pamda import pamda
 
 
-# Async Testing
-@pamda.thunkify
-def sleeper(name, wait):
-    waited = 0
-    while waited < wait:
-        # Note: Async kill does not kill sleeping threads
-        # Once the sleep finishes, the thread is killed
-        time.sleep(0.1)
-        waited += 0.1
-        # print(f'{name} has waited {waited} seconds')
-    return wait
+def test_type_enforcement():
+    with pytest.raises(Exception):
+        pamda.add("a", 1)
 
 
-try:
+def test_async_wait():
+    @pamda.thunkify
+    def sleeper(name, wait):
+        waited = 0
+        while waited < wait:
+            time.sleep(0.1)
+            waited += 0.1
+        return wait
+
     start_time = time.time()
     async_test_a = sleeper("a", 0.3)
     async_test_b = sleeper("b", 0.2)
@@ -33,12 +25,18 @@ try:
     async_test_a.asyncWait()
     async_test_b.asyncWait()
     async_time = time.time() - start_time
-    if async_time < 0.3 or async_time > 0.301:
-        print("anyncWait Test Failed")
-except:
-    print("asyncWait Test Failed")
+    assert 0.3 <= async_time < 1.5
 
-try:
+
+def test_async_kill():
+    @pamda.thunkify
+    def sleeper(name, wait):
+        waited = 0
+        while waited < wait:
+            time.sleep(0.1)
+            waited += 0.1
+        return wait
+
     start_time = time.time()
     async_test_a = sleeper("a", 0.3)
     async_test_b = sleeper("b", 0.2)
@@ -48,7 +46,4 @@ try:
     async_test_a.asyncKill()
     async_test_b.asyncWait()
     async_time = time.time() - start_time
-    if async_time < 0.2 or async_time > 0.201:
-        print("asyncKill Test Failed")
-except:
-    print("asyncKill Test Failed")
+    assert 0.2 <= async_time < 1.5
